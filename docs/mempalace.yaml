@@ -1,0 +1,55 @@
+wing: docs
+rooms:
+- name: commerce
+  description: Files from commerce/
+  keywords:
+  - commerce
+  - commerce
+- name: design
+  description: Files from design/
+  keywords:
+  - design
+  - design
+- name: visual_ref
+  description: Files from visual-ref/
+  keywords:
+  - visual_ref
+  - visual-ref
+- name: death_valley
+  description: Files from death-valley/
+  keywords:
+  - death_valley
+  - death-valley
+- name: ugc
+  description: Files from ugc/
+  keywords:
+  - ugc
+  - ugc
+- name: world
+  description: Files from world/
+  keywords:
+  - world
+  - world
+- name: skills
+  description: Files from skills/
+  keywords:
+  - skills
+  - skills
+- name: systems
+  description: Files from systems/
+  keywords:
+  - systems
+  - systems
+- name: legal
+  description: Files from legal/
+  keywords:
+  - legal
+  - legal
+- name: reference
+  description: Files from reference/
+  keywords:
+  - reference
+  - reference
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []

@@ -1,0 +1,480 @@
+{
+  "name": "utopia-of-eternity",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "BridgeBootstrap": {
+        "$path": "src/ServerScriptService/BridgeBootstrap.luau"
+      },
+      "CatalogBootstrap": {
+        "$path": "src/ServerScriptService/CatalogBootstrap.luau"
+      },
+      "GameBootstrap": {
+        "$path": "src/ServerScriptService/GameBootstrap.server.luau"
+      },
+      "HubGreyboxBuilder": {
+        "$path": "src/ServerScriptService/HubGreyboxBuilder.luau"
+      },
+      "ShuttleGreyboxBuilder": {
+        "$path": "src/ServerScriptService/ShuttleGreyboxBuilder.luau"
+      },
+      "World": {
+        "$className": "Folder",
+        "OrganicCSGBuilder": {
+          "$path": "src/ServerScriptService/World/OrganicCSGBuilder.luau"
+        },
+        "WorldBuildState": {
+          "$path": "src/ServerScriptService/World/WorldBuildState.luau"
+        },
+        "WorldPlaceGuard": {
+          "$path": "src/ServerScriptService/World/WorldPlaceGuard.luau"
+        },
+        "WorldBuildBudget": {
+          "$path": "src/ServerScriptService/World/WorldBuildBudget.luau"
+        },
+        "WorldBuildShared": {
+          "$path": "src/ServerScriptService/World/WorldBuildShared.luau"
+        },
+        "WorldBootstrap": {
+          "$path": "src/ServerScriptService/World/WorldBootstrap.luau"
+        },
+        "WorldStudioSpawnGuard": {
+          "$path": "src/ServerScriptService/World/WorldStudioSpawnGuard.luau"
+        },
+        "HubWorldBuilder": {
+          "$path": "src/ServerScriptService/World/HubWorldBuilder.luau"
+        },
+        "SolhavenWorldBuilder": {
+          "$path": "src/ServerScriptService/World/SolhavenWorldBuilder.luau"
+        },
+        "NocturneWorldBuilder": {
+          "$path": "src/ServerScriptService/World/NocturneWorldBuilder.luau"
+        },
+        "EternityCityWorldBuilder": {
+          "$path": "src/ServerScriptService/World/EternityCityWorldBuilder.luau"
+        },
+        "EternityCityLighting": {
+          "$path": "src/ServerScriptService/World/EternityCityLighting.luau"
+        },
+        "EternityCityAccessGuard": {
+          "$path": "src/ServerScriptService/World/EternityCityAccessGuard.luau"
+        },
+        "CommerceDistrictBuilder": {
+          "$path": "src/ServerScriptService/World/CommerceDistrictBuilder.luau"
+        },
+        "DeathValleyWorldBuilder": {
+          "$path": "src/ServerScriptService/World/DeathValleyWorldBuilder.luau"
+        },
+        "DeathValleyZone1Builder": {
+          "$path": "src/ServerScriptService/World/DeathValleyZone1Builder.luau"
+        },
+        "DeathValleyKeyGhostBuilder": {
+          "$path": "src/ServerScriptService/World/DeathValleyKeyGhostBuilder.luau"
+        },
+        "DeathValleySurvivalBuilder": {
+          "$path": "src/ServerScriptService/World/DeathValleySurvivalBuilder.luau"
+        },
+        "DeathValleyPOIBuilder": {
+          "$path": "src/ServerScriptService/World/DeathValleyPOIBuilder.luau"
+        },
+        "DeathValleyHellboundTravelBuilder": {
+          "$path": "src/ServerScriptService/World/DeathValleyHellboundTravelBuilder.luau"
+        },
+        "DeathValleyMegaZonesBuilder": {
+          "$path": "src/ServerScriptService/World/DeathValleyMegaZonesBuilder.luau"
+        },
+        "LoadoutPlazaKit": {
+          "$path": "src/ServerScriptService/World/LoadoutPlazaKit.luau"
+        },
+        "PrismKeyPickupKit": {
+          "$path": "src/ServerScriptService/World/PrismKeyPickupKit.luau"
+        },
+        "EternityCityMarinaLandmark": {
+          "$path": "src/ServerScriptService/World/EternityCityMarinaLandmark.luau"
+        },
+        "EternityCityAuroraSpireLandmark": {
+          "$path": "src/ServerScriptService/World/EternityCityAuroraSpireLandmark.luau"
+        },
+        "EternityCityCanalPromenadeLandmark": {
+          "$path": "src/ServerScriptService/World/EternityCityCanalPromenadeLandmark.luau"
+        },
+        "EternityCitySkyRailPlazaLandmark": {
+          "$path": "src/ServerScriptService/World/EternityCitySkyRailPlazaLandmark.luau"
+        },
+        "EternityCityAuroraMegaMallLandmark": {
+          "$path": "src/ServerScriptService/World/EternityCityAuroraMegaMallLandmark.luau"
+        },
+        "EternityCityTwilightOverpassLandmark": {
+          "$path": "src/ServerScriptService/World/EternityCityTwilightOverpassLandmark.luau"
+        }
+      },
+      "Shuttle": {
+        "$className": "Folder",
+        "HeavenSkyController": {
+          "$path": "src/ServerScriptService/Shuttle/HeavenSkyController.luau"
+        },
+        "ShuttlePassengerManager": {
+          "$path": "src/ServerScriptService/Shuttle/ShuttlePassengerManager.luau"
+        },
+        "ShuttleJourney": {
+          "$path": "src/ServerScriptService/Shuttle/ShuttleJourney.luau"
+        },
+        "ShuttleScheduler": {
+          "$path": "src/ServerScriptService/Shuttle/ShuttleScheduler.server.luau"
+        }
+      },
+      "Commerce": {
+        "$className": "Folder",
+        "CommerceRemoteSetup": {
+          "$path": "src/ServerScriptService/Commerce/CommerceRemoteSetup.server.luau"
+        },
+        "CommerceShopService": {
+          "$path": "src/ServerScriptService/Commerce/CommerceShopService.server.luau"
+        }
+      },
+      "Face": {
+        "$className": "Folder",
+        "PrismFaceGate": {
+          "$path": "src/ServerScriptService/Face/PrismFaceGate.server.luau"
+        }
+      },
+      "Progression": {
+        "$className": "Folder",
+        "PrismKeyService": {
+          "$path": "src/ServerScriptService/Progression/PrismKeyService.luau"
+        },
+        "PrismKeyPlayerStore": {
+          "$path": "src/ServerScriptService/Progression/PrismKeyPlayerStore.luau"
+        },
+        "PrismKeyPickupService": {
+          "$path": "src/ServerScriptService/Progression/PrismKeyPickupService.luau"
+        },
+        "PrismKeyPersistence": {
+          "$path": "src/ServerScriptService/Progression/PrismKeyPersistence.server.luau"
+        },
+        "PrismKeyGhostNpcService": {
+          "$path": "src/ServerScriptService/Progression/PrismKeyGhostNpcService.luau"
+        },
+        "PrismKeyRemoteSetup": {
+          "$path": "src/ServerScriptService/Progression/PrismKeyRemoteSetup.server.luau"
+        },
+        "PrismKeyTradeHandlers": {
+          "$path": "src/ServerScriptService/Progression/PrismKeyTradeHandlers.server.luau"
+        }
+      },
+      "Dungeon": {
+        "$className": "Folder",
+        "DungeonLoadoutService": {
+          "$path": "src/ServerScriptService/Dungeon/DungeonLoadoutService.luau"
+        },
+        "DungeonZoneRuntime": {
+          "$path": "src/ServerScriptService/Dungeon/DungeonZoneRuntime.luau"
+        },
+        "DungeonRemoteSetup": {
+          "$path": "src/ServerScriptService/Dungeon/DungeonRemoteSetup.server.luau"
+        },
+        "DungeonLoadoutHandlers": {
+          "$path": "src/ServerScriptService/Dungeon/DungeonLoadoutHandlers.server.luau"
+        },
+        "DungeonMegaZoneHandlers": {
+          "$path": "src/ServerScriptService/Dungeon/DungeonMegaZoneHandlers.server.luau"
+        }
+      },
+      "DeathValley": {
+        "$className": "Folder",
+        "DeathValleyBeaconService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyBeaconService.luau"
+        },
+        "DeathValleyWraithFactory": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyWraithFactory.luau"
+        },
+        "DeathValleyNightService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyNightService.luau"
+        },
+        "DeathValleyReviveService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyReviveService.luau"
+        },
+        "DeathValleyNightModifierService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyNightModifierService.luau"
+        },
+        "DeathValleyCheckpointService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyCheckpointService.luau"
+        },
+        "DeathValleyExpansionService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyExpansionService.luau"
+        },
+        "DeathValleyPOIService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyPOIService.luau"
+        },
+        "DeathValleyPlayerStore": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyPlayerStore.luau"
+        },
+        "DeathValleyWeeklyBossService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyWeeklyBossService.luau"
+        },
+        "DeathValleySeasonService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySeasonService.luau"
+        },
+        "DeathValleyLeaderboardService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLeaderboardService.luau"
+        },
+        "DeathValleyLeaderboardGlobalService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLeaderboardGlobalService.luau"
+        },
+        "DeathValleyLfgService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLfgService.luau"
+        },
+        "DeathValleyLfgCrossServerService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLfgCrossServerService.luau"
+        },
+        "DeathValleyLfgQueueService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLfgQueueService.luau"
+        },
+        "DeathValleyLfgInviteService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLfgInviteService.luau"
+        },
+        "DeathValleySeasonRewardService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySeasonRewardService.luau"
+        },
+        "DeathValleySeasonRolloverService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySeasonRolloverService.luau"
+        },
+        "DeathValleySeasonAdminService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySeasonAdminService.luau"
+        },
+        "DeathValleyCosmeticService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyCosmeticService.luau"
+        },
+        "DeathValleyTitleService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyTitleService.luau"
+        },
+        "DeathValleyLoadoutService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLoadoutService.luau"
+        },
+        "DeathValleyLoadoutPresetService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLoadoutPresetService.luau"
+        },
+        "DeathValleyLoadoutMirrorService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLoadoutMirrorService.luau"
+        },
+        "DeathValleyLoadoutPresetShareService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLoadoutPresetShareService.luau"
+        },
+        "DeathValleyFriendPresenceService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyFriendPresenceService.luau"
+        },
+        "DeathValleyFriendJoinService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyFriendJoinService.luau"
+        },
+        "DeathValleySocialNotifyService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySocialNotifyService.luau"
+        },
+        "DeathValleyJoinDataService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyJoinDataService.luau"
+        },
+        "DeathValleyLoadoutPresetMarketService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLoadoutPresetMarketService.luau"
+        },
+        "DeathValleyLoadoutPresetPackService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLoadoutPresetPackService.luau"
+        },
+        "DeathValleyLoadoutFeaturedService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLoadoutFeaturedService.luau"
+        },
+        "DeathValleyLoadoutFeaturedRotationService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLoadoutFeaturedRotationService.luau"
+        },
+        "DeathValleyCreatorRevenueService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyCreatorRevenueService.luau"
+        },
+        "DeathValleyCreatorPayoutSyncBridge": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyCreatorPayoutSyncBridge.luau"
+        },
+        "DeathValleyUgcCreatorPackService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyUgcCreatorPackService.luau"
+        },
+        "DeathValleySeasonalPopUpShopService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySeasonalPopUpShopService.luau"
+        },
+        "DeathValleyLfgFriendsService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLfgFriendsService.luau"
+        },
+        "DeathValleySeasonalRingService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySeasonalRingService.luau"
+        },
+        "DeathValleySpiritChamberService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySpiritChamberService.luau"
+        },
+        "DeathValleyRemoteSetup": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyRemoteSetup.server.luau"
+        },
+        "DeathValleySurvivalHandlers": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySurvivalHandlers.server.luau"
+        },
+        "DeathValleyLoadoutHandlers": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyLoadoutHandlers.server.luau"
+        },
+        "DeathValleyFriendPresenceHandlers": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyFriendPresenceHandlers.server.luau"
+        },
+        "DeathValleySocialHandlers": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleySocialHandlers.server.luau"
+        }
+      },
+      "Hellbound": {
+        "$className": "Folder",
+        "HellboundTravelService": {
+          "$path": "src/ServerScriptService/Hellbound/HellboundTravelService.luau"
+        },
+        "HellboundTerminalService": {
+          "$path": "src/ServerScriptService/Hellbound/HellboundTerminalService.luau"
+        },
+        "HellboundRemoteSetup": {
+          "$path": "src/ServerScriptService/Hellbound/HellboundRemoteSetup.server.luau"
+        },
+        "HellboundTravelHandlers": {
+          "$path": "src/ServerScriptService/Hellbound/HellboundTravelHandlers.server.luau"
+        },
+        "HellboundTerminalHandlers": {
+          "$path": "src/ServerScriptService/Hellbound/HellboundTerminalHandlers.server.luau"
+        }
+      },
+      "Mount": {
+        "$className": "Folder",
+        "MountRewardService": {
+          "$path": "src/ServerScriptService/Mount/MountRewardService.luau"
+        },
+        "EternityVehicleShop": {
+          "$path": "src/ServerScriptService/Mount/EternityVehicleShop.luau"
+        },
+        "MountRemoteSetup": {
+          "$path": "src/ServerScriptService/Mount/MountRemoteSetup.server.luau"
+        },
+        "MountRewardHandlers": {
+          "$path": "src/ServerScriptService/Mount/MountRewardHandlers.server.luau"
+        }
+      },
+      "TeleportBootstrap": {
+        "$path": "src/ServerScriptService/TeleportBootstrap.server.luau"
+      },
+      "Secrets": {
+        "$className": "Folder",
+        "BridgeSecrets": {
+          "$path": "src/ServerScriptService/Secrets/BridgeSecrets.luau"
+        },
+        "PlaceSecrets": {
+          "$path": "src/ServerScriptService/Secrets/PlaceSecrets.luau"
+        },
+        "CatalogSecrets": {
+          "$path": "src/ServerScriptService/Secrets/CatalogSecrets.luau"
+        }
+      },
+      "SecurityCore": {
+        "$path": "src/ServerScriptService/SecurityCore.server.luau"
+      },
+      "SecurityRemoteBootstrap": {
+        "$path": "src/ServerScriptService/SecurityRemoteBootstrap.server.luau"
+      },
+      "Security": {
+        "$className": "Folder",
+        "RemoteGuard": {
+          "$path": "src/ServerScriptService/Security/RemoteGuard.luau"
+        },
+        "RateLimiter": {
+          "$path": "src/ServerScriptService/Security/RateLimiter.luau"
+        },
+        "MovementValidator": {
+          "$path": "src/ServerScriptService/Security/MovementValidator.luau"
+        },
+        "EconomyGuard": {
+          "$path": "src/ServerScriptService/Security/EconomyGuard.luau"
+        },
+        "SuspicionTracker": {
+          "$path": "src/ServerScriptService/Security/SuspicionTracker.luau"
+        },
+        "HoneypotRemotes": {
+          "$path": "src/ServerScriptService/Security/HoneypotRemotes.luau"
+        },
+        "BackdoorScanner": {
+          "$path": "src/ServerScriptService/Security/BackdoorScanner.luau"
+        },
+        "BanRegistry": {
+          "$path": "src/ServerScriptService/Security/BanRegistry.luau"
+        },
+        "BanBroadcast": {
+          "$path": "src/ServerScriptService/Security/BanBroadcast.luau"
+        },
+        "EvasionDetector": {
+          "$path": "src/ServerScriptService/Security/EvasionDetector.luau"
+        },
+        "SentinelStrike": {
+          "$path": "src/ServerScriptService/Security/SentinelStrike.luau"
+        },
+        "LineNotifier": {
+          "$path": "src/ServerScriptService/Security/LineNotifier.luau"
+        },
+        "GriefingGuard": {
+          "$path": "src/ServerScriptService/Security/GriefingGuard.luau"
+        },
+        "EconomyInflationGuard": {
+          "$path": "src/ServerScriptService/Security/EconomyInflationGuard.luau"
+        },
+        "SevereOffenseGate": {
+          "$path": "src/ServerScriptService/Security/SevereOffenseGate.luau"
+        },
+        "EmulatorDetector": {
+          "$path": "src/ServerScriptService/Security/EmulatorDetector.luau"
+        },
+        "LogExportBridge": {
+          "$path": "src/ServerScriptService/Security/LogExportBridge.luau"
+        },
+        "FanExperienceGuard": {
+          "$path": "src/ServerScriptService/Security/FanExperienceGuard.luau"
+        },
+        "FanScanBridge": {
+          "$path": "src/ServerScriptService/Security/FanScanBridge.luau"
+        },
+        "SupportDeskService": {
+          "$path": "src/ServerScriptService/Security/SupportDeskService.luau"
+        },
+        "SupportDeskRemoteSetup": {
+          "$path": "src/ServerScriptService/Security/SupportDeskRemoteSetup.server.luau"
+        },
+        "SupportDeskHandlers": {
+          "$path": "src/ServerScriptService/Security/SupportDeskHandlers.server.luau"
+        }
+      }
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "$path": "src/ReplicatedStorage"
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "$path": "src/StarterPlayer/StarterPlayerScripts"
+      }
+    },
+    "StarterGui": {
+      "$className": "StarterGui",
+      "$path": "src/StarterGui"
+    },
+    "ServerStorage": {
+      "$className": "ServerStorage",
+      "WorldKits": {
+        "$className": "Folder",
+        "ArchRibKit": {
+          "$path": "src/ServerStorage/WorldKits/ArchRibKit.luau"
+        }
+      }
+    },
+    "HttpService": {
+      "$className": "HttpService",
+      "$properties": {
+        "HttpEnabled": true
+      }
+    }
+  }
+}

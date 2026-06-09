@@ -1,0 +1,153 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "dev", "feature/**"]
+  pull_request:
+    branches: ["main", "dev"]
+
+jobs:
+  # ──────────────────────────────────────────────────────────────
+  # 1. Rojo build — ensures project.json + all .luau files compile
+  #    into a valid .rbxlx without errors.
+  # ──────────────────────────────────────────────────────────────
+  rojo-build:
+    name: Rojo Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+
+      - name: Install tools (rojo + selene)
+        run: aftman install
+
+      - name: Build place file
+        run: rojo build default.project.json -o utopia-ci.rbxlx
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: utopia-rbxlx
+          path: utopia-ci.rbxlx
+          retention-days: 7
+
+  # ──────────────────────────────────────────────────────────────
+  # 2. Selene lint — static analysis on all Luau sources
+  # ──────────────────────────────────────────────────────────────
+  selene-lint:
+    name: Selene Lint
+    runs-on: ubuntu-latest
+    needs: rojo-build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+
+      - name: Install tools
+        run: aftman install
+
+      - name: Run Selene
+        run: selene src/
+
+  # ──────────────────────────────────────────────────────────────
+  # 3. Python validation scripts
+  # ──────────────────────────────────────────────────────────────
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate WorldPlaceGuard
+        run: python scripts/validate-world-place-guard.py
+
+      - name: Validate P0 publish secrets
+        run: python scripts/validate-p0-publish.py
+
+  # ──────────────────────────────────────────────────────────────
+  # 4. Security gate — scan for known-bad patterns in source
+  # ──────────────────────────────────────────────────────────────
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check DEV_GRANT_FREE / ENABLE_DEV_GRANT not enabled
+        run: |
+          python3 - <<'EOF'
+          import re, sys
+          from pathlib import Path
+          # Match assignment lines only (not comments)
+          PAT = re.compile(r"^[^-]*\b(DEV_GRANT_FREE|ENABLE_DEV_GRANT)\s*=\s*true\b", re.MULTILINE)
+          issues = []
+          for f in Path("src").rglob("*.luau"):
+              text = f.read_text(encoding="utf-8")
+              for m in PAT.finditer(text):
+                  line_no = text[:m.start()].count("\n") + 1
+                  issues.append(f"{f}:{line_no}: {m.group().strip()}")
+          if issues:
+              print("FAIL — dev grant flag enabled in source:")
+              for i in issues: print(" ", i)
+              sys.exit(1)
+          print("OK — DEV_GRANT flags not enabled")
+          EOF
+
+      - name: Check ProcessReceipt has offline-player guard
+        run: |
+          # Each file that defines ProcessReceipt must contain a NotProcessedYet return
+          # before any PurchaseGranted (meaning it handles the offline-player case).
+          python3 - <<'EOF'
+          import re, sys
+          from pathlib import Path
+
+          issues = []
+          for f in Path("src").rglob("*.luau"):
+              text = f.read_text(encoding="utf-8")
+              if "ProcessReceipt" not in text:
+                  continue
+              if "PurchaseGranted" not in text:
+                  continue
+              # The file must contain NotProcessedYet (offline guard)
+              if "NotProcessedYet" not in text:
+                  issues.append(f"{f}: has PurchaseGranted but no NotProcessedYet guard")
+
+          if issues:
+              print("FAIL — ProcessReceipt missing offline-player guard (NotProcessedYet):")
+              for i in issues: print(" ", i)
+              sys.exit(1)
+          print("OK — ProcessReceipt handlers have NotProcessedYet guard")
+          EOF
+
+      - name: Check no naked MemoryStore init (missing pcall)
+        run: |
+          python3 - <<'EOF'
+          import re, sys
+          from pathlib import Path
+
+          # For each MemoryStoreService:GetSortedMap/GetHashMap call, check that pcall
+          # appears within the 5 preceding lines (handles multi-line pcall(function() ... end) pattern).
+          MS_PAT = re.compile(r"MemoryStoreService:(?:GetSortedMap|GetHashMap)\(")
+          issues = []
+          for f in Path("src").rglob("*.luau"):
+              text = f.read_text(encoding="utf-8")
+              lines = text.splitlines()
+              for m in MS_PAT.finditer(text):
+                  line_no = text[:m.start()].count("\n")  # 0-indexed
+                  window = lines[max(0, line_no - 5): line_no + 1]
+                  if not any("pcall" in ln for ln in window):
+                      issues.append(f"{f}:{line_no + 1}: {lines[line_no].strip()}")
+          if issues:
+              print("FAIL — Naked MemoryStore init (no pcall in preceding 5 lines):")
+              for i in issues: print(" ", i)
+              sys.exit(1)
+          print("OK — All MemoryStore inits wrapped in pcall")
+          EOF

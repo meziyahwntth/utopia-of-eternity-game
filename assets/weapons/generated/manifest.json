@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "source": "ChatGPT-generated concept art (original IP — Utopia of Eternity)",
+  "conceptArtDir": "assets/weapons/generated",
+  "weapons": [
+    { "id": "blood_knife", "file": "blood-knife.png", "displayName": "Blood Knife", "kind": "Dagger", "slot": "light" },
+    { "id": "m16", "file": "m16.png", "displayName": "M16", "kind": "AssaultRifle", "slot": "light" },
+    { "id": "ak47", "file": "ak47.png", "displayName": "AK-47", "kind": "AssaultRifle", "slot": "light" },
+    { "id": "m4a1", "file": "m4a1.png", "displayName": "M4A1", "kind": "AssaultRifle", "slot": "light" },
+    { "id": "goddess_fan", "file": "goddess-fan.png", "displayName": "Goddess Fan", "kind": "Fan", "slot": "light" },
+    { "id": "demon_slaying_spear", "file": "demon-slaying-spear.png", "displayName": "Demon-Slaying Spear", "kind": "Spear", "slot": "light" },
+    { "id": "immortal_sword", "file": "immortal-sword.png", "displayName": "Immortal Sword", "kind": "Longsword", "slot": "light" },
+    { "id": "machine_gun", "file": "machine-gun.png", "displayName": "Machine Gun", "kind": "LMG", "slot": "heavy" },
+    { "id": "bazooka", "file": "bazooka.png", "displayName": "Bazooka", "kind": "Launcher", "slot": "heavy" },
+    { "id": "bazuka", "file": "bazuka-lion.png", "displayName": "Bazuka", "kind": "Launcher", "slot": "heavy" },
+    { "id": "thors_hammer", "file": "thors-hammer.png", "displayName": "Thor's Hammer", "kind": "Hammer", "slot": "heavy" },
+    { "id": "demon_slayer_sword", "file": "demon-slayer-sword.png", "displayName": "Demon Slayer Sword", "kind": "Greatsword", "slot": "heavy" },
+    { "id": "heavenly_sword", "file": "heavenly-sword.png", "displayName": "Heavenly Sword", "kind": "Greatsword", "slot": "heavy" }
+  ]
+}

@@ -1,0 +1,41 @@
+wing: utopia_of_eternity
+description: Roblox game Utopia of Eternity — Rojo Luau + Bridge + Death Valley Phases A-R
+rooms:
+- name: project_handbook
+  description: Master handbook, start-here, index
+  keywords:
+  - handbook
+  - start-here
+  - utopia
+  - eternity
+- name: death_valley
+  description: Death Valley phases, loadout, bazaar, creator economy
+  keywords:
+  - death-valley
+  - loadout
+  - bazaar
+  - phase
+  - hellbound
+- name: commerce
+  description: Eternity City commerce, fashion, shops
+  keywords:
+  - commerce
+  - fashion
+  - shop
+  - prism
+- name: source_code
+  description: ServerScriptService DeathValley, GameConfig, Bridge
+  keywords:
+  - luau
+  - rojo
+  - server
+  - bridge
+- name: design
+  description: GDD, DESIGN-V02, systems
+  keywords:
+  - gdd
+  - design
+  - systems
+- name: general
+  description: Other project files
+  keywords: []

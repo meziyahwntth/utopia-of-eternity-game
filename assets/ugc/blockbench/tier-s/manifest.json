@@ -1,0 +1,58 @@
+{
+  "tier": "S",
+  "version": "0.1",
+  "sets": [
+    {
+      "setId": "coquette_ribbon_dream",
+      "displayName": "Coquette Ribbon Dream",
+      "conceptImage": "docs/visual-ref/fashion/teen-trend/teen-coquette-ribbon-dream.png",
+      "brief": "docs/ugc/blockbench-briefs/01-coquette-ribbon-dream.md",
+      "pieces": [
+        { "id": "coquette_lace_dress", "slot": "Shirt", "robloxType": "LayeredClothing_Torso", "bbmodel": "coquette_lace_dress.bbmodel", "maxTris": 3500 },
+        { "id": "coquette_bow_hair", "slot": "Hair", "robloxType": "Accessory_Hair", "bbmodel": "coquette_bow_hair.bbmodel", "maxTris": 2500 },
+        { "id": "coquette_mary_janes", "slot": "Shoes", "robloxType": "LayeredClothing_RightShoe", "bbmodel": "coquette_mary_janes.bbmodel", "maxTris": 2000 },
+        { "id": "coquette_ribbon_choker", "slot": "Neck", "robloxType": "Accessory_Neck", "bbmodel": "coquette_ribbon_choker.bbmodel", "maxTris": 1200 },
+        { "id": "coquette_soft_aura", "slot": "Aura", "robloxType": "VFX_Only", "bbmodel": null }
+      ]
+    },
+    {
+      "setId": "marina_old_money",
+      "displayName": "Marina Old Money",
+      "conceptImage": "docs/visual-ref/fashion/teen-trend/teen-marina-old-money.png",
+      "brief": "docs/ugc/blockbench-briefs/02-marina-old-money.md",
+      "pieces": [
+        { "id": "oldmoney_linen_blazer", "slot": "Shirt", "robloxType": "LayeredClothing_Torso", "bbmodel": "oldmoney_linen_blazer.bbmodel", "maxTris": 3200 },
+        { "id": "oldmoney_tailored_pants", "slot": "Pants", "robloxType": "LayeredClothing_Legs", "bbmodel": "oldmoney_tailored_pants.bbmodel", "maxTris": 2800 },
+        { "id": "oldmoney_pearl_stack", "slot": "Neck", "robloxType": "Accessory_Neck", "bbmodel": "oldmoney_pearl_stack.bbmodel", "maxTris": 1000 },
+        { "id": "oldmoney_loafers", "slot": "Shoes", "robloxType": "LayeredClothing_RightShoe", "bbmodel": "oldmoney_loafers.bbmodel", "maxTris": 1800 },
+        { "id": "oldmoney_clutch", "slot": "Back", "robloxType": "Accessory_Back", "bbmodel": "oldmoney_clutch.bbmodel", "maxTris": 1500 }
+      ]
+    },
+    {
+      "setId": "twilight_gothic_rose",
+      "displayName": "Twilight Gothic Rose",
+      "conceptImage": "docs/visual-ref/fashion/teen-trend/teen-twilight-gothic-rose.png",
+      "brief": "docs/ugc/blockbench-briefs/03-twilight-gothic-rose.md",
+      "pieces": [
+        { "id": "gothic_corset_top", "slot": "Shirt", "robloxType": "LayeredClothing_Torso", "bbmodel": "gothic_corset_top.bbmodel", "maxTris": 3400 },
+        { "id": "gothic_layer_skirt", "slot": "Pants", "robloxType": "LayeredClothing_Legs", "bbmodel": "gothic_layer_skirt.bbmodel", "maxTris": 3000 },
+        { "id": "gothic_choker_stack", "slot": "Neck", "robloxType": "Accessory_Neck", "bbmodel": "gothic_choker_stack.bbmodel", "maxTris": 1400 },
+        { "id": "gothic_platform_boots", "slot": "Shoes", "robloxType": "LayeredClothing_RightShoe", "bbmodel": "gothic_platform_boots.bbmodel", "maxTris": 2200 },
+        { "id": "gothic_dark_aura", "slot": "Aura", "robloxType": "VFX_Only", "bbmodel": null }
+      ]
+    },
+    {
+      "setId": "academy_preppy_pink",
+      "displayName": "Academy Preppy Pink",
+      "conceptImage": "docs/visual-ref/fashion/teen-trend/teen-academy-preppy-pink.png",
+      "brief": "docs/ugc/blockbench-briefs/04-academy-preppy-pink.md",
+      "pieces": [
+        { "id": "preppy_sweater_vest", "slot": "Shirt", "robloxType": "LayeredClothing_Torso", "bbmodel": "preppy_sweater_vest.bbmodel", "maxTris": 3000 },
+        { "id": "preppy_plaid_skirt", "slot": "Pants", "robloxType": "LayeredClothing_Legs", "bbmodel": "preppy_plaid_skirt.bbmodel", "maxTris": 2600 },
+        { "id": "preppy_mary_janes", "slot": "Shoes", "robloxType": "LayeredClothing_RightShoe", "bbmodel": "preppy_mary_janes.bbmodel", "maxTris": 1900 },
+        { "id": "preppy_ribbon_bow", "slot": "Hair", "robloxType": "Accessory_Hair", "bbmodel": "preppy_ribbon_bow.bbmodel", "maxTris": 1800 },
+        { "id": "preppy_designer_bag", "slot": "Back", "robloxType": "Accessory_Back", "bbmodel": "preppy_designer_bag.bbmodel", "maxTris": 2800 }
+      ]
+    }
+  ]
+}

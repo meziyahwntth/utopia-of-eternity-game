@@ -1,0 +1,26 @@
+# Roblox / Rojo
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+/sourcemap.json
+
+# Secrets — never commit
+.env
+.env.*
+bridge/.env
+bridge/data/
+src/ServerScriptService/Secrets/BridgeSecrets.luau
+src/ServerScriptService/Secrets/PlaceSecrets.luau
+src/ServerScriptService/Secrets/CatalogSecrets.luau
+*.pem
+.rojo-api-key
+.publish-venv/
+
+# OS / editor
+.DS_Store
+*.swp
+.vscode/
+
+# Build artifacts
+node_modules/
