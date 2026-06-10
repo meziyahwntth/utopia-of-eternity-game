@@ -421,6 +421,10 @@ if RunService:IsStudio() then
 		local function seedCreatorCredits(player: Player)
 			task.defer(function()
 				local data = DeathValleyPlayerStore.load(player.UserId)
+				if not data then
+					warn("[DeathValley] Studio: PlayerStore.load returned nil for", player.Name, "— skipping seed")
+					return
+				end
 				local balance = if typeof(data.creatorBalance) == "number" then data.creatorBalance else 0
 				if balance < minPayout then
 					data.creatorBalance = seedAmount
