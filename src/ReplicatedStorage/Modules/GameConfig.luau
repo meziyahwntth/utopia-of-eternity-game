@@ -210,6 +210,7 @@ GameConfig.Seasons = {
 	"ChineseNewYear",
 	"Songkran",
 	"LoyKrathong",
+	"SummerFestival",
 }
 
 -- Seasonal pop-up shop theming (Phase S)
@@ -243,6 +244,11 @@ GameConfig.SeasonThemes = {
 		accent = Color3.fromRGB(255, 180, 60),
 		signColor = Color3.fromRGB(200, 120, 40),
 		badge = "Loy Krathong",
+	},
+	SummerFestival = {
+		accent = Color3.fromRGB(0, 220, 255),
+		signColor = Color3.fromRGB(255, 80, 180),
+		badge = "Summer Fest",
 	},
 }
 

@@ -128,6 +128,12 @@
         },
         "EternityCityMarinaShowroomLandmark": {
           "$path": "src/ServerScriptService/World/EternityCityMarinaShowroomLandmark.luau"
+        },
+        "EternityCityFestivalStage": {
+          "$path": "src/ServerScriptService/World/EternityCityFestivalStage.luau"
+        },
+        "EternityCityPhotoZones": {
+          "$path": "src/ServerScriptService/World/EternityCityPhotoZones.luau"
         }
       },
       "Shuttle": {
@@ -381,6 +387,9 @@
       },
       "TeleportBootstrap": {
         "$path": "src/ServerScriptService/TeleportBootstrap.server.luau"
+      },
+      "FestivalCountdownService": {
+        "$path": "src/ServerScriptService/FestivalCountdownService.luau"
       },
       "Secrets": {
         "$className": "Folder",
