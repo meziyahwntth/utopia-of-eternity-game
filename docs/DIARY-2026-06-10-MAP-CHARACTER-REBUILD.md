@@ -194,3 +194,14 @@ DV content เหลือ: POI art pass (Whispering Grove, Hollow Lake) + Zone 
   Hub/Solhaven/Nocturne) — playtest: `[WHITE4] nearwhite=1 (DomeShell/SanctuaryCanopy ข้อยกเว้น)`
 - บทเรียน audit สี: ห้าม scope แค่ World/ — kit ใน ServerStorage ก็สร้าง part ใต้เมืองได้
 - ยังไม่ push (recolor 3 รอบค้างใน working tree)
+
+## Landmark #7 Marina Showroom Strip — ตรวจรับผ่าน
+
+- ไฟล์ใหม่ EternityCityMarinaShowroomLandmark.luau (~175 parts): โชว์รูมกระจก 3 หลัง +
+  แท่นโชว์ + mock vehicle, pier railings + PierLamp ×16 + deck lines, ป้าย 1
+- Playtest: `[LM7] pads=21 lamps=16 sign=1 white=1 shopPrompts=3` ✓
+  (kiosk commerce 3 ร้านอยู่ครบ, nearwhite ยังเป็น 1 = SanctuaryCanopy)
+- ⚠️ หมายเหตุ: VehiclePad attribute ติด 21 parts (validate ระบุ 4) — mock vehicle
+  ทุกชิ้นถูกแท็กด้วย ยังไม่มี logic ใช้ attribute นี้จึงไม่กระทบ แต่ถ้าอนาคตทำระบบ
+  spawn รถบนแท่น ต้อง dedupe ก่อน
+- **Landmark ครบทั้ง 7 ตาม handover แล้ว** — ยังไม่ push

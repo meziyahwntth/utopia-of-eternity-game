@@ -28,6 +28,7 @@ local EternityCityCanalPromenadeLandmark = require(script.Parent.EternityCityCan
 local EternityCitySkyRailPlazaLandmark = require(script.Parent.EternityCitySkyRailPlazaLandmark)
 local EternityCityAuroraMegaMallLandmark = require(script.Parent.EternityCityAuroraMegaMallLandmark)
 local EternityCityTwilightOverpassLandmark = require(script.Parent.EternityCityTwilightOverpassLandmark)
+local EternityCityMarinaShowroomLandmark = require(script.Parent.EternityCityMarinaShowroomLandmark)
 
 local EternityCityWorldBuilder = {}
 
@@ -285,6 +286,18 @@ local function buildTwilightOverpass(parent: Instance, profile: WorldBuildConfig
 	EternityCityAccessGuard.tagDistrict(district, 10, "TwilightOverpass")
 end
 
+local function buildMarinaShowroomStrip(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+	if hasStatic("Static_MarinaShowroom") then
+		print("[Utopia] skip greybox: MarinaShowroom (static found)")
+		return
+	end
+	EternityCityMarinaShowroomLandmark.build({
+		parent = parent,
+		profile = profile,
+		budget = budget,
+	})
+end
+
 -- Blueprint §4.1: pure builder — สร้าง part แล้วคืน BuildResult
 -- pcall + WorldBuildState ย้ายขึ้น BuildOrchestrator (จุดเดียวที่ set state)
 function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): WorldBuilderTypes.BuildResult
@@ -325,6 +338,7 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	buildHoverShowroom(model, profile, budget)
 	buildVehicleShop(model, profile, budget)
 	buildTwilightOverpass(model, profile, budget)
+	buildMarinaShowroomStrip(model, profile, budget)
 	CommerceDistrictBuilder:BuildAll(model, profile, budget)
 
 	LoadoutPlazaKit.addPlaza(model, {
