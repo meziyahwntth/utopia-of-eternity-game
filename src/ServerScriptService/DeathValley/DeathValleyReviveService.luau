@@ -19,6 +19,10 @@ local playerDownedEvent = remotes:WaitForChild("PlayerDowned") :: RemoteEvent
 
 local pendingRevives: { [number]: { targetId: number, startedAt: number } } = {}
 
+local function isDeathValleyPlace(): boolean
+	return WorldPlaceGuard:GetCurrentPlaceKey() == "DeathValley"
+end
+
 local function setDowned(player: Player, downed: boolean)
 	player:SetAttribute("DV_Downed", downed)
 	local char = player.Character
@@ -76,10 +80,6 @@ function DeathValleyReviveService.onHumanoidDied(player: Player)
 			end
 		end
 	end)
-end
-
-local function isDeathValleyPlace(): boolean
-	return WorldPlaceGuard:GetCurrentPlaceKey() == "DeathValley"
 end
 
 function DeathValleyReviveService.bindPlayer(player: Player)

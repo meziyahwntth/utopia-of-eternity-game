@@ -96,6 +96,9 @@
         "DeathValleyPeakColonyBuilder": {
           "$path": "src/ServerScriptService/World/DeathValleyPeakColonyBuilder.luau"
         },
+        "DeathValleyMilitaryBaseBuilder": {
+          "$path": "src/ServerScriptService/World/DeathValleyMilitaryBaseBuilder.luau"
+        },
         "DeathValleyMegaZonesBuilder": {
           "$path": "src/ServerScriptService/World/DeathValleyMegaZonesBuilder.luau"
         },
