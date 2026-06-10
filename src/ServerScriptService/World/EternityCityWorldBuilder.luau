@@ -33,6 +33,7 @@ local ShowroomVehicleDisplay = require(ServerScriptService:WaitForChild("Mount")
 local EternityCityFestivalStage = require(script.Parent.EternityCityFestivalStage)
 local EternityCityPhotoZones = require(script.Parent.EternityCityPhotoZones)
 local FestivalCountdownService = require(ServerScriptService:WaitForChild("FestivalCountdownService"))
+local EternityCityQuestBoard = require(script.Parent.EternityCityQuestBoard)
 
 local EternityCityWorldBuilder = {}
 
@@ -379,6 +380,7 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	EternityCityFestivalStage.setup(model, profile.Palette)
 	EternityCityPhotoZones.setup(model, profile.Palette)
 	FestivalCountdownService.setup(model, profile.Palette)
+	EternityCityQuestBoard.setup(model, profile.Palette)
 
 	WorldBuildBudget:report("EternityCity", budget)
 

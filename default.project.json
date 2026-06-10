@@ -134,6 +134,9 @@
         },
         "EternityCityPhotoZones": {
           "$path": "src/ServerScriptService/World/EternityCityPhotoZones.luau"
+        },
+        "EternityCityQuestBoard": {
+          "$path": "src/ServerScriptService/World/EternityCityQuestBoard.luau"
         }
       },
       "Shuttle": {
@@ -188,6 +191,21 @@
         },
         "PrismKeyTradeHandlers": {
           "$path": "src/ServerScriptService/Progression/PrismKeyTradeHandlers.server.luau"
+        },
+        "DailyStreakStore": {
+          "$path": "src/ServerScriptService/Progression/DailyStreakStore.luau"
+        },
+        "DailyStreakService": {
+          "$path": "src/ServerScriptService/Progression/DailyStreakService.luau"
+        },
+        "DailyQuestStore": {
+          "$path": "src/ServerScriptService/Progression/DailyQuestStore.luau"
+        },
+        "DailyQuestService": {
+          "$path": "src/ServerScriptService/Progression/DailyQuestService.luau"
+        },
+        "FestivalPersistence": {
+          "$path": "src/ServerScriptService/Progression/FestivalPersistence.server.luau"
         }
       },
       "Dungeon": {

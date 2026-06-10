@@ -147,3 +147,83 @@ end
 Players.PlayerAdded:Connect(bindGriefingHooks)
 
 print("[Utopia] GriefingGuard: sanctuary + PvP hooks online")
+
+-- ─── [3] Festival Daily Remotes ──────────────────────────────────────────────
+
+local DailyStreakService = require(ServerScriptService:WaitForChild("Progression"):WaitForChild("DailyStreakService"))
+local DailyQuestService = require(ServerScriptService:WaitForChild("Progression"):WaitForChild("DailyQuestService"))
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
+
+-- Informational reads — create remotes + wire directly (no RemoteGuard needed)
+
+local function ensureRemote(name: string): RemoteEvent
+	local existing = remotes:FindFirstChild(name)
+	if existing and existing:IsA("RemoteEvent") then
+		return existing
+	end
+	if existing then
+		existing:Destroy()
+	end
+	local ev = Instance.new("RemoteEvent")
+	ev.Name = name
+	ev.Parent = remotes
+	return ev
+end
+
+local getStreakInfoEv = ensureRemote("GetStreakInfo")
+local getQuestInfoEv = ensureRemote("GetQuestInfo")
+
+getStreakInfoEv.OnServerEvent:Connect(function(player: Player)
+	local streakDay = player:GetAttribute("DailyStreakDay")
+	local day = if typeof(streakDay) == "number" then streakDay else 0
+	getStreakInfoEv:FireClient(player, { day = day })
+end)
+
+getQuestInfoEv.OnServerEvent:Connect(function(player: Player)
+	local info = DailyQuestService.getQuestInfo(player)
+	getQuestInfoEv:FireClient(player, info)
+end)
+
+-- Write operations via RemoteGuard (rate-limited, schema-validated, auto-creates remote)
+RemoteGuard:Register("ClaimStreakReward", {
+	rateLimit = {
+		maxTokens = 3,
+		refillPerSecond = 0.2,
+	},
+	schema = {},
+	handler = function(player: Player)
+		local ok, msg = DailyStreakService.claimReward(player)
+		local claimEv = remotes:WaitForChild("ClaimStreakReward") :: RemoteEvent
+		claimEv:FireClient(player, { ok = ok, message = msg })
+	end,
+})
+
+RemoteGuard:Register("ClaimQuestReward", {
+	rateLimit = {
+		maxTokens = 5,
+		refillPerSecond = 0.5,
+	},
+	schema = {
+		{ name = "questId", type = "string", maxLen = 64 },
+	},
+	handler = function(player: Player, questId: string)
+		local ok, msg = DailyQuestService.claimQuest(player, questId)
+		local claimEv = remotes:WaitForChild("ClaimQuestReward") :: RemoteEvent
+		claimEv:FireClient(player, { ok = ok, message = msg })
+	end,
+})
+
+RemoteGuard:Register("ClaimQuestBonus", {
+	rateLimit = {
+		maxTokens = 3,
+		refillPerSecond = 0.2,
+	},
+	schema = {},
+	handler = function(player: Player)
+		local ok, msg = DailyQuestService.claimBonus(player)
+		local bonusEv = remotes:WaitForChild("ClaimQuestBonus") :: RemoteEvent
+		bonusEv:FireClient(player, { ok = ok, message = msg })
+	end,
+})
+
+print("[Utopia] RemoteGuard: Festival daily remotes registered")
