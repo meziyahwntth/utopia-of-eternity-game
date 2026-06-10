@@ -39,9 +39,12 @@ local DEFAULT_BOSS_HP = {
 	abyss_throne = 6000,
 }
 
+-- Registry กลาง zoneId → runtime (ให้ SecurityRemoteBootstrap lookup ได้)
+local registry: { [string]: ZoneRuntime } = {}
+
 function DungeonZoneRuntime.create(zoneDef: PrismDeathValleyDungeonConfig.ZoneDef): ZoneRuntime
 	local maxHp = zoneDef.bossMaxHp or DEFAULT_BOSS_HP[zoneDef.id] or 240
-	return {
+	local runtime: ZoneRuntime = {
 		zoneDef = zoneDef,
 		zonePlayers = {},
 		bossActive = false,
@@ -50,6 +53,12 @@ function DungeonZoneRuntime.create(zoneDef: PrismDeathValleyDungeonConfig.ZoneDe
 		bossMaxHp = maxHp,
 		lastOutcomeMessage = nil,
 	}
+	registry[zoneDef.id] = runtime
+	return runtime
+end
+
+function DungeonZoneRuntime.getRuntime(zoneId: string): ZoneRuntime?
+	return registry[zoneId]
 end
 
 function DungeonZoneRuntime.getPlayersInZone(runtime: ZoneRuntime): { Player }

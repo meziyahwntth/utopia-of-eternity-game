@@ -1,7 +1,7 @@
 --!strict
 --[[
 	WorldBuildState — Singleton สถานะการ build โลก
-	ใช้แทน poll-loop ใน WorldStudioSpawnGuard เพื่อป้องกัน:
+	ใช้แทน poll-loop ใน spawn guard เดิม เพื่อป้องกัน:
 	  - waitForWorldReady block 60s เมื่อ build fail กลางทาง
 	  - VoidGuard spawn stabilizeCharacter ซ้อนกัน (re-entrancy)
 

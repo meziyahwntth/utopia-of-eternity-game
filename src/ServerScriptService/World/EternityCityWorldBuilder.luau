@@ -12,7 +12,7 @@ local WorldBuildConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitF
 local OrganicCSGBuilder = require(script.Parent.OrganicCSGBuilder)
 local WorldBuildBudget = require(script.Parent.WorldBuildBudget)
 local WorldBuildShared = require(script.Parent.WorldBuildShared)
-local WorldBuildState = require(script.Parent.WorldBuildState)
+local WorldBuilderTypes = require(script.Parent.WorldBuilderTypes)
 local WorldPlaceGuard = require(script.Parent.WorldPlaceGuard)
 local EternityCityLighting = require(script.Parent.EternityCityLighting)
 local EternityCityAccessGuard = require(script.Parent.EternityCityAccessGuard)
@@ -240,88 +240,82 @@ local function buildTwilightOverpass(parent: Instance, profile: WorldBuildConfig
 	EternityCityAccessGuard.tagDistrict(district, 10, "TwilightOverpass")
 end
 
-function EternityCityWorldBuilder:Build()
+-- Blueprint §4.1: pure builder — สร้าง part แล้วคืน BuildResult
+-- pcall + WorldBuildState ย้ายขึ้น BuildOrchestrator (จุดเดียวที่ set state)
+function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): WorldBuilderTypes.BuildResult
 	if not WorldPlaceGuard:ShouldBuild("EternityCity") then
 		warn("[Utopia] EternityCityWorldBuilder skipped — ShouldBuild=false PlaceId=", game.PlaceId)
-		return
+		return WorldBuilderTypes.skip("not this place")
 	end
 	if WorldPlaceGuard:ModelExists("UtopiaEternityCity") then
 		print("[Utopia] Eternity City already built — skipping")
-		WorldBuildState.markReady()
-		return
+		return WorldBuilderTypes.skip("UtopiaEternityCity already built")
 	end
 
 	print("[Utopia] Eternity City build starting… PlaceId=", game.PlaceId)
 
-	local buildOk, buildErr = pcall(function()
-		local profile = WorldBuildConfig:GetProfile("EternityCity")
-		local budget = WorldBuildBudget:new(profile.MaxParts)
+	local profile = WorldBuildConfig:GetProfile("EternityCity")
+	local budget = WorldBuildBudget:new(profile.MaxParts)
 
-		local model = Instance.new("Model")
-		model.Name = "UtopiaEternityCity"
-		model.Parent = workspace
+	local model = Instance.new("Model")
+	model.Name = "UtopiaEternityCity"
+	model.Parent = workspace
 
-		WorldBuildShared:makeGround(model, profile.GroundSizeStuds, profile.Palette.Pearl, Enum.Material.SmoothPlastic)
-		WorldBuildBudget:add(budget, 1)
+	WorldBuildShared:makeGround(model, profile.GroundSizeStuds, profile.Palette.Pearl, Enum.Material.SmoothPlastic)
+	WorldBuildBudget:add(budget, 1)
 
-		local sanctuaryRadius = WorldBuildShared:getSanctuaryRadius("EternityCity")
-		WorldBuildShared:makeSanctuaryZone(model, sanctuaryRadius, budget, profile)
-		WorldBuildShared:addSanctuarySpawns(model, GameConfig.Sanctuary.EternityCityMinSpawnPoints, sanctuaryRadius, budget)
-		orientSanctuarySpawns(model)
-		WorldBuildShared:buildOrganicCanopy(CFrame.new(0, 0, 0), model, profile, budget)
+	local sanctuaryRadius = WorldBuildShared:getSanctuaryRadius("EternityCity")
+	WorldBuildShared:makeSanctuaryZone(model, sanctuaryRadius, budget, profile)
+	WorldBuildShared:addSanctuarySpawns(model, GameConfig.Sanctuary.EternityCityMinSpawnPoints, sanctuaryRadius, budget)
+	orientSanctuarySpawns(model)
+	WorldBuildShared:buildOrganicCanopy(CFrame.new(0, 0, 0), model, profile, budget)
 
-		buildCoastline(profile)
-		buildMountainBackdrop(profile)
-		buildMarinaRing(model, profile, budget)
-		buildAuroraSpireCluster(model, profile, budget)
-		buildAuroraMegaMall(model, profile, budget)
-		buildCanalPromenade(model, profile, budget)
-		buildSkyRailPlaza(model, profile, budget)
-		buildHoverShowroom(model, profile, budget)
-		buildVehicleShop(model, profile, budget)
-		buildTwilightOverpass(model, profile, budget)
-		CommerceDistrictBuilder:BuildAll(model, profile, budget)
+	buildCoastline(profile)
+	buildMountainBackdrop(profile)
+	buildMarinaRing(model, profile, budget)
+	buildAuroraSpireCluster(model, profile, budget)
+	buildAuroraMegaMall(model, profile, budget)
+	buildCanalPromenade(model, profile, budget)
+	buildSkyRailPlaza(model, profile, budget)
+	buildHoverShowroom(model, profile, budget)
+	buildVehicleShop(model, profile, budget)
+	buildTwilightOverpass(model, profile, budget)
+	CommerceDistrictBuilder:BuildAll(model, profile, budget)
 
-		LoadoutPlazaKit.addPlaza(model, {
-			origin = Vector3.new(0, 0, 42),
-			wardrobeLabel = "Eternity Wardrobe",
-			mirrorLabel = "Plaza Mirror",
-			autoRotate = true,
-		})
+	LoadoutPlazaKit.addPlaza(model, {
+		origin = Vector3.new(0, 0, 42),
+		wardrobeLabel = "Eternity Wardrobe",
+		mirrorLabel = "Plaza Mirror",
+		autoRotate = true,
+	})
 
-		EternityCityLighting.apply(model, profile.Palette)
+	EternityCityLighting.apply(model, profile.Palette)
 
-		PrismKeyPickupKit.addPickup({
-			pickupId = "eternity_canal_gate_key_11",
-			keyNumber = 11,
-			position = Vector3.new(80, 3, -40),
-			parent = model,
-		})
-		PrismKeyPickupKit.addPickup({
-			pickupId = "eternity_skyrail_gate_key_15",
-			keyNumber = 15,
-			position = Vector3.new(-40, 6, 60),
-			parent = model,
-		})
-		PrismKeyPickupKit.addPickup({
-			pickupId = "eternity_mall_gate_key_20",
-			keyNumber = 20,
-			position = Vector3.new(-30, 12, -140),
-			parent = model,
-		})
+	PrismKeyPickupKit.addPickup({
+		pickupId = "eternity_canal_gate_key_11",
+		keyNumber = 11,
+		position = Vector3.new(80, 3, -40),
+		parent = model,
+	})
+	PrismKeyPickupKit.addPickup({
+		pickupId = "eternity_skyrail_gate_key_15",
+		keyNumber = 15,
+		position = Vector3.new(-40, 6, 60),
+		parent = model,
+	})
+	PrismKeyPickupKit.addPickup({
+		pickupId = "eternity_mall_gate_key_20",
+		keyNumber = 20,
+		position = Vector3.new(-30, 12, -140),
+		parent = model,
+	})
 
-		EternityCityAccessGuard.start(model)
+	EternityCityAccessGuard.start(model)
 
-		WorldBuildBudget:report("EternityCity", budget)
-	end)
+	WorldBuildBudget:report("EternityCity", budget)
 
-	if buildOk then
-		print("[Utopia] Eternity City built — aurora · marina · canal · gates · Sky Lounge 50 · loadout plaza")
-		WorldBuildState.markReady()
-	else
-		warn("[Utopia] EternityCityWorldBuilder:Build() FAILED:", buildErr)
-		WorldBuildState.markFailed(tostring(buildErr))
-	end
+	print("[Utopia] Eternity City built — aurora · marina · canal · gates · Sky Lounge 50 · loadout plaza")
+	return WorldBuilderTypes.success(model)
 end
 
 return EternityCityWorldBuilder

@@ -8,7 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PrismDeathValleySurvivalConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PrismDeathValleySurvivalConfig"))
 local DeathValleyBeaconService = require(script.Parent:WaitForChild("DeathValleyBeaconService"))
-local WorldStudioSpawnGuard = require(game:GetService("ServerScriptService"):WaitForChild("World"):WaitForChild("WorldStudioSpawnGuard"))
+local SpawnService = require(game:GetService("ServerScriptService"):WaitForChild("World"):WaitForChild("SpawnService"))
 
 local WorldPlaceGuard = require(game:GetService("ServerScriptService"):WaitForChild("World"):WaitForChild("WorldPlaceGuard"))
 
@@ -61,7 +61,7 @@ function DeathValleyReviveService.onHumanoidDied(player: Player)
 
 		task.delay(PrismDeathValleySurvivalConfig.Revive.DownedSeconds, function()
 		if player.Parent and player:GetAttribute("DV_Downed") == true then
-			WorldStudioSpawnGuard.respawnPlayer(player)
+			SpawnService.respawnPlayer(player)
 		end
 	end)
 

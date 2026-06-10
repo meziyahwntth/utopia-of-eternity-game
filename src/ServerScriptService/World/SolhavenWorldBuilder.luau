@@ -11,6 +11,7 @@ local WorldBuildConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitF
 local OrganicCSGBuilder = require(script.Parent.OrganicCSGBuilder)
 local WorldBuildBudget = require(script.Parent.WorldBuildBudget)
 local WorldBuildShared = require(script.Parent.WorldBuildShared)
+local WorldBuilderTypes = require(script.Parent.WorldBuilderTypes)
 local WorldPlaceGuard = require(script.Parent.WorldPlaceGuard)
 local LoadoutPlazaKit = require(script.Parent.LoadoutPlazaKit)
 local PrismKeyPickupKit = require(script.Parent.PrismKeyPickupKit)
@@ -19,12 +20,13 @@ local ArchRibKit = require(ServerStorage:WaitForChild("WorldKits"):WaitForChild(
 
 local SolhavenWorldBuilder = {}
 
-function SolhavenWorldBuilder:Build()
+-- Blueprint §4.1: pure builder — สร้าง part แล้วคืน BuildResult
+function SolhavenWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): WorldBuilderTypes.BuildResult
 	if not WorldPlaceGuard:ShouldBuild("Solhaven") then
-		return
+		return WorldBuilderTypes.skip("not this place")
 	end
 	if WorldPlaceGuard:ModelExists("UtopiaSolhaven") then
-		return
+		return WorldBuilderTypes.skip("UtopiaSolhaven already built")
 	end
 
 	local profile = WorldBuildConfig:GetProfile("Solhaven")
@@ -91,6 +93,7 @@ function SolhavenWorldBuilder:Build()
 
 	WorldBuildBudget:report("Solhaven", budget)
 	print("[Utopia] Solhaven microcurve world built")
+	return WorldBuilderTypes.success(model)
 end
 
 return SolhavenWorldBuilder

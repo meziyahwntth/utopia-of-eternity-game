@@ -187,7 +187,7 @@ local function buildTransitHub(district: Folder, ctx: BuildContext)
 			district,
 			"HubEdge_" .. tostring(xSide),
 			Vector3.new(2, 0.8, 28),
-			CFrame.new(platform.CFrame * CFrame.new(xSide, 1.4, 0)),
+			platform.CFrame * CFrame.new(xSide, 1.4, 0),
 			palette.Cyan,
 			Enum.Material.Neon,
 			0.05

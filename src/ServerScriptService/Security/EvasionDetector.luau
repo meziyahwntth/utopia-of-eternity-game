@@ -6,7 +6,17 @@ local GameConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChil
 
 local EvasionDetector = {}
 
-local profileStore = DataStoreService:GetOrderedDataStore("UtopiaEvasionProfiles_v1")
+local profileStore: OrderedDataStore? = nil
+do
+	local ok, result = pcall(function()
+		return DataStoreService:GetOrderedDataStore("UtopiaEvasionProfiles_v1")
+	end)
+	if ok then
+		profileStore = result
+	else
+		warn("[Security] DataStore init failed (EvasionDetector):", result)
+	end
+end
 
 export type SessionProfile = {
 	userId: number,
@@ -64,16 +74,23 @@ function EvasionDetector:SaveProfile(player: Player, banReason: string)
 		bannedAt = os.time(),
 		banReason = banReason,
 	}
-	pcall(function()
-		profileStore:SetAsync(tostring(player.UserId), profile)
-	end)
+	local store = profileStore
+	if store then
+		pcall(function()
+			store:SetAsync(tostring(player.UserId), profile)
+		end)
+	end
 	return profile
 end
 
 function EvasionDetector:ScoreJoin(player: Player): number
 	local score = 0
+	local store = profileStore
+	if not store then
+		return score
+	end
 	local ok, profiles = pcall(function()
-		return profileStore:GetSortedAsync(false, 25):GetCurrentPage()
+		return store:GetSortedAsync(false, 25):GetCurrentPage()
 	end)
 	if not ok or not profiles then
 		return score

@@ -13,16 +13,18 @@ local WorldBuildConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitF
 local OrganicCSGBuilder = require(script.Parent.OrganicCSGBuilder)
 local WorldBuildBudget = require(script.Parent.WorldBuildBudget)
 local WorldBuildShared = require(script.Parent.WorldBuildShared)
+local WorldBuilderTypes = require(script.Parent.WorldBuilderTypes)
 local WorldPlaceGuard = require(script.Parent.WorldPlaceGuard)
 
 local DeathValleyWorldBuilder = {}
 
-function DeathValleyWorldBuilder:Build()
+-- Blueprint §4.1: pure builder — สร้าง part แล้วคืน BuildResult
+function DeathValleyWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): WorldBuilderTypes.BuildResult
 	if not WorldPlaceGuard:ShouldBuild("DeathValley") then
-		return
+		return WorldBuilderTypes.skip("not this place")
 	end
 	if WorldPlaceGuard:ModelExists("UtopiaDeathValley") then
-		return
+		return WorldBuilderTypes.skip("UtopiaDeathValley already built")
 	end
 
 	local profile = WorldBuildConfig:GetProfile("DeathValley")
@@ -127,6 +129,7 @@ function DeathValleyWorldBuilder:Build()
 	megaBuilder:BuildWeeklyBossArena(model, profile, budget)
 
 	print("[Utopia] Death Valley built — Phase A+B+C + Zone 1–5 + travel pipeline")
+	return WorldBuilderTypes.success(model)
 end
 
 return DeathValleyWorldBuilder

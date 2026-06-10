@@ -14,6 +14,7 @@ local WorldBuildConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitF
 local OrganicCSGBuilder = require(script.Parent.OrganicCSGBuilder)
 local WorldBuildBudget = require(script.Parent.WorldBuildBudget)
 local WorldBuildShared = require(script.Parent.WorldBuildShared)
+local WorldBuilderTypes = require(script.Parent.WorldBuilderTypes)
 local WorldPlaceGuard = require(script.Parent.WorldPlaceGuard)
 
 local ShuttleGreyboxBuilder = require(ServerScriptService:WaitForChild("ShuttleGreyboxBuilder"))
@@ -140,12 +141,14 @@ local function addTeleportKiosks(parent: Instance)
 	end
 end
 
-function HubWorldBuilder:Build()
+-- Blueprint §4.1: pure builder — สร้าง part แล้วคืน BuildResult
+-- ห้ามแตะ WorldBuildState / pcall รอบตัวเอง (BuildOrchestrator เป็นเจ้าของ)
+function HubWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): WorldBuilderTypes.BuildResult
 	if not WorldPlaceGuard:ShouldBuild("Hub") then
-		return
+		return WorldBuilderTypes.skip("not this place")
 	end
 	if WorldPlaceGuard:ModelExists("UtopiaHubWorld") then
-		return
+		return WorldBuilderTypes.skip("UtopiaHubWorld already built")
 	end
 
 	local profile = WorldBuildConfig:GetProfile("Hub")
@@ -246,6 +249,7 @@ function HubWorldBuilder:Build()
 
 	WorldBuildBudget:report("Hub", budget)
 	print("[Utopia] Hub microcurve world built — plaza + museum + garden + kiosks")
+	return WorldBuilderTypes.success(model)
 end
 
 return HubWorldBuilder

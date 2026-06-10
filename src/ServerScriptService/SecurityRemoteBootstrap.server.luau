@@ -35,32 +35,48 @@ RemoteGuard:Register("HealChannelComplete_Guarded", {
 		refillPerSecond = 0.25, -- refill 1 token ทุก 4 วิ → ~15 heals/นาที
 	},
 	schema = {
-		{ name = "targetUserId", type = "number", min = 1, max = 9_999_999_999 },
+		-- UserId ปัจจุบันทะลุหมื่นล้านแล้ว (เช่น 11,076,697,270) — เผื่อ headroom
+		{ name = "targetUserId", type = "number", min = 1, max = 1e15 },
 	},
 	handler = function(player: Player, targetUserId: number)
 		-- delegate ไปยัง DungeonZoneRuntime โดยตรง
 		local zoneId = player:GetAttribute("DungeonZoneId")
 		if typeof(zoneId) ~= "string" then
+			warn("[HealHandler] SKIP: no DungeonZoneId attr on", player.Name)
 			return
 		end
-		local runtime = DungeonZoneRuntime.getRuntime and DungeonZoneRuntime.getRuntime(zoneId)
+
+		-- ตรวจ getRuntime ก่อนเรียก (ป้องกัน nil function ใน build เก่า)
+		if typeof(DungeonZoneRuntime.getRuntime) ~= "function" then
+			warn("[HealHandler] SKIP: DungeonZoneRuntime.getRuntime is not a function — rebuild required")
+			return
+		end
+
+		local runtime = DungeonZoneRuntime.getRuntime(zoneId)
 		if not runtime then
+			warn("[HealHandler] SKIP: no runtime for zone", zoneId)
 			return
 		end
+
 		local state = runtime.zonePlayers[player.UserId]
 		if not state then
+			warn("[HealHandler] SKIP: player not in zonePlayers, zoneId=", zoneId)
 			return
 		end
+
 		local target = Players:GetPlayerByUserId(targetUserId)
 		if not target or not runtime.zonePlayers[target.UserId] then
+			warn("[HealHandler] SKIP: target invalid or not in zone, targetUserId=", targetUserId)
 			return
 		end
+
 		state.healCount += 1
 		DungeonZoneRuntime.syncContributionAttributes(player, state)
 		local hum = target:FindFirstChildOfClass("Humanoid")
 		if hum then
 			hum.Health = math.min(hum.MaxHealth, hum.Health + 15)
 		end
+		print("[HealHandler] OK: healed", target.Name, "healCount now=", state.healCount)
 	end,
 })
 

@@ -35,6 +35,23 @@ local SentinelStrike
 local SevereOffenseGate
 local floodCounts: { [number]: { [string]: number } } = {}
 
+local function ensureRemotesFolder(): Folder
+	local current = remotesFolder
+	if current and current.Parent then
+		return current
+	end
+	local existing = ReplicatedStorage:FindFirstChild("Remotes")
+	if existing and existing:IsA("Folder") then
+		remotesFolder = existing
+		return existing
+	end
+	local folder = Instance.new("Folder")
+	folder.Name = "Remotes"
+	folder.Parent = ReplicatedStorage
+	remotesFolder = folder
+	return folder
+end
+
 function RemoteGuard:Init(deps: {
 	RateLimiter: any,
 	SuspicionTracker: any,
@@ -45,12 +62,7 @@ function RemoteGuard:Init(deps: {
 	SuspicionTracker = deps.SuspicionTracker
 	SentinelStrike = deps.SentinelStrike
 	SevereOffenseGate = deps.SevereOffenseGate
-	remotesFolder = ReplicatedStorage:FindFirstChild("Remotes") :: Folder?
-	if not remotesFolder then
-		remotesFolder = Instance.new("Folder")
-		remotesFolder.Name = "Remotes"
-		remotesFolder.Parent = ReplicatedStorage
-	end
+	ensureRemotesFolder()
 end
 
 local function validateField(field: SchemaField, value: any): boolean
@@ -90,10 +102,8 @@ end
 
 function RemoteGuard:Register(name: string, config: RemoteConfig)
 	registry[name] = config
-	if not remotesFolder then
-		return
-	end
-	local existing = remotesFolder:FindFirstChild(name)
+	local folder = ensureRemotesFolder()
+	local existing = folder:FindFirstChild(name)
 	local remote: RemoteEvent
 	if existing and existing:IsA("RemoteEvent") then
 		remote = existing
@@ -103,7 +113,7 @@ function RemoteGuard:Register(name: string, config: RemoteConfig)
 		end
 		remote = Instance.new("RemoteEvent")
 		remote.Name = name
-		remote.Parent = remotesFolder
+		remote.Parent = folder
 	end
 	remote.OnServerEvent:Connect(function(player: Player, ...)
 		local args = { ... }

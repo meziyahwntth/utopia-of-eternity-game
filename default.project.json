@@ -27,6 +27,18 @@
         "WorldBuildState": {
           "$path": "src/ServerScriptService/World/WorldBuildState.luau"
         },
+        "WorldBuilderTypes": {
+          "$path": "src/ServerScriptService/World/WorldBuilderTypes.luau"
+        },
+        "BuildOrchestrator": {
+          "$path": "src/ServerScriptService/World/BuildOrchestrator.luau"
+        },
+        "SpawnService": {
+          "$path": "src/ServerScriptService/World/SpawnService.luau"
+        },
+        "VoidRecovery": {
+          "$path": "src/ServerScriptService/World/VoidRecovery.luau"
+        },
         "WorldPlaceGuard": {
           "$path": "src/ServerScriptService/World/WorldPlaceGuard.luau"
         },
@@ -38,9 +50,6 @@
         },
         "WorldBootstrap": {
           "$path": "src/ServerScriptService/World/WorldBootstrap.luau"
-        },
-        "WorldStudioSpawnGuard": {
-          "$path": "src/ServerScriptService/World/WorldStudioSpawnGuard.luau"
         },
         "HubWorldBuilder": {
           "$path": "src/ServerScriptService/World/HubWorldBuilder.luau"

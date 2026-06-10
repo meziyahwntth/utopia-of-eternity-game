@@ -429,6 +429,8 @@ GameConfig.WorldBuild = {
 	PCMaxParts = 18000,
 	DefaultLodDistanceStuds = 512,
 	MicroTrimDistanceStuds = 128,
+	-- SpawnService: รอ WorldBuildState ready นานสุดกี่วินาทีก่อนปล่อย character ลง emergency floor
+	ReadyTimeoutSeconds = 60,
 }
 
 -- Studio: when PlaceId == 0, simulate this place for world build (set nil for Hub)

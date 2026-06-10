@@ -29,54 +29,109 @@ local FanExperienceGuard = require(securityFolder.FanExperienceGuard)
 local FanScanBridge = require(securityFolder.FanScanBridge)
 local BackdoorScanner = require(securityFolder.BackdoorScanner)
 
-SentinelStrike:Init({
-	BanRegistry = BanRegistry,
-	BanBroadcast = BanBroadcast,
-	EvasionDetector = EvasionDetector,
-	LineNotifier = LineNotifier,
-	SuspicionTracker = SuspicionTracker,
-})
+local function runStep(label: string, fn: () -> ())
+	print("[SecurityCore] step:", label)
+	local ok, err = pcall(fn)
+	if not ok then
+		warn("[SecurityCore] FAIL " .. label .. " →", err)
+	end
+end
 
-SevereOffenseGate:Init({ SentinelStrike = SentinelStrike, LogExportBridge = LogExportBridge })
-EmulatorDetector:Init({ SentinelStrike = SentinelStrike, LogExportBridge = LogExportBridge })
+runStep("SentinelStrike:Init", function()
+	SentinelStrike:Init({
+		BanRegistry = BanRegistry,
+		BanBroadcast = BanBroadcast,
+		EvasionDetector = EvasionDetector,
+		LineNotifier = LineNotifier,
+		SuspicionTracker = SuspicionTracker,
+	})
+end)
 
-EconomyInflationGuard:Init({
-	EconomyGuard = EconomyGuard,
-	SuspicionTracker = SuspicionTracker,
-	SentinelStrike = SentinelStrike,
-	LogExportBridge = LogExportBridge,
-})
+runStep("SevereOffenseGate:Init", function()
+	SevereOffenseGate:Init({ SentinelStrike = SentinelStrike, LogExportBridge = LogExportBridge })
+end)
 
-GriefingGuard:Init({ SuspicionTracker = SuspicionTracker, SentinelStrike = SentinelStrike })
-FanExperienceGuard:Init({ LogExportBridge = LogExportBridge })
-FanScanBridge:Init({ FanExperienceGuard = FanExperienceGuard })
+runStep("EmulatorDetector:Init", function()
+	EmulatorDetector:Init({ SentinelStrike = SentinelStrike, LogExportBridge = LogExportBridge })
+end)
 
-BanBroadcast:Init({ BanRegistry = BanRegistry })
-BanBroadcast:StartListening()
+runStep("EconomyInflationGuard:Init", function()
+	EconomyInflationGuard:Init({
+		EconomyGuard = EconomyGuard,
+		SuspicionTracker = SuspicionTracker,
+		SentinelStrike = SentinelStrike,
+		LogExportBridge = LogExportBridge,
+	})
+end)
 
-RemoteGuard:Init({
-	RateLimiter = RateLimiter,
-	SuspicionTracker = SuspicionTracker,
-	SentinelStrike = SentinelStrike,
-	SevereOffenseGate = SevereOffenseGate,
-})
+runStep("GriefingGuard:Init", function()
+	GriefingGuard:Init({ SuspicionTracker = SuspicionTracker, SentinelStrike = SentinelStrike })
+end)
 
-MovementValidator:Init({
-	SuspicionTracker = SuspicionTracker,
-	SentinelStrike = SentinelStrike,
-})
+runStep("FanExperienceGuard:Init", function()
+	FanExperienceGuard:Init({ LogExportBridge = LogExportBridge })
+end)
 
-HoneypotRemotes:Init({
-	SuspicionTracker = SuspicionTracker,
-	SentinelStrike = SentinelStrike,
-	SevereOffenseGate = SevereOffenseGate,
-})
+runStep("FanScanBridge:Init", function()
+	FanScanBridge:Init({ FanExperienceGuard = FanExperienceGuard })
+end)
 
-BackdoorScanner:Scan()
-HoneypotRemotes:Deploy()
-MovementValidator:Start()
-LogExportBridge:StartAutoFlush()
-FanScanBridge:StartPolling()
+runStep("BanBroadcast:Init", function()
+	BanBroadcast:Init({ BanRegistry = BanRegistry })
+end)
+
+runStep("BanBroadcast:StartListening", function()
+	-- MessagingService:SubscribeAsync yields ค้างบน local file — แยก thread กัน boot ค้าง
+	task.spawn(function()
+		BanBroadcast:StartListening()
+	end)
+end)
+
+runStep("RemoteGuard:Init", function()
+	RemoteGuard:Init({
+		RateLimiter = RateLimiter,
+		SuspicionTracker = SuspicionTracker,
+		SentinelStrike = SentinelStrike,
+		SevereOffenseGate = SevereOffenseGate,
+	})
+end)
+
+runStep("MovementValidator:Init", function()
+	MovementValidator:Init({
+		SuspicionTracker = SuspicionTracker,
+		SentinelStrike = SentinelStrike,
+	})
+end)
+
+runStep("HoneypotRemotes:Init", function()
+	HoneypotRemotes:Init({
+		SuspicionTracker = SuspicionTracker,
+		SentinelStrike = SentinelStrike,
+		SevereOffenseGate = SevereOffenseGate,
+	})
+end)
+
+runStep("BackdoorScanner:Scan", function()
+	BackdoorScanner:Scan()
+end)
+
+runStep("HoneypotRemotes:Deploy", function()
+	HoneypotRemotes:Deploy()
+end)
+
+runStep("MovementValidator:Start", function()
+	MovementValidator:Start()
+end)
+
+runStep("LogExportBridge:StartAutoFlush", function()
+	LogExportBridge:StartAutoFlush()
+end)
+
+runStep("FanScanBridge:StartPolling", function()
+	FanScanBridge:StartPolling()
+end)
+
+print("[SecurityCore] ALL STEPS COMPLETE — Shield online ✅")
 
 local function onPlayerAdded(player: Player)
 	if BanRegistry:IsBanned(player.UserId) then
