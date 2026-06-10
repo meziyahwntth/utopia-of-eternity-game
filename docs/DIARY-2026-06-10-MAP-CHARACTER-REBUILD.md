@@ -205,3 +205,25 @@ DV content เหลือ: POI art pass (Whispering Grove, Hollow Lake) + Zone 
   ทุกชิ้นถูกแท็กด้วย ยังไม่มี logic ใช้ attribute นี้จึงไม่กระทบ แต่ถ้าอนาคตทำระบบ
   spawn รถบนแท่น ต้อง dedupe ก่อน
 - **Landmark ครบทั้ง 7 ตาม handover แล้ว** — ยังไม่ push
+
+## Vehicle Showcase — ตรวจรับผ่าน
+
+- LM7 push แล้ว (98ac242) · ShowroomVehicleDisplay.luau ใหม่ (224 บรรทัด):
+  spawn รถโชว์ 3 รุ่นจาก VehicleMountCatalog (sports_car/big_bike/pickup_truck)
+  บนแท่น VehiclePad (dedupe 21→3), BillboardGui ชื่อรุ่น, หมุน 0.3 rad/s,
+  ViewInShopPrompt → OpenEternityShop (เช็ค canUseShop key 15+ ตามเดิม ไม่ bypass)
+- Playtest: `[VSC] pads=3 models=3 prompts=3 white=1` + `[ROT] delta=0.3` ✓
+- Commit 0484666 ค้าง local — ตรวจรับแล้ว push ได้ในรอบถัดไป
+- ทิศทางใหม่จาก Praphan: เน้นวัยรุ่น/retention ตาม DESIGN-RESEARCH-TEEN-RETENTION.md
+  เริ่ม Summer Music Festival เฟส 1 (เวที+countdown+photo zone)
+
+## Summer Festival เฟส 1 "Eternity Soundwave" — ตรวจรับผ่าน
+
+- ไฟล์ใหม่: EternityCityFestivalStage (เวที 32×20 + LED wall 12 + speaker 4 + laser 6 ต้น),
+  EternityCityPhotoZones (ring/wing/arch ×3), FestivalCountdownService + client countdown
+- GameConfig: season SummerFestival (15 มิ.ย. – 31 ส.ค. 2026) + festival lighting save/revert
+- Playtest: `[FES] led=12 spk=4 laser=12 photo=3 signs=2 tgt=true white=1` +
+  `[LAS] LaserBeam delta=0.4` (เสา static ตามดีไซน์) ✓
+- Commit 22e6084 ค้าง local — ตรวจรับแล้ว push ได้รอบถัดไป
+- แผนต่อ (DESIGN-RESEARCH): เฟส 2 daily streak + quest board → fashion show →
+  mount trading → Eternity Pass

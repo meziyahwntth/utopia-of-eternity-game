@@ -152,7 +152,17 @@ print("[Utopia] GriefingGuard: sanctuary + PvP hooks online")
 
 local DailyStreakService = require(ServerScriptService:WaitForChild("Progression"):WaitForChild("DailyStreakService"))
 local DailyQuestService = require(ServerScriptService:WaitForChild("Progression"):WaitForChild("DailyQuestService"))
-local remotes = ReplicatedStorage:WaitForChild("Remotes")
+
+-- ใช้ pattern เดียวกับ RemoteGuard.ensureRemotesFolder — ไม่ใช้ WaitForChild
+-- เพราะ SecurityRemoteBootstrap กับ SecurityCore อยู่ root ServerScriptService ระดับเดียวกัน
+-- Roblox ไม่รับประกัน execution order → WaitForChild อาจ yield infinite
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remotes = ReplicatedStorage:FindFirstChild("Remotes") :: Folder?
+if not remotes then
+	remotes = Instance.new("Folder")
+	remotes.Name = "Remotes"
+	remotes.Parent = ReplicatedStorage
+end
 
 -- Informational reads — create remotes + wire directly (no RemoteGuard needed)
 
