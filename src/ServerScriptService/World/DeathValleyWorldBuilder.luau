@@ -49,7 +49,7 @@ function DeathValleyWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): W
 
 	local radius = WorldBuildShared:getSanctuaryRadius("DeathValley")
 	WorldBuildShared:makeSanctuaryZone(model, radius, budget, profile)
-	WorldBuildShared:addSanctuarySpawns(model, 3, radius, budget)
+	WorldBuildShared:addSanctuarySpawns(model, 3, 90, budget)
 
 	OrganicCSGBuilder:createDome(Vector3.new(0, 12, -55), 20, {
 		color = Color3.fromRGB(40, 35, 50),

@@ -163,3 +163,12 @@ DV content เหลือ: POI art pass (Whispering Grove, Hollow Lake) + Zone 
 - คิวงาน art pass จาก HANDOVER-TO-FABLE5.md **ครบทั้งหมดแล้ว**
 - งานค้างถัดไป: แก้ SanctuarySpawn_1 ใต้ terrain mountain (spawn บนยอดเขา y=72),
   BackdoorScanner → CI, push งานสะสม
+
+## Fix DV SanctuarySpawn_2 ใต้ terrain mountain — ตรวจรับผ่าน
+
+- Root cause: วง spawn 72 studs (DefaultRadiusStuds 120 × 0.6) ทำ spawn_2 (−36,1,−62.4)
+  จมใน terrain FillBlock z[−100,−60] → player ถูกดันขึ้นยอดเขา y=72
+- Fix (Cursor): หดวง spawn เฉพาะ DV → addSanctuarySpawns(model,3,90,budget) = วง 54 studs
+  (1 บรรทัด, ไม่แตะ WorldBuildShared/place อื่น/terrain) — VALIDATE-FIX-DV-SPAWN.txt PASS
+- Playtest: spawns (−27,1,−47)/(−27,1,46)/(54,1,−1) + playerY=4 ✓ (เดิม 72)
+- หมายเหตุ: push แล้ว 2 commits ก่อนหน้า (2ae4813 POI, 321a96d Zones) — fix นี้ยังไม่ push
