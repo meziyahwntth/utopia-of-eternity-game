@@ -107,33 +107,42 @@ function DeathValleyWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): W
 
 	WorldBuildBudget:report("DeathValley", budget)
 
+	print("[Utopia-DV] Building Zone1...")
 	local zone1Builder = require(script.Parent:WaitForChild("DeathValleyZone1Builder"))
 	zone1Builder:Build(model, profile, budget)
 
+	print("[Utopia-DV] Building KeyGhost...")
 	local ghostBuilder = require(script.Parent:WaitForChild("DeathValleyKeyGhostBuilder"))
 	ghostBuilder:Build(model)
 
+	print("[Utopia-DV] Building Survival...")
 	local survivalBuilder = require(script.Parent:WaitForChild("DeathValleySurvivalBuilder"))
 	survivalBuilder:Build(model, profile, budget)
 
+	print("[Utopia-DV] Building POIs (WhisperingGrove + HollowLake)...")
 	local poiBuilder = require(script.Parent:WaitForChild("DeathValleyPOIBuilder"))
 	poiBuilder:BuildPOIs(model, profile, budget)
 	poiBuilder:BuildHorizonRings(model, profile, budget)
 	poiBuilder:BuildHellboundPathStub(model, profile, budget)
 
+	print("[Utopia-DV] Building Hellbound Travel...")
 	local travelBuilder = require(script.Parent:WaitForChild("DeathValleyHellboundTravelBuilder"))
 	travelBuilder:BuildPlayable(model, profile, budget)
 
+	print("[Utopia-DV] Building PeakColony...")
 	local colonyBuilder = require(script.Parent:WaitForChild("DeathValleyPeakColonyBuilder"))
 	colonyBuilder:Build(model, profile, budget)
 
+	print("[Utopia-DV] Building MilitaryBase...")
 	local militaryBuilder = require(script.Parent:WaitForChild("DeathValleyMilitaryBaseBuilder"))
 	militaryBuilder:Build(model, profile, budget)
 
+	print("[Utopia-DV] Building MegaZones...")
 	local megaBuilder = require(script.Parent:WaitForChild("DeathValleyMegaZonesBuilder"))
 	megaBuilder:Build(model, profile, budget)
 	megaBuilder:BuildWeeklyBossArena(model, profile, budget)
 
+	print("[Utopia-DV] Building SpiritChambers...")
 	local spiritBuilder = require(script.Parent:WaitForChild("DeathValleySpiritChamberBuilder"))
 	spiritBuilder:Build(model, profile, budget)
 
