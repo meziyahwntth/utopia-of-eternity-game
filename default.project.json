@@ -414,9 +414,6 @@
         "HoneypotRemotes": {
           "$path": "src/ServerScriptService/Security/HoneypotRemotes.luau"
         },
-        "BackdoorScanner": {
-          "$path": "src/ServerScriptService/Security/BackdoorScanner.luau"
-        },
         "BanRegistry": {
           "$path": "src/ServerScriptService/Security/BanRegistry.luau"
         },

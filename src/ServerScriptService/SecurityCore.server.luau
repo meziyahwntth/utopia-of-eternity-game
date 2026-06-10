@@ -27,7 +27,6 @@ local MovementValidator = require(securityFolder.MovementValidator)
 local HoneypotRemotes = require(securityFolder.HoneypotRemotes)
 local FanExperienceGuard = require(securityFolder.FanExperienceGuard)
 local FanScanBridge = require(securityFolder.FanScanBridge)
-local BackdoorScanner = require(securityFolder.BackdoorScanner)
 
 local function runStep(label: string, fn: () -> ())
 	print("[SecurityCore] step:", label)
@@ -109,10 +108,6 @@ runStep("HoneypotRemotes:Init", function()
 		SentinelStrike = SentinelStrike,
 		SevereOffenseGate = SevereOffenseGate,
 	})
-end)
-
-runStep("BackdoorScanner:Scan", function()
-	BackdoorScanner:Scan()
 end)
 
 runStep("HoneypotRemotes:Deploy", function()
