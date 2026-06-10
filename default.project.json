@@ -374,6 +374,9 @@
         },
         "MountRewardHandlers": {
           "$path": "src/ServerScriptService/Mount/MountRewardHandlers.server.luau"
+        },
+        "ShowroomVehicleDisplay": {
+          "$path": "src/ServerScriptService/Mount/ShowroomVehicleDisplay.luau"
         }
       },
       "TeleportBootstrap": {

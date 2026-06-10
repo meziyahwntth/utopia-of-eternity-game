@@ -267,39 +267,43 @@ local function buildShowroom(shopIndex: number, pos: Vector3, district: Folder, 
 		}
 	)
 
-	-- Mock vehicle (block art — 3-box car shape on pedestal)
+	-- Mock vehicle block-art (placeholder until ShowroomVehicleDisplay replaces them)
 	local bodyColor = if shopIndex == 2 then palette.Teal else palette.Steel
+	local vehicleRoot = Instance.new("Folder")
+	vehicleRoot.Name = "DisplayVehiclePlaceholder_" .. label
+	vehicleRoot.Parent = district
+
 	addPart(
-		district,
+		vehicleRoot,
 		"VehicleBody_" .. label,
 		Vector3.new(6, 2, 3.5),
 		CFrame.new(pedPos.X, PIER_CENTER.Y + 3.5, pedPos.Z),
 		bodyColor,
 		Enum.Material.SmoothPlastic
-	):SetAttribute("VehiclePad", true)
+	)
 
 	-- Cabin/glass top
 	addPart(
-		district,
+		vehicleRoot,
 		"VehicleCabin_" .. label,
 		Vector3.new(4, 1.4, 2),
 		CFrame.new(pedPos.X - 0.8, PIER_CENTER.Y + 4.8, pedPos.Z),
 		palette.Cyan,
 		Enum.Material.Glass,
 		0.3
-	):SetAttribute("VehiclePad", true)
+	)
 
 	-- Wheels (4 small cylinders represented as cubes)
 	for _, wx in { -2.2, 2.2 } do
 		for _, wz in { -1.2, 1.2 } do
 			addPart(
-				district,
+				vehicleRoot,
 				"VehicleWheel_" .. label .. "_" .. tostring(wx) .. "_" .. tostring(wz),
 				Vector3.new(1, 1, 1),
 				CFrame.new(pedPos.X + wx, PIER_CENTER.Y + 1.2, pedPos.Z + wz),
 				palette.Twilight,
 				Enum.Material.SmoothPlastic
-			):SetAttribute("VehiclePad", true)
+			)
 		end
 	end
 

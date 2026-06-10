@@ -29,6 +29,7 @@ local EternityCitySkyRailPlazaLandmark = require(script.Parent.EternityCitySkyRa
 local EternityCityAuroraMegaMallLandmark = require(script.Parent.EternityCityAuroraMegaMallLandmark)
 local EternityCityTwilightOverpassLandmark = require(script.Parent.EternityCityTwilightOverpassLandmark)
 local EternityCityMarinaShowroomLandmark = require(script.Parent.EternityCityMarinaShowroomLandmark)
+local ShowroomVehicleDisplay = require(ServerScriptService:WaitForChild("Mount"):WaitForChild("ShowroomVehicleDisplay"))
 
 local EternityCityWorldBuilder = {}
 
@@ -370,6 +371,8 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	})
 
 	EternityCityAccessGuard.start(model)
+
+	ShowroomVehicleDisplay.setup(model)
 
 	WorldBuildBudget:report("EternityCity", budget)
 
