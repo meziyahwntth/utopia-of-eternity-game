@@ -31,6 +31,15 @@ local EternityCityTwilightOverpassLandmark = require(script.Parent.EternityCityT
 
 local EternityCityWorldBuilder = {}
 
+-- Hybrid static-skip: ถ้ามี static model ใน UtopiaStatic folder ให้ข้าม greybox
+local function hasStatic(staticName: string): boolean
+	local staticFolder = workspace:FindFirstChild("UtopiaStatic")
+	if not staticFolder or not staticFolder:IsA("Folder") then
+		return false
+	end
+	return staticFolder:FindFirstChild(staticName) ~= nil
+end
+
 local MARINA_CENTER = Vector3.new(180, 0, -80)
 local AURORA_ORIGIN = CFrame.new(0, 0, -120)
 
@@ -63,6 +72,10 @@ local function buildCoastline(profile: WorldBuildConfig.PlaceProfile)
 end
 
 local function buildMarinaRing(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+	if hasStatic("Static_MarinaRing") then
+		print("[Utopia] skip greybox: MarinaRing (static found)")
+		return
+	end
 	local marina = EternityCityMarinaLandmark.build({
 		parent = parent,
 		profile = profile,
@@ -73,6 +86,10 @@ local function buildMarinaRing(parent: Instance, profile: WorldBuildConfig.Place
 end
 
 local function buildAuroraSpireCluster(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+	if hasStatic("Static_AuroraSpire") then
+		print("[Utopia] skip greybox: AuroraSpire (static found)")
+		return
+	end
 	local district = EternityCityAuroraSpireLandmark.build({
 		parent = parent,
 		profile = profile,
@@ -85,6 +102,10 @@ end
 local MEGAMALL_BASE = CFrame.new(-30, 0, -150)
 
 local function buildAuroraMegaMall(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+	if hasStatic("Static_AuroraMegaMall") then
+		print("[Utopia] skip greybox: AuroraMegaMall (static found)")
+		return
+	end
 	local district = EternityCityAuroraMegaMallLandmark.build({
 		parent = parent,
 		profile = profile,
@@ -95,6 +116,10 @@ local function buildAuroraMegaMall(parent: Instance, profile: WorldBuildConfig.P
 end
 
 local function buildCanalPromenade(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+	if hasStatic("Static_CanalPromenade") then
+		print("[Utopia] skip greybox: CanalPromenade (static found)")
+		return
+	end
 	local district = EternityCityCanalPromenadeLandmark.build({
 		parent = parent,
 		profile = profile,
@@ -104,6 +129,10 @@ local function buildCanalPromenade(parent: Instance, profile: WorldBuildConfig.P
 end
 
 local function buildReflectivePlaza(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+	if hasStatic("Static_ReflectivePlaza") then
+		print("[Utopia] skip greybox: ReflectivePlaza (static found)")
+		return
+	end
 	local plaza = Instance.new("Folder")
 	plaza.Name = "ReflectivePlaza"
 	plaza.Parent = parent
@@ -135,6 +164,10 @@ end
 local SKYRAIL_ORIGIN = CFrame.new(0, 0, 40)
 
 local function buildSkyRailPlaza(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+	if hasStatic("Static_SkyRailPlaza") then
+		print("[Utopia] skip greybox: SkyRailPlaza (static found)")
+		return
+	end
 	local district = EternityCitySkyRailPlazaLandmark.build({
 		parent = parent,
 		profile = profile,
@@ -152,6 +185,10 @@ local function buildSkyRailPlaza(parent: Instance, profile: WorldBuildConfig.Pla
 end
 
 local function buildHoverShowroom(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+	if hasStatic("Static_HoverShowroom") then
+		print("[Utopia] skip greybox: HoverShowroom (static found)")
+		return
+	end
 	local showroom = Instance.new("Folder")
 	showroom.Name = "HoverShowroom"
 	showroom.Parent = parent
@@ -183,9 +220,13 @@ local function buildHoverShowroom(parent: Instance, profile: WorldBuildConfig.Pl
 end
 
 local function buildVehicleShop(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
-	local shop = Instance.new("Folder")
-	shop.Name = "EternityPremiumShop"
-	shop.Parent = parent
+	if hasStatic("Static_VehicleShop") then
+		print("[Utopia] skip greybox: VehicleShop (static found)")
+		return
+	end
+local shop = Instance.new("Folder")
+shop.Name = "EternityPremiumShop"
+shop.Parent = parent
 	EternityCityAccessGuard.tagDistrict(shop, 15, "PremiumShop")
 
 	local building = Instance.new("Part")
@@ -231,6 +272,10 @@ end
 local TWILIGHT_ORIGIN = CFrame.new(-100, 0, 80)
 
 local function buildTwilightOverpass(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+	if hasStatic("Static_TwilightOverpass") then
+		print("[Utopia] skip greybox: TwilightOverpass (static found)")
+		return
+	end
 	local district = EternityCityTwilightOverpassLandmark.build({
 		parent = parent,
 		profile = profile,

@@ -46,26 +46,18 @@ local function addPart(
 	return part
 end
 
-local function addBillboard(parent: BasePart, text: string)
-	local gui = Instance.new("BillboardGui")
-	gui.Size = UDim2.fromOffset(260, 52)
-	gui.StudsOffset = Vector3.new(0, 8, 0)
-	gui.AlwaysOnTop = false
+local function addLabel(parent: BasePart, text: string)
+	local gui = Instance.new("SurfaceGui")
+	gui.Face = Enum.NormalId.Front
 	gui.Parent = parent
-
 	local label = Instance.new("TextLabel")
 	label.Size = UDim2.fromScale(1, 1)
-	label.BackgroundTransparency = 0.3
-	label.BackgroundColor3 = Color3.fromRGB(10, 18, 32)
-	label.Text = text
+	label.BackgroundTransparency = 1
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.TextScaled = true
 	label.Font = Enum.Font.GothamBold
-	label.TextSize = 19
-	label.TextColor3 = Color3.fromRGB(212, 175, 55)
+	label.Text = text
 	label.Parent = gui
-
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 10)
-	corner.Parent = label
 end
 
 -- ──────────────────────────────────────────────
@@ -162,170 +154,61 @@ local function buildPylons(district: Folder, ctx: BuildContext)
 	end
 end
 
--- ──────────────────────────────────────────────
--- Transit hub — central station platform
+-- ReflectivePlaza — ลานสะท้อน ~90 studs, Glass Reflectance สูง, Neon edge trim
 -- ──────────────────────────────────────────────
 
-local function buildTransitHub(district: Folder, ctx: BuildContext)
+local function buildReflectivePlaza(district: Folder, ctx: BuildContext)
 	local palette = ctx.profile.Palette
 	local base = ctx.origin.Position
 
-	-- Elevated platform deck
-	local platformY = base.Y + 20
-	local platform = addPart(
+	-- Main reflective surface
+	local plaza = addPart(
 		district,
-		"HubDeck",
-		Vector3.new(52, 2, 28),
-		CFrame.new(base + Vector3.new(0, platformY, 0)),
+		"ReflectivePad",
+		Vector3.new(90, 0.5, 90),
+		CFrame.new(base + Vector3.new(0, 0.4, 0)),
 		palette.Pearl,
-		Enum.Material.SmoothPlastic
+		Enum.Material.Glass,
+		0.25
 	)
+	plaza.Reflectance = 0.4
 
-	-- Neon edge trim
-	for _, xSide in { -27, 27 } do
+	-- Neon edge trim (4 sides)
+	local edgeLength = 90
+	local halfEdge = edgeLength / 2
+	local edgeSides = {
+		{ pos = Vector3.new(0, 0.65, -halfEdge + 1), size = Vector3.new(edgeLength - 2, 0.3, 1) },
+		{ pos = Vector3.new(0, 0.65, halfEdge - 1), size = Vector3.new(edgeLength - 2, 0.3, 1) },
+		{ pos = Vector3.new(-halfEdge + 1, 0.65, 0), size = Vector3.new(1, 0.3, edgeLength - 2) },
+		{ pos = Vector3.new(halfEdge - 1, 0.65, 0), size = Vector3.new(1, 0.3, edgeLength - 2) },
+	}
+	for i, side in edgeSides do
 		addPart(
 			district,
-			"HubEdge_" .. tostring(xSide),
-			Vector3.new(2, 0.8, 28),
-			platform.CFrame * CFrame.new(xSide, 1.4, 0),
+			"PlazaTrim_" .. i,
+			side.size,
+			CFrame.new(base + side.pos),
 			palette.Cyan,
 			Enum.Material.Neon,
 			0.05
 		)
 	end
 
-	-- Roof canopy (glass)
-	addPart(
-		district,
-		"HubCanopy",
-		Vector3.new(56, 1, 32),
-		CFrame.new(base + Vector3.new(0, platformY + 14, 0)),
-		palette.Cyan,
-		Enum.Material.Glass,
-		0.45
-	)
-
-	-- Canopy support arches
-	for _, xArch in { -20, 0, 20 } do
+	-- Radial glow lanes from center
+	for i = -2, 2 do
 		addPart(
 			district,
-			"CanopyArch_" .. tostring(xArch),
-			Vector3.new(1.2, 14, 1.2),
-			CFrame.new(base + Vector3.new(xArch, platformY + 7, 14)),
-			palette.Pearl,
-			Enum.Material.SmoothPlastic
-		)
-		addPart(
-			district,
-			"CanopyArch2_" .. tostring(xArch),
-			Vector3.new(1.2, 14, 1.2),
-			CFrame.new(base + Vector3.new(xArch, platformY + 7, -14)),
-			palette.Pearl,
-			Enum.Material.SmoothPlastic
+			"GlowLane_" .. i,
+			Vector3.new(80, 0.2, 1.2),
+			CFrame.new(base + Vector3.new(i * 8, 0.55, 0)),
+			palette.Gold,
+			Enum.Material.Neon,
+			0.15
 		)
 	end
 
-	-- Departure board beacon with billboard
-	local boardPos = base + Vector3.new(0, platformY + 7, -12)
-	local board = addPart(
-		district,
-		"DepartureBoard",
-		Vector3.new(14, 5, 1),
-		CFrame.new(boardPos),
-		Color3.fromRGB(12, 18, 32),
-		Enum.Material.SmoothPlastic
-	)
-	addBillboard(board, "Sky Rail Plaza · Key 15+")
-
-	local light = Instance.new("PointLight")
-	light.Color = palette.Gold
-	light.Brightness = 2.2
-	light.Range = 50
-	light.Parent = board
-
-	WorldBuildBudget:add(ctx.budget, 10)
-end
-
--- ──────────────────────────────────────────────
--- Observation deck on top of hub
--- ──────────────────────────────────────────────
-
-local function buildObservationDeck(district: Folder, ctx: BuildContext)
-	local palette = ctx.profile.Palette
-	local base = ctx.origin.Position
-
-	local deckY = base.Y + 36
-	addPart(
-		district,
-		"ObsDeck",
-		Vector3.new(28, 1.2, 28),
-		CFrame.new(base + Vector3.new(0, deckY, 0)),
-		palette.Pearl,
-		Enum.Material.Slate
-	)
-
-	-- Circular railing (8 posts + neon cap rails)
-	for i = 0, 7 do
-		local angle = (i / 8) * math.pi * 2
-		local r = 13
-		local pos = base + Vector3.new(math.cos(angle) * r, deckY + 2.5, math.sin(angle) * r)
-		addPart(
-			district,
-			"ObsPost_" .. i,
-			Vector3.new(0.6, 4, 0.6),
-			CFrame.new(pos),
-			palette.Pearl,
-			Enum.Material.SmoothPlastic
-		)
-	end
-	MicroCurveBuilder:fillCircle(base + Vector3.new(0, deckY + 4.8, 0), 13, 0.6, {
-		voxelStuds = ctx.profile.VoxelStuds * 0.8,
-		color = palette.Cyan,
-		material = Enum.Material.Neon,
-		parent = district,
-		filled = false,
-		collision = false,
-		budget = ctx.budget,
-	})
-
-	-- Central spire beacon
-	local spire = addPart(
-		district,
-		"ObsSpire",
-		Vector3.new(2.5, 18, 2.5),
-		CFrame.new(base + Vector3.new(0, deckY + 10, 0)),
-		palette.Gold,
-		Enum.Material.Neon,
-		0.06
-	)
-	local spireLight = Instance.new("PointLight")
-	spireLight.Color = palette.Gold
-	spireLight.Brightness = 2.8
-	spireLight.Range = 70
-	spireLight.Parent = spire
-
-	WorldBuildBudget:add(ctx.budget, 8)
-end
-
--- ──────────────────────────────────────────────
--- Ground-level plaza with radial pattern
--- ──────────────────────────────────────────────
-
-local function buildGroundPlaza(district: Folder, ctx: BuildContext)
-	local palette = ctx.profile.Palette
-	local base = ctx.origin.Position
-
-	-- Outer ring plaza floor
-	MicroCurveBuilder:fillCircle(base + Vector3.new(0, 0.6, 0), 56, 3, {
-		voxelStuds = ctx.profile.VoxelStuds,
-		color = palette.Pearl,
-		material = Enum.Material.Slate,
-		parent = district,
-		filled = false,
-		budget = ctx.budget,
-	})
-	-- Neon accent ring
-	MicroCurveBuilder:fillCircle(base + Vector3.new(0, 0.8, 0), 54, 1.2, {
+	-- Inner accent circle
+	MicroCurveBuilder:fillCircle(base + Vector3.new(0, 0.65, 0), 18, 1.2, {
 		voxelStuds = ctx.profile.VoxelStuds * 0.85,
 		color = palette.Gold,
 		material = Enum.Material.Neon,
@@ -334,32 +217,82 @@ local function buildGroundPlaza(district: Folder, ctx: BuildContext)
 		collision = false,
 		budget = ctx.budget,
 	})
-	-- Inner circle (solid)
-	MicroCurveBuilder:fillCircle(base + Vector3.new(0, 0.5, 0), 24, 24, {
-		voxelStuds = ctx.profile.VoxelStuds,
-		color = palette.Pearl,
-		material = Enum.Material.SmoothPlastic,
-		parent = district,
-		filled = true,
-		budget = ctx.budget,
-	})
 
-	-- Radial spoke lights
-	for i = 0, 5 do
-		local angle = (i / 6) * math.pi * 2
-		local nearPos = base + Vector3.new(math.cos(angle) * 26, 1.2, math.sin(angle) * 26)
-		addPart(
+	WorldBuildBudget:add(ctx.budget, 11)
+end
+
+-- ──────────────────────────────────────────────
+-- Transit stops — 2 แห่งบนราง: ชานชาลา + canopy + ป้าย + ProximityPrompt
+-- ──────────────────────────────────────────────
+
+local STOP_INDICES = { 5, 16 } -- roughly opposing sides of the 32-sample loop
+
+local function buildTransitStops(district: Folder, ctx: BuildContext)
+	local palette = ctx.profile.Palette
+
+	for _, si in STOP_INDICES do
+		local t = si / TRACK_SAMPLES
+		local trackPos = sampleTrack(t, ctx.origin)
+
+		-- Platform deck
+		local platform = addPart(
 			district,
-			"SpokeLight_" .. i,
-			Vector3.new(0.8, 0.8, 22),
-			CFrame.lookAt(nearPos, nearPos + Vector3.new(math.cos(angle + math.pi / 2), 0, math.sin(angle + math.pi / 2))),
-			palette.Cyan,
-			Enum.Material.Neon,
-			0.12
+			"TransitPlatform_" .. si,
+			Vector3.new(12, 1, 8),
+			CFrame.new(trackPos + Vector3.new(0, -1, 0)),
+			palette.Pearl,
+			Enum.Material.SmoothPlastic
 		)
-	end
+		platform:SetAttribute("SkyRailStop", true)
 
-	WorldBuildBudget:add(ctx.budget, 6)
+		-- Canopy
+		local canopy = addPart(
+			district,
+			"TransitCanopy_" .. si,
+			Vector3.new(14, 0.5, 10),
+			CFrame.new(trackPos + Vector3.new(0, 6, 0)),
+			palette.Cyan,
+			Enum.Material.Glass,
+			0.4
+		)
+
+		-- Sign pillar
+		local signPart = addPart(
+			district,
+			"StopSign_" .. si,
+			Vector3.new(1.5, 4, 1.5),
+			CFrame.new(trackPos + Vector3.new(0, 2, 4)),
+			palette.Gold,
+			Enum.Material.SmoothPlastic
+		)
+		addLabel(signPart, "Sky Rail Stop " .. si)
+
+		-- ProximityPrompt on platform
+		local prompt = Instance.new("ProximityPrompt")
+		prompt.Name = "BoardSkyRail"
+		prompt.ActionText = "Board Sky Rail"
+		prompt.ObjectText = "Transit Stop"
+		prompt.MaxActivationDistance = 10
+		prompt.Parent = platform
+
+		-- Light beacon
+		local beacon = addPart(
+			district,
+			"StopBeacon_" .. si,
+			Vector3.new(1, 1, 1),
+			CFrame.new(trackPos + Vector3.new(0, 8, 0)),
+			palette.Gold,
+			Enum.Material.Neon,
+			0.08
+		)
+		local stopLight = Instance.new("PointLight")
+		stopLight.Color = palette.Cyan
+		stopLight.Brightness = 1.5
+		stopLight.Range = 30
+		stopLight.Parent = beacon
+
+		WorldBuildBudget:add(ctx.budget, 6)
+	end
 end
 
 -- ──────────────────────────────────────────────
@@ -372,11 +305,10 @@ function EternityCitySkyRailPlazaLandmark.build(ctx: BuildContext): Folder
 	district:SetAttribute("LandmarkArtPass", "v4_skyrail")
 	district:SetAttribute("VisualBibleDistrict", "SkyRailPlaza")
 
-	buildGroundPlaza(district, ctx)
+	buildReflectivePlaza(district, ctx)
 	buildPylons(district, ctx)
 	buildRailTrack(district, ctx)
-	buildTransitHub(district, ctx)
-	buildObservationDeck(district, ctx)
+	buildTransitStops(district, ctx)
 
 	district.Parent = ctx.parent
 	return district

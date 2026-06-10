@@ -90,6 +90,12 @@
         "DeathValleyHellboundTravelBuilder": {
           "$path": "src/ServerScriptService/World/DeathValleyHellboundTravelBuilder.luau"
         },
+        "DeathValleySpiritChamberBuilder": {
+          "$path": "src/ServerScriptService/World/DeathValleySpiritChamberBuilder.luau"
+        },
+        "DeathValleyPeakColonyBuilder": {
+          "$path": "src/ServerScriptService/World/DeathValleyPeakColonyBuilder.luau"
+        },
         "DeathValleyMegaZonesBuilder": {
           "$path": "src/ServerScriptService/World/DeathValleyMegaZonesBuilder.luau"
         },

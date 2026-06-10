@@ -124,11 +124,17 @@ function DeathValleyWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): W
 	local travelBuilder = require(script.Parent:WaitForChild("DeathValleyHellboundTravelBuilder"))
 	travelBuilder:BuildPlayable(model, profile, budget)
 
+	local colonyBuilder = require(script.Parent:WaitForChild("DeathValleyPeakColonyBuilder"))
+	colonyBuilder:Build(model, profile, budget)
+
 	local megaBuilder = require(script.Parent:WaitForChild("DeathValleyMegaZonesBuilder"))
 	megaBuilder:Build(model, profile, budget)
 	megaBuilder:BuildWeeklyBossArena(model, profile, budget)
 
-	print("[Utopia] Death Valley built — Phase A+B+C + Zone 1–5 + travel pipeline")
+	local spiritBuilder = require(script.Parent:WaitForChild("DeathValleySpiritChamberBuilder"))
+	spiritBuilder:Build(model, profile, budget)
+
+	print("[Utopia] Death Valley built — Phase A+B+C+D + Zone 1–5 + travel pipeline + Peak Colony + 3 Spirit Chambers")
 	return WorldBuilderTypes.success(model)
 end
 
