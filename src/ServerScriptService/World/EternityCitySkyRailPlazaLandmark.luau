@@ -92,7 +92,7 @@ local function buildRailTrack(district: Folder, ctx: BuildContext)
 		end
 		MicroCurveBuilder:fillArc(points, 1.8, {
 			voxelStuds = ctx.profile.VoxelStuds * 1.1,
-			color = palette.Pearl,
+			color = palette.Steel,
 			material = Enum.Material.SmoothPlastic,
 			parent = district,
 			collision = true,
@@ -137,7 +137,7 @@ local function buildPylons(district: Folder, ctx: BuildContext)
 			"Pylon_" .. i,
 			Vector3.new(2.5, height, 2.5),
 			CFrame.new(midPos),
-			palette.Pearl,
+			palette.Slate,
 			Enum.Material.SmoothPlastic
 		)
 		-- Pylon cap neon ring
@@ -167,7 +167,7 @@ local function buildReflectivePlaza(district: Folder, ctx: BuildContext)
 		"ReflectivePad",
 		Vector3.new(90, 0.5, 90),
 		CFrame.new(base + Vector3.new(0, 0.4, 0)),
-		palette.Pearl,
+		palette.Midnight,
 		Enum.Material.Glass,
 		0.25
 	)
@@ -240,7 +240,7 @@ local function buildTransitStops(district: Folder, ctx: BuildContext)
 			"TransitPlatform_" .. si,
 			Vector3.new(12, 1, 8),
 			CFrame.new(trackPos + Vector3.new(0, -1, 0)),
-			palette.Pearl,
+			palette.Slate,
 			Enum.Material.SmoothPlastic
 		)
 		platform:SetAttribute("SkyRailStop", true)

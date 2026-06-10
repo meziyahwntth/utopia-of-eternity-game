@@ -8,7 +8,7 @@ local EternityCityLighting = {}
 function EternityCityLighting.apply(model: Model, palette: { Pearl: Color3, Gold: Color3, Cyan: Color3 })
 	local lighting = game:GetService("Lighting")
 	lighting.ClockTime = 16.5
-	lighting.Brightness = 2.2
+	lighting.Brightness = 1.2
 	lighting.Ambient = Color3.fromRGB(120, 130, 150)
 	lighting.OutdoorAmbient = Color3.fromRGB(140, 150, 170)
 	lighting.EnvironmentDiffuseScale = 0.4
@@ -21,7 +21,7 @@ function EternityCityLighting.apply(model: Model, palette: { Pearl: Color3, Gold
 	end
 	atmosphere.Density = 0.28
 	atmosphere.Offset = 0.15
-	atmosphere.Color = palette.Pearl
+	atmosphere.Color = palette.Twilight
 	atmosphere.Decay = palette.Cyan
 	atmosphere.Glare = 0.35
 	atmosphere.Haze = 1.2

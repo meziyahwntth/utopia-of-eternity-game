@@ -25,7 +25,7 @@ local HubWorldBuilder = {}
 local COLORS = {
 	Solhaven = Color3.fromRGB(255, 200, 80),
 	Nocturne = Color3.fromRGB(170, 100, 255),
-	EternityCity = Color3.fromRGB(255, 255, 255),
+	EternityCity = Color3.fromRGB(0, 229, 255),
 	DeathValley = Color3.fromRGB(80, 40, 100),
 }
 

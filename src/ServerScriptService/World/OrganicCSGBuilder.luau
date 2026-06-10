@@ -20,7 +20,7 @@ local function part(name: string, size: Vector3, cf: CFrame, opts: ShapeOpts): P
 	p.CFrame = cf
 	p.Anchored = true
 	p.CanCollide = if opts.collision ~= nil then opts.collision else true
-	p.Color = opts.color or Color3.fromRGB(245, 245, 240)
+	p.Color = opts.color or Color3.fromRGB(90, 105, 125)
 	p.Material = opts.material or Enum.Material.SmoothPlastic
 	p.Transparency = opts.transparency or 0
 	p.TopSurface = Enum.SurfaceType.Smooth

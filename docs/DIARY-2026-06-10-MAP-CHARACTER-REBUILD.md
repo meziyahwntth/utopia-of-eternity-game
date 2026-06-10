@@ -172,3 +172,25 @@ DV content เหลือ: POI art pass (Whispering Grove, Hollow Lake) + Zone 
   (1 บรรทัด, ไม่แตะ WorldBuildShared/place อื่น/terrain) — VALIDATE-FIX-DV-SPAWN.txt PASS
 - Playtest: spawns (−27,1,−47)/(−27,1,46)/(54,1,−1) + playerY=4 ✓ (เดิม 72)
 - หมายเหตุ: push แล้ว 2 commits ก่อนหน้า (2ae4813 POI, 321a96d Zones) — fix นี้ยังไม่ push
+
+## BackdoorScanner → CI + push — ตรวจรับผ่าน
+
+- Cursor ลบ BackdoorScanner.luau (dead code — Script.Source อ่านไม่ได้ใน live game)
+  + ตัด require/runStep ใน SecurityCore + ตัด entry ใน default.project.json
+- เพิ่ม CI step "Backdoor pattern scan" ใน job security-scan (word-boundary regex,
+  ข้าม comment lines, scan ปัจจุบัน = 0 hits) — VALIDATE-BACKDOOR-CI.txt PASS
+- Push แล้ว: 1f4ea0b (spawn fix) + 1d38f42 (CI) → origin/main, working tree clean
+- Playtest ยืนยัน: [SecurityCore] ALL STEPS COMPLETE — Shield online ✓ (boot ไม่พังหลังลบ)
+- บทเรียน: command bar ใน play mode = Client context → มองไม่เห็น ServerScriptService
+  เช็คของฝั่ง server ให้ดูจาก server log prints แทน
+
+## Eternity City Recolor — แก้ขาวโพลน — ตรวจรับผ่าน (3 รอบ)
+
+- ปัญหาจาก Praphan: เมืองขาวโพลนแยกอาคารไม่ออก
+- รอบ 1: เพิ่ม Steel/Slate/Midnight/Teal + แก้ Brightness 2.2→1.2 + atmosphere — เหลือ 247 ขาว
+  (audit grep แค่ `profile.Palette.Pearl` หลุด alias `palette.Pearl` ใน landmark ทั้ง 6 ไฟล์)
+- รอบ 2: ไล่ตามลิสต์ [WHITE2] ครบ — เหลือ 72 (ArchRibKit ใน ServerStorage/WorldKits นอก scope)
+- รอบ 3: ส่ง palette Steel/Slate จาก AuroraSpireLandmark → CreateAll (fallback กลางคงไว้ให้
+  Hub/Solhaven/Nocturne) — playtest: `[WHITE4] nearwhite=1 (DomeShell/SanctuaryCanopy ข้อยกเว้น)`
+- บทเรียน audit สี: ห้าม scope แค่ World/ — kit ใน ServerStorage ก็สร้าง part ใต้เมืองได้
+- ยังไม่ push (recolor 3 รอบค้างใน working tree)

@@ -71,7 +71,7 @@ local function buildCentralNeedle(district: Folder, ctx: BuildContext)
 	local base = ctx.origin.Position
 
 	OrganicCSGBuilder:createSpire(base, 128, 16, {
-		color = palette.Pearl,
+		color = palette.Steel,
 		material = Enum.Material.SmoothPlastic,
 		parent = district,
 		name = "AuroraCentralNeedle",
@@ -114,14 +114,14 @@ local function buildSatelliteSpires(district: Folder, ctx: BuildContext)
 		local height = 90 + (i % 4) * 18
 		local pos = ctx.origin * CFrame.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
 		OrganicCSGBuilder:createSpire(pos.Position, height, 12 + (i % 3) * 2, {
-			color = palette.Pearl,
+			color = if i % 2 == 0 then palette.Slate else palette.Steel,
 			material = Enum.Material.SmoothPlastic,
 			parent = district,
 			name = "Spire_" .. i,
 		})
 		if i % 2 == 0 then
 			OrganicCSGBuilder:createDome(pos.Position + Vector3.new(0, height * 0.35, 0), 14 + i, {
-				color = palette.Pearl,
+				color = palette.Teal,
 				parent = district,
 				name = "GeoDome_" .. i,
 			})
@@ -161,7 +161,7 @@ local function buildBasePlaza(district: Folder, ctx: BuildContext)
 
 	MicroCurveBuilder:fillCircle(base + Vector3.new(0, 0.8, 0), 44, 2.2, {
 		voxelStuds = ctx.profile.VoxelStuds,
-		color = palette.Pearl,
+		color = palette.Midnight,
 		material = Enum.Material.Slate,
 		parent = district,
 		filled = false,
@@ -177,7 +177,14 @@ local function buildBasePlaza(district: Folder, ctx: BuildContext)
 		budget = ctx.budget,
 	})
 
-	ArchRibKit:CreateAll(ctx.origin * CFrame.new(0, 0, 25), 22, district, ctx.budget)
+	ArchRibKit:CreateAll(ctx.origin * CFrame.new(0, 0, 25), 22, district, ctx.budget, {
+		palette = {
+			Pearl = Color3.fromRGB(90, 105, 125),
+			PearlAlt = Color3.fromRGB(55, 68, 88),
+			Gold = palette.Gold,
+			Cyan = palette.Cyan,
+		}
+	})
 end
 
 function EternityCityAuroraSpireLandmark.build(ctx: BuildContext): Folder

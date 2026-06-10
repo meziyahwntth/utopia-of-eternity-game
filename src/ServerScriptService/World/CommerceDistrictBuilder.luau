@@ -37,7 +37,7 @@ local function makeShopKiosk(
 	base.Size = Vector3.new(18, 4, 14)
 	base.CFrame = CFrame.new(position.X, y, position.Z)
 	base.Anchored = true
-	base.Color = profile.Palette.Pearl
+	base.Color = profile.Palette.Slate
 	base.Material = Enum.Material.SmoothPlastic
 	base.Parent = parent
 	WorldBuildBudget:add(budget, 1)
@@ -141,7 +141,7 @@ local function buildAuroraMegaMall(
 
 	local origin = Vector3.new(-60, 0, -80)
 	OrganicCSGBuilder:createSpire(origin, 90, 14, {
-		color = profile.Palette.Pearl,
+		color = profile.Palette.Midnight,
 		material = Enum.Material.SmoothPlastic,
 		parent = district,
 		name = "MegaMallTower",
@@ -154,7 +154,7 @@ local function buildAuroraMegaMall(
 		band.Size = Vector3.new(32, 2, 32)
 		band.CFrame = CFrame.new(origin + Vector3.new(0, floor * 16, 0))
 		band.Anchored = true
-		band.Color = profile.Palette.Pearl
+		band.Color = profile.Palette.Steel
 		band.Material = Enum.Material.SmoothPlastic
 		band.Parent = district
 		OrganicCSGBuilder:createGlassBand(band.CFrame.Position, 34, 1.5, {
@@ -230,7 +230,7 @@ local function buildMarinaShowroom(
 	pier.Size = Vector3.new(120, 1, 30)
 	pier.CFrame = CFrame.new(220, 1, -40)
 	pier.Anchored = true
-	pier.Color = profile.Palette.Pearl
+	pier.Color = profile.Palette.Slate
 	pier.Material = Enum.Material.SmoothPlastic
 	pier.Parent = district
 	WorldBuildBudget:add(budget, 1)
@@ -360,13 +360,13 @@ local function buildHellboundTerminal(
 	pad.Size = Vector3.new(80, 1, 50)
 	pad.CFrame = CFrame.new(240, 2, 80)
 	pad.Anchored = true
-	pad.Color = profile.Palette.Pearl
+	pad.Color = profile.Palette.Midnight
 	pad.Material = Enum.Material.SmoothPlastic
 	pad.Parent = district
 	WorldBuildBudget:add(budget, 1)
 
 	OrganicCSGBuilder:createDome(Vector3.new(240, 8, 80), 16, {
-		color = profile.Palette.Pearl,
+		color = profile.Palette.Teal,
 		parent = district,
 		name = "TerminalDome",
 	})

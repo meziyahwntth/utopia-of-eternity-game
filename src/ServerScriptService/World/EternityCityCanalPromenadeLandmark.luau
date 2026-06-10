@@ -106,7 +106,7 @@ local function buildBoardwalk(district: Folder, ctx: BuildContext)
 	local points = buildBoardwalkPoints()
 	MicroCurveBuilder:fillArc(points, 3, {
 		voxelStuds = ctx.profile.VoxelStuds,
-		color = palette.Pearl,
+		color = palette.Slate,
 		material = Enum.Material.SmoothPlastic,
 		parent = district,
 		collision = true,
@@ -161,7 +161,7 @@ local function buildGateArch(district: Folder, ctx: BuildContext)
 		"CanalGateLeft",
 		Vector3.new(2, 14, 2),
 		CFrame.new(gatePos + Vector3.new(-12, 7, 0)),
-		palette.Pearl,
+		palette.Steel,
 		Enum.Material.SmoothPlastic
 	)
 	local right = addPart(
@@ -169,7 +169,7 @@ local function buildGateArch(district: Folder, ctx: BuildContext)
 		"CanalGateRight",
 		Vector3.new(2, 14, 2),
 		CFrame.new(gatePos + Vector3.new(12, 7, 0)),
-		palette.Pearl,
+		palette.Steel,
 		Enum.Material.SmoothPlastic
 	)
 	local lintel = addPart(
@@ -199,7 +199,7 @@ local function buildBridges(district: Folder, ctx: BuildContext)
 			"CanalBridge_" .. tostring(math.floor(t * 100)),
 			Vector3.new(18, 1.2, 8),
 			CFrame.new(center + Vector3.new(0, 4.5, 0)),
-			palette.Pearl,
+			palette.Slate,
 			Enum.Material.Slate
 		)
 		addPart(

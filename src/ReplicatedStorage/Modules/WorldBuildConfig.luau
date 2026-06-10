@@ -21,6 +21,10 @@ export type PlaceProfile = {
 		Cyan: Color3,
 		Twilight: Color3,
 		Amber: Color3,
+		Steel: Color3,
+		Slate: Color3,
+		Midnight: Color3,
+		Teal: Color3,
 	},
 }
 
@@ -30,6 +34,10 @@ local PALETTE = {
 	Cyan = Color3.fromRGB(0, 229, 255),
 	Twilight = Color3.fromRGB(10, 22, 40),
 	Amber = Color3.fromRGB(255, 179, 71),
+	Steel = Color3.fromRGB(90, 105, 125),
+	Slate = Color3.fromRGB(55, 68, 88),
+	Midnight = Color3.fromRGB(25, 35, 50),
+	Teal = Color3.fromRGB(45, 115, 135),
 }
 
 WorldBuildConfig.Profiles = {

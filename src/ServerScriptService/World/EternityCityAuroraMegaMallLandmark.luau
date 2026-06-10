@@ -79,7 +79,7 @@ local function buildMallSpireAndPodium(district: Folder, ctx: BuildContext)
 	local palette = ctx.profile.Palette
 
 	OrganicCSGBuilder:createSpire(ctx.base.Position, 160, 28, {
-		color = palette.Pearl,
+		color = palette.Midnight,
 		material = Enum.Material.SmoothPlastic,
 		parent = district,
 		name = "MallSpire",
@@ -91,7 +91,7 @@ local function buildMallSpireAndPodium(district: Folder, ctx: BuildContext)
 		"MallPodium",
 		Vector3.new(68, 8, 68),
 		ctx.base * CFrame.new(0, 4, 0),
-		palette.Pearl,
+		palette.Slate,
 		Enum.Material.SmoothPlastic
 	)
 
@@ -190,7 +190,7 @@ local function buildMallFloors(district: Folder, ctx: BuildContext)
 					"MallColumn_" .. fStr .. "_" .. tostring(cx) .. "_" .. tostring(cz),
 					Vector3.new(2, 2, 2),
 					ctx.base * CFrame.new(cx, fy + 1, cz),
-					palette.Pearl,
+					palette.Steel,
 					Enum.Material.SmoothPlastic
 				)
 				partCount += 1
@@ -204,7 +204,7 @@ local function buildMallFloors(district: Folder, ctx: BuildContext)
 				"MallColumnMidZ_" .. fStr .. "_0_" .. tostring(cz),
 				Vector3.new(2, 2, 2),
 				ctx.base * CFrame.new(0, fy + 1, cz),
-				palette.Pearl,
+				palette.Steel,
 				Enum.Material.SmoothPlastic
 			)
 			partCount += 1
@@ -215,7 +215,7 @@ local function buildMallFloors(district: Folder, ctx: BuildContext)
 				"MallColumnMidX_" .. fStr .. "_" .. tostring(cx) .. "_0",
 				Vector3.new(2, 2, 2),
 				ctx.base * CFrame.new(cx, fy + 1, 0),
-				palette.Pearl,
+				palette.Steel,
 				Enum.Material.SmoothPlastic
 			)
 			partCount += 1
@@ -254,7 +254,7 @@ local function buildMallFloors(district: Folder, ctx: BuildContext)
 				"MallRamp_" .. fStr .. "_to_" .. tostring(floorIndex + 2),
 				Vector3.new(rampRun, 0.6, rampHalfWidth * 2),
 				ctx.base * CFrame.new(0, rampY, rampZ) * CFrame.Angles(-rampAngle, 0, 0),
-				palette.Pearl,
+				palette.Slate,
 				Enum.Material.SmoothPlastic
 			)
 			-- Ramp edge rails (neon strips along ramp sides)
@@ -342,7 +342,7 @@ local function buildSkyLounge50(district: Folder, ctx: BuildContext)
 			"SkyLoungeSofa_" .. i,
 			Vector3.new(8, 1.5, 3),
 			loungeBase * CFrame.new(cluster.pos) * CFrame.Angles(0, cluster.rot, 0),
-			palette.Pearl,
+			palette.Teal,
 			Enum.Material.SmoothPlastic
 		)
 		-- Sofa backrest
@@ -372,7 +372,7 @@ local function buildSkyLounge50(district: Folder, ctx: BuildContext)
 		"SkyLoungeBar",
 		Vector3.new(10, 2, 3),
 		loungeBase * CFrame.new(0, 1, -8),
-		palette.Pearl,
+		palette.Slate,
 		Enum.Material.SmoothPlastic
 	)
 	addPart(
@@ -395,7 +395,7 @@ local function buildSkyLounge50(district: Folder, ctx: BuildContext)
 			"SkyLoungePost_" .. i,
 			Vector3.new(0.6, 4, 0.6),
 			CFrame.new(postPos),
-			palette.Pearl,
+			palette.Steel,
 			Enum.Material.SmoothPlastic
 		)
 	end
@@ -426,7 +426,7 @@ local function buildSkyLounge50(district: Folder, ctx: BuildContext)
 		"SkyLoungeCanopy",
 		Vector3.new(62, 0.8, 62),
 		loungeBase * CFrame.new(0, 12, 0),
-		palette.Pearl,
+		palette.Teal,
 		Enum.Material.Glass,
 		0.55
 	)
@@ -448,7 +448,7 @@ local function buildLiveMirror(district: Folder, ctx: BuildContext)
 		"LiveMirror",
 		Vector3.new(10, 12, 1),
 		mirrorBase * CFrame.new(0, 6, 0),
-		palette.Pearl,
+		palette.Steel,
 		Enum.Material.Glass,
 		0.15
 	)

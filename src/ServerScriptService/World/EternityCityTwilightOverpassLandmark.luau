@@ -88,7 +88,7 @@ local function buildOverpass(district: Folder, ctx: BuildContext)
 		"OverpassDeck",
 		Vector3.new(DECK_WIDTH, 1.2, DECK_HALF_Z * 2),
 		CFrame.new(center + Vector3.new(0, DECK_Y, 0)),
-		palette.Pearl,
+		palette.Slate,
 		Enum.Material.SmoothPlastic
 	)
 	partCount += 1
@@ -148,7 +148,7 @@ local function buildOverpass(district: Folder, ctx: BuildContext)
 			"OverpassRamp_" .. ramp.label,
 			Vector3.new(DECK_WIDTH, 0.8, RAMP_RUN),
 			CFrame.new(center + Vector3.new(0, rampCenterY, rampCenterZ)) * CFrame.Angles(ramp.rampAngle, 0, 0),
-			palette.Pearl,
+			palette.Slate,
 			Enum.Material.SmoothPlastic
 		)
 		partCount += 1
@@ -177,7 +177,7 @@ local function buildOverpass(district: Folder, ctx: BuildContext)
 				"RampPillar_" .. ramp.label .. "_" .. tostring(pillarFrac),
 				Vector3.new(1.5, pillarY, 1.5),
 				CFrame.new(center + Vector3.new(0, pillarY / 2, pillarZ)),
-				palette.Pearl,
+				palette.Steel,
 				Enum.Material.SmoothPlastic
 			)
 			partCount += 1
@@ -191,7 +191,7 @@ local function buildOverpass(district: Folder, ctx: BuildContext)
 			"DeckPillar_" .. tostring(zPillar),
 			Vector3.new(2, DECK_Y - 1, 2),
 			CFrame.new(center + Vector3.new(0, (DECK_Y - 1) / 2, zPillar)),
-			palette.Pearl,
+			palette.Steel,
 			Enum.Material.SmoothPlastic
 		)
 		partCount += 1
@@ -229,7 +229,7 @@ local function buildEventArches(district: Folder, ctx: BuildContext)
 
 		-- Build arch using OrganicCSGBuilder
 		OrganicCSGBuilder:createArch(archOrigin, ARCH_HALF_SPAN * 2, ARCH_HEIGHT, 2.5, {
-			color = palette.Pearl,
+			color = palette.Slate,
 			material = Enum.Material.SmoothPlastic,
 			parent = district,
 			name = "EventArch_" .. i,
@@ -289,7 +289,7 @@ local function buildEventStage(district: Folder, ctx: BuildContext)
 		"EventStagePlatform",
 		Vector3.new(24, 0.8, 16),
 		CFrame.new(stageCenter),
-		palette.Pearl,
+		palette.Midnight,
 		Enum.Material.SmoothPlastic
 	)
 	stageDeck:SetAttribute("EventStage", true)
@@ -381,7 +381,7 @@ local function buildLanternCorridor(district: Folder, ctx: BuildContext)
 				"OverpassPost_" .. i .. "_" .. tostring(xSide),
 				Vector3.new(0.8, 14, 0.8),
 				CFrame.new(center + Vector3.new(xSide, 7, zOff)),
-				palette.Pearl,
+				palette.Steel,
 				Enum.Material.SmoothPlastic
 			)
 			partCount += 1

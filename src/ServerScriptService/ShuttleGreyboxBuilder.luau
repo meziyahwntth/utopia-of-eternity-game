@@ -209,8 +209,14 @@ function ShuttleGreyboxBuilder:BuildEternityVariant(parent: Instance, origin: CF
 	local _stop, dock, shuttleDock = self:BuildStop(parent, origin)
 	local build = self:BuildShuttle(parent, shuttleDock)
 
+	-- Eternity recolor: stop canopy must not be near-white (city recolor pass)
+	local stopCanopy = _stop:FindFirstChild("Canopy")
+	if stopCanopy and stopCanopy:IsA("BasePart") then
+		stopCanopy.Color = Color3.fromRGB(55, 68, 88)
+	end
+
 	local root = build.Root
-	root.Color = Color3.fromRGB(245, 245, 250)
+	root.Color = Color3.fromRGB(90, 105, 125)
 	root.Material = Enum.Material.SmoothPlastic
 
 	local glassBand = Instance.new("Part")

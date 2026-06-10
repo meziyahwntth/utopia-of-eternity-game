@@ -142,7 +142,7 @@ local function buildReflectivePlaza(parent: Instance, profile: WorldBuildConfig.
 	pad.Size = Vector3.new(90, 0.4, 90)
 	pad.CFrame = CFrame.new(0, 0.3, -35)
 	pad.Anchored = true
-	pad.Color = profile.Palette.Pearl
+	pad.Color = profile.Palette.Midnight
 	pad.Material = Enum.Material.Glass
 	pad.Reflectance = 0.35
 	pad.Parent = plaza
@@ -199,7 +199,7 @@ local function buildHoverShowroom(parent: Instance, profile: WorldBuildConfig.Pl
 	pad.Size = Vector3.new(100, 1, 60)
 	pad.CFrame = CFrame.new(-90, 0.5, 20)
 	pad.Anchored = true
-	pad.Color = profile.Palette.Pearl
+	pad.Color = profile.Palette.Midnight
 	pad.Material = Enum.Material.SmoothPlastic
 	pad.Parent = showroom
 	WorldBuildBudget:add(budget, 1)
@@ -234,7 +234,7 @@ shop.Parent = parent
 	building.Size = Vector3.new(36, 16, 24)
 	building.CFrame = CFrame.new(50, 8, -20)
 	building.Anchored = true
-	building.Color = profile.Palette.Pearl
+	building.Color = profile.Palette.Slate
 	building.Material = Enum.Material.SmoothPlastic
 	building.Parent = shop
 	WorldBuildBudget:add(budget, 1)
@@ -306,7 +306,7 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	model.Name = "UtopiaEternityCity"
 	model.Parent = workspace
 
-	WorldBuildShared:makeGround(model, profile.GroundSizeStuds, profile.Palette.Pearl, Enum.Material.SmoothPlastic)
+	WorldBuildShared:makeGround(model, profile.GroundSizeStuds, profile.Palette.Twilight, Enum.Material.Slate)
 	WorldBuildBudget:add(budget, 1)
 
 	local sanctuaryRadius = WorldBuildShared:getSanctuaryRadius("EternityCity")

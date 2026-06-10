@@ -13,7 +13,7 @@ local ArchRibKit = {}
 export type RibOpts = {
 	span: number?,
 	height: number?,
-	palette: { Pearl: Color3, Gold: Color3, Cyan: Color3 }?,
+	palette: { Pearl: Color3, PearlAlt: Color3?, Gold: Color3, Cyan: Color3 }?,
 	parent: Instance?,
 	budget: { count: number, max: number }?,
 }
@@ -82,11 +82,27 @@ function ArchRibKit:Create(index: number, origin: CFrame, opts: RibOpts?): Model
 	return model
 end
 
-function ArchRibKit:CreateAll(origin: CFrame, spacing: number, parent: Instance, budget: { count: number, max: number }?): { Model }
+function ArchRibKit:CreateAll(origin: CFrame, spacing: number, parent: Instance, budget: { count: number, max: number }?, opts: RibOpts?): { Model }
 	local models: { Model } = {}
 	for i = 1, 8 do
 		local cf = origin * CFrame.new((i - 4.5) * spacing, 0, 0)
-		table.insert(models, self:Create(i, cf, { parent = parent, budget = budget }))
+		local callOpts: RibOpts = {
+			parent = parent,
+			budget = budget,
+		}
+		if opts then
+			if opts.span then callOpts.span = opts.span end
+			if opts.height then callOpts.height = opts.height end
+			if opts.palette then
+				local bodyColor = if i % 2 == 0 and opts.palette.PearlAlt then opts.palette.PearlAlt else opts.palette.Pearl
+				callOpts.palette = {
+					Pearl = bodyColor,
+					Gold = opts.palette.Gold,
+					Cyan = opts.palette.Cyan,
+				}
+			end
+		end
+		table.insert(models, self:Create(i, cf, callOpts))
 	end
 	return models
 end
