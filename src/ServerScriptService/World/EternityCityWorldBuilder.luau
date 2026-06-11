@@ -349,7 +349,7 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 		buildCoastline(profile)
 		buildMountainBackdrop(profile)
 	else
-		model:SetAttribute("TerrainLayout", "imported-v2")
+		model:SetAttribute("TerrainLayout", "imported-" .. GameConfig.TerrainProfile.Version)
 	end
 
 	local marinaCenter = EternityTerrainSetup.getLandmarkPosition("MarinaCenter", MARINA_CENTER)

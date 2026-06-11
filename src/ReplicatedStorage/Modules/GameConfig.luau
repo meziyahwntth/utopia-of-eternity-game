@@ -479,12 +479,17 @@ GameConfig.CityLighting = {
 		{ name = "AuroraSpireGlow", landmarkKey = "AuroraOrigin", yOffset = 70, colorKey = "Gold", range = 220, brightness = 2.2 },
 		{ name = "MarinaGlow", landmarkKey = "MarinaCenter", yOffset = 18, colorKey = "Cyan", range = 180, brightness = 1.6 },
 		{ name = "SkyRailGlow", landmarkKey = "SkyRailOrigin", yOffset = 32, colorKey = "Gold", range = 140, brightness = 1.2 },
-		{ name = "FashionStageGlow", landmarkKey = "FashionStage", yOffset = 20, colorKey = "Gold", range = 120, brightness = 1.8 },
+		{ name = "FashionStageGlow", landmarkKey = "FashionStage", yOffset = 20, colorKey = "Gold", range = 72, brightness = 0.85 },
+	},
+	FashionStageLights = {
+		SpotLight = { brightness = 1.5, range = 28, angle = 35 },
+		TrussPoint = { brightness = 0.5, range = 10 },
 	},
 }
 
 -- EternityCity heightmap import spec — values from scripts/gen-eternity-terrain.py v3 + meta JSON
 GameConfig.TerrainProfile = {
+	Version = "v3",
 	MapSize = 2048,
 	HeightmapResolution = 1024,
 	RegionHeight = 256,

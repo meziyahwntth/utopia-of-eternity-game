@@ -6,6 +6,9 @@
 ]]
 local EternityCityFashionStage = {}
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GameConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("GameConfig"))
+
 local function addPart(
 	parent: Instance,
 	name: string,
@@ -75,6 +78,7 @@ local function buildPodiums(parent: Folder, palette: any, center: Vector3)
 end
 
 local function buildSpotlights(parent: Folder, palette: any, center: Vector3)
+	local lights = GameConfig.CityLighting.FashionStageLights
 	for i = 1, 4 do
 		local xOff = (i - 2.5) * 10
 		local truss = addPart(
@@ -98,16 +102,16 @@ local function buildSpotlights(parent: Folder, palette: any, center: Vector3)
 		local light = Instance.new("SpotLight")
 		light.Name = "FashionSpot"
 		light.Color = palette.Amber
-		light.Brightness = 3
-		light.Range = 45
-		light.Angle = 35
+		light.Brightness = lights.SpotLight.brightness
+		light.Range = lights.SpotLight.range
+		light.Angle = lights.SpotLight.angle
 		light.Face = Enum.NormalId.Bottom
 		light.Parent = lamp
 
 		local point = Instance.new("PointLight")
 		point.Color = palette.Cyan
-		point.Brightness = 1.2
-		point.Range = 18
+		point.Brightness = lights.TrussPoint.brightness
+		point.Range = lights.TrussPoint.range
 		point.Parent = truss
 	end
 end
