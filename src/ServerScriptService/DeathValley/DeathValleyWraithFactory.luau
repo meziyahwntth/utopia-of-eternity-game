@@ -15,6 +15,7 @@ local DeathValleyWraithFactory = {}
 local activeFolder: Folder? = nil
 local activeWraiths: { Model } = {}
 local aiConnection: RBXScriptConnection? = nil
+local onKilledCallback: ((attacker: Player?, kind: string, position: Vector3) -> ())? = nil
 
 local function getSpawnPosition(): Vector3
 	local angle = math.random() * math.pi * 2
@@ -176,6 +177,69 @@ function DeathValleyWraithFactory.startAi()
 			aiConnection = nil
 		end
 	end)
+end
+
+-- ─── Combat loop API ─────────────────────────────────────────────
+
+function DeathValleyWraithFactory.setOnKilled(callback: (attacker: Player?, kind: string, position: Vector3) -> ())
+	onKilledCallback = callback
+end
+
+function DeathValleyWraithFactory.findNearestActive(position: Vector3, maxDistance: number): Model?
+	local best: Model? = nil
+	local bestDist = maxDistance
+	for _, model in activeWraiths do
+		local core = model.PrimaryPart
+		local hum = model:FindFirstChildOfClass("Humanoid")
+		if core and core.Parent and hum and hum.Health > 0 then
+			local d = (core.Position - position).Magnitude
+			if d <= bestDist then
+				bestDist = d
+				best = model
+			end
+		end
+	end
+	return best
+end
+
+local function removeFromActive(model: Model)
+	for i = #activeWraiths, 1, -1 do
+		if activeWraiths[i] == model then
+			table.remove(activeWraiths, i)
+			break
+		end
+	end
+end
+
+function DeathValleyWraithFactory.applyDamage(model: Model, amount: number, attacker: Player?): (boolean, number)
+	local hum = model:FindFirstChildOfClass("Humanoid")
+	local core = model.PrimaryPart
+	if not hum or hum.Health <= 0 or not core then
+		return false, 0
+	end
+	hum:TakeDamage(amount)
+
+	-- Hit flash
+	local wraithTable = PrismDeathValleySurvivalConfig.Wraiths :: { [string]: PrismDeathValleySurvivalConfig.WraithDef }
+	local def = wraithTable[tostring(model:GetAttribute("WraithKind"))]
+	core.Color = Color3.new(1, 1, 1)
+	task.delay(0.08, function()
+		if core.Parent and def then
+			core.Color = def.color
+		end
+	end)
+
+	if hum.Health <= 0 then
+		local kind = model:GetAttribute("WraithKind")
+		local position = core.Position
+		removeFromActive(model)
+		model:Destroy()
+		if onKilledCallback and typeof(kind) == "string" then
+			onKilledCallback(attacker, kind, position)
+		end
+		return true, 0
+	end
+	return false, hum.Health
 end
 
 function DeathValleyWraithFactory.clearAll()

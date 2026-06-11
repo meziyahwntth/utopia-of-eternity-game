@@ -133,6 +133,18 @@ PrismDeathValleySurvivalConfig.Revive = {
 
 PrismDeathValleySurvivalConfig.StartingLuminiteShards = 30
 
+-- Combat loop — ผู้เล่นกด strike ใส่ wraith ที่ใกล้สุดในระยะ (no-P2W: ดาเมจคงที่ ไม่ขึ้นกับของซื้อ)
+PrismDeathValleySurvivalConfig.Combat = {
+	BaseDamage = 20,
+	AttackRangeStuds = 16,
+	AttackCooldownSeconds = 0.45,
+	ShardRewards = {
+		Whisper = 2,
+		Stalker = 3,
+		LegionEcho = 8,
+	} :: { [string]: number },
+}
+
 PrismDeathValleySurvivalConfig.CheckpointMinBeaconLevel = 3
 PrismDeathValleySurvivalConfig.WeeklyBossMinRing = 3
 PrismDeathValleySurvivalConfig.SeasonalRingMinRing = 4

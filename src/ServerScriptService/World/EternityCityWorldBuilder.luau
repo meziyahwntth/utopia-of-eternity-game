@@ -499,6 +499,14 @@ local function ensureHeroLandmarks(
 		attachHeroMeshSafe(towerDistrict, "EternityTower", eternityTowerBase)
 	end
 
+	-- Landmark #4: Sky Rail Plaza — procedural district สร้างไว้แล้วใน Build flow
+	-- (EternityCitySkyRailPlazaLandmark) แค่ครอบ hero mesh station เพิ่ม
+	local skyRailDistrict = model:FindFirstChild("SkyRailPlaza")
+	if skyRailDistrict and skyRailDistrict:IsA("Folder") and not skyRailDistrict:FindFirstChild("SkyRailPlazaHeroMesh") then
+		local skyRailBase = CFrame.new(EternityTerrainSetup.getLandmarkPosition("SkyRailOrigin", Vector3.new(0, 0, 40)))
+		attachHeroMeshSafe(skyRailDistrict, "SkyRailPlaza", skyRailBase)
+	end
+
 	return plazaDistrict, towerDistrict
 end
 
@@ -626,6 +634,12 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	buildAuroraMegaMall(model, profile, budget, megaMallBase)
 	buildCanalPromenade(model, profile, budget, canalOffset)
 	buildSkyRailPlaza(model, profile, budget, skyRailOrigin)
+	do -- Landmark #4 hero mesh — fresh-build path (augment path อยู่ใน ensureHeroLandmarks)
+		local skyRailDistrict = model:FindFirstChild("SkyRailPlaza")
+		if skyRailDistrict and skyRailDistrict:IsA("Folder") and not skyRailDistrict:FindFirstChild("SkyRailPlazaHeroMesh") then
+			attachHeroMeshSafe(skyRailDistrict, "SkyRailPlaza", skyRailOrigin)
+		end
+	end
 	buildHoverShowroom(model, profile, budget)
 	buildVehicleShop(model, profile, budget)
 	buildTwilightOverpass(model, profile, budget, twilightOrigin)

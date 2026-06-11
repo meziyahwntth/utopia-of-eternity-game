@@ -532,6 +532,12 @@ GameConfig.HeroMeshes = {
 		YOffset = 0,
 		Rotation = Vector3.zero,
 	},
+	SkyRailPlaza = {
+		MeshId = "rbxassetid://106585159616794",
+		Scale = 55, -- native 1.90×0.49×0.51 → ~105×27×28 studs
+		YOffset = 0,
+		Rotation = Vector3.zero,
+	},
 }
 
 -- Fashion Show — Dress-to-Impress style contest (Eternity City festival zone)

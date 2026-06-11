@@ -209,12 +209,21 @@ def decimate_mesh(src: Path, name: str, out_path: Path) -> dict[str, Any]:
 
     mesh, rot_note = fix_up_axis_if_needed(raw)
 
+    # Meshy OBJ เป็น vertex-split triangle soup (~3 verts/face) — ต้อง merge ก่อน
+    # ไม่งั้น split() แตกเป็น component ละ 1 หน้า แล้ว cull ลบทิ้งเกือบหมด
+    # (เรียนรู้จาก SkyRailPlaza 2026-06-12)
+    mesh.merge_vertices()
+
     vertices = np.asarray(mesh.vertices, dtype=np.float32)
     faces = np.asarray(mesh.faces, dtype=np.int32)
 
     def cull_components(tr: trimesh.Trimesh) -> trimesh.Trimesh:
         comps = tr.split(only_watertight=False)
-        big = [c for c in comps if c.area > 0.01]
+        total = sum(c.area for c in comps)
+        if total <= 0:
+            return tr
+        # cull แบบ relative — ค่า absolute 0.01 เคยลบ mesh unit-scale ทั้งตัว
+        big = [c for c in comps if c.area > total * 1e-4]
         if not big:
             return tr
         return trimesh.util.concatenate(big) if len(big) > 1 else big[0]

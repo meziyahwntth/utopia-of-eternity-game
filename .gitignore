@@ -23,6 +23,7 @@ src/ServerScriptService/Secrets/CatalogSecrets.luau
 # Meshy pipeline raw downloads (decimated OBJ in assets/City/ is tracked)
 assets/City/*_generate.*
 assets/City/*_raw.*
+assets/City/*-raw.*
 
 # OS / editor
 .DS_Store

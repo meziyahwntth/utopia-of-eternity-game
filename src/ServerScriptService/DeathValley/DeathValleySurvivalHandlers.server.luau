@@ -26,9 +26,11 @@ local DeathValleySeasonRewardService = require(script.Parent:WaitForChild("Death
 local DeathValleySeasonRolloverService = require(script.Parent:WaitForChild("DeathValleySeasonRolloverService"))
 local DeathValleyLfgFriendsService = require(script.Parent:WaitForChild("DeathValleyLfgFriendsService"))
 local DeathValleySeasonAdminService = require(script.Parent:WaitForChild("DeathValleySeasonAdminService"))
+local DeathValleyCombatService = require(script.Parent:WaitForChild("DeathValleyCombatService"))
 
 local remotes = ReplicatedStorage:WaitForChild("DeathValleyRemotes")
 local getSurvivalState = remotes:WaitForChild("GetSurvivalState") :: RemoteFunction
+local attackWraith = remotes:WaitForChild("AttackWraith") :: RemoteFunction
 local depositBeaconFuel = remotes:WaitForChild("DepositBeaconFuel") :: RemoteFunction
 local upgradeBeacon = remotes:WaitForChild("UpgradeBeacon") :: RemoteFunction
 local startReviveChannel = remotes:WaitForChild("StartReviveChannel") :: RemoteFunction
@@ -85,6 +87,13 @@ end
 
 attackWeeklyBoss.OnServerInvoke = function(player: Player)
 	return DeathValleyWeeklyBossService.attackBoss(player)
+end
+
+attackWraith.OnServerInvoke = function(player: Player)
+	if not allow(player, "AttackWraith", 12, 6) then
+		return false, "Rate limited"
+	end
+	return DeathValleyCombatService.attack(player)
 end
 
 postLfgListing.OnServerInvoke = function(player: Player, zoneId: string)
@@ -396,6 +405,7 @@ local function bootstrap()
 	end
 
 	DeathValleyReviveService.start()
+	DeathValleyCombatService.start()
 	DeathValleyLfgQueueService.ensureSubscribed()
 	DeathValleyLfgInviteService.ensureSubscribed()
 	DeathValleySeasonRolloverService.tryProcessRollover()

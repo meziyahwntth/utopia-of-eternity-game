@@ -258,6 +258,9 @@
         "DeathValleyWraithFactory": {
           "$path": "src/ServerScriptService/DeathValley/DeathValleyWraithFactory.luau"
         },
+        "DeathValleyCombatService": {
+          "$path": "src/ServerScriptService/DeathValley/DeathValleyCombatService.luau"
+        },
         "DeathValleyNightService": {
           "$path": "src/ServerScriptService/DeathValley/DeathValleyNightService.luau"
         },

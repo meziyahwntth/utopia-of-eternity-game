@@ -105,5 +105,7 @@ ensureRemote("RemoteFunction", "GetMyUgcCreatorPacks")
 ensureRemote("RemoteFunction", "GetSeasonalPopUpShop")
 ensureRemote("RemoteEvent", "PresetPackPurchased")
 ensureRemote("RemoteEvent", "SpiritChamberStateChanged")
+ensureRemote("RemoteFunction", "AttackWraith")
+ensureRemote("RemoteEvent", "WraithKilled")
 
 print("[DeathValley] Survival remotes ready")
