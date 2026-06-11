@@ -454,7 +454,36 @@ GameConfig.CityPalette = {
 	Teal = Color3.fromRGB(45, 115, 135),
 }
 
--- EternityCity heightmap import spec — values from scripts/gen-eternity-terrain.py + meta JSON
+-- Eternity City lighting — tuned for Marble/Metal specular on Pearl & Gold landmarks
+GameConfig.CityLighting = {
+	ClockTime = 11,
+	GeographicLatitude = 22,
+	Brightness = 2.2,
+	Ambient = Color3.fromRGB(132, 140, 158),
+	OutdoorAmbient = Color3.fromRGB(168, 175, 192),
+	EnvironmentDiffuseScale = 0.5,
+	EnvironmentSpecularScale = 1.0,
+	Atmosphere = {
+		Density = 0.22,
+		Offset = 0.1,
+		Glare = 0.42,
+		Haze = 0.85,
+	},
+	Bloom = {
+		Intensity = 0.35,
+		Size = 16,
+		Threshold = 0.9,
+	},
+	PointLights = {
+		{ name = "SanctuaryGlow", landmarkKey = "LoadoutPlaza", yOffset = 28, colorKey = "Cyan", range = 300, brightness = 2.4 },
+		{ name = "AuroraSpireGlow", landmarkKey = "AuroraOrigin", yOffset = 70, colorKey = "Gold", range = 220, brightness = 2.2 },
+		{ name = "MarinaGlow", landmarkKey = "MarinaCenter", yOffset = 18, colorKey = "Cyan", range = 180, brightness = 1.6 },
+		{ name = "SkyRailGlow", landmarkKey = "SkyRailOrigin", yOffset = 32, colorKey = "Gold", range = 140, brightness = 1.2 },
+		{ name = "FashionStageGlow", landmarkKey = "FashionStage", yOffset = 20, colorKey = "Gold", range = 120, brightness = 1.8 },
+	},
+}
+
+-- EternityCity heightmap import spec — values from scripts/gen-eternity-terrain.py v3 + meta JSON
 GameConfig.TerrainProfile = {
 	MapSize = 2048,
 	HeightmapResolution = 1024,
@@ -464,21 +493,21 @@ GameConfig.TerrainProfile = {
 	SeaLevelHeightMap = 52,
 	PlateauY = 72,
 	SeaLevelY = 53,
-	PlateauCenterPixel = Vector2.new(460, 553),
-	BayCenterPixel = Vector2.new(860, 223),
-	PlateauCenterStud = Vector3.new(-104, 72, 82),
-	BayCenterStud = Vector3.new(696, 53, -578),
+	PlateauCenterPixel = Vector2.new(480, 543),
+	BayCenterPixel = Vector2.new(940, 103),
+	PlateauCenterStud = Vector3.new(-64, 72, 62),
+	BayCenterStud = Vector3.new(856, 53, -818),
 	MapEdgeInsetStuds = 32,
 	-- Landmark XZ on plateau (Y snapped via EternityTerrainSetup.getGroundY)
 	Landmarks = {
-		AuroraOrigin = Vector3.new(-104, 72, 82),
-		MarinaCenter = Vector3.new(160, 72, -20),
-		CanalPathOffset = Vector3.new(-124, 72, 102),
-		SkyRailOrigin = Vector3.new(-104, 72, 122),
-		TwilightOrigin = Vector3.new(-204, 72, 162),
-		FashionStage = Vector3.new(-234, 72, 197),
-		LoadoutPlaza = Vector3.new(-104, 72, 102),
-		MegaMallBase = Vector3.new(-134, 72, -68),
+		AuroraOrigin = Vector3.new(-64, 72, 62),
+		MarinaCenter = Vector3.new(200, 72, -40),
+		CanalPathOffset = Vector3.new(-84, 72, 82),
+		SkyRailOrigin = Vector3.new(-64, 72, 102),
+		TwilightOrigin = Vector3.new(-164, 72, 142),
+		FashionStage = Vector3.new(-194, 72, 177),
+		LoadoutPlaza = Vector3.new(-64, 72, 82),
+		MegaMallBase = Vector3.new(-94, 72, -88),
 	},
 }
 

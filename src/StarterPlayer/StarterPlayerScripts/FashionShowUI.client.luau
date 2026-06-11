@@ -228,6 +228,10 @@ task.spawn(function()
 	end
 end)
 
+workspace:GetAttributeChangedSignal("FashionState"):Connect(function()
+	getFashionInfo:FireServer()
+end)
+
 task.spawn(function()
 	while true do
 		if countdownEndsAt > 0 then

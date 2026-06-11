@@ -71,8 +71,8 @@ local function buildCentralNeedle(district: Folder, ctx: BuildContext)
 	local base = ctx.origin.Position
 
 	OrganicCSGBuilder:createSpire(base, 128, 16, {
-		color = palette.Steel,
-		material = Enum.Material.SmoothPlastic,
+		color = palette.Pearl,
+		material = Enum.Material.Marble,
 		parent = district,
 		name = "AuroraCentralNeedle",
 	})
@@ -114,8 +114,8 @@ local function buildSatelliteSpires(district: Folder, ctx: BuildContext)
 		local height = 90 + (i % 4) * 18
 		local pos = ctx.origin * CFrame.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
 		OrganicCSGBuilder:createSpire(pos.Position, height, 12 + (i % 3) * 2, {
-			color = if i % 2 == 0 then palette.Slate else palette.Steel,
-			material = Enum.Material.SmoothPlastic,
+			color = if i % 2 == 0 then palette.Pearl else palette.Steel,
+			material = Enum.Material.Marble,
 			parent = district,
 			name = "Spire_" .. i,
 		})
@@ -161,8 +161,8 @@ local function buildBasePlaza(district: Folder, ctx: BuildContext)
 
 	MicroCurveBuilder:fillCircle(base + Vector3.new(0, 0.8, 0), 44, 2.2, {
 		voxelStuds = ctx.profile.VoxelStuds,
-		color = palette.Midnight,
-		material = Enum.Material.Slate,
+		color = palette.Pearl,
+		material = Enum.Material.Marble,
 		parent = district,
 		filled = false,
 		budget = ctx.budget,

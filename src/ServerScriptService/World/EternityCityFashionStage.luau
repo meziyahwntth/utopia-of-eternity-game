@@ -123,7 +123,7 @@ local function buildAudience(parent: Folder, palette: any, center: Vector3)
 				Vector3.new(4, 1.2, 2),
 				CFrame.new(center + Vector3.new(x, 0.6 + row * 0.4, z)),
 				palette.Steel,
-				Enum.Material.SmoothPlastic
+				Enum.Material.Metal
 			)
 		end
 	end
@@ -172,9 +172,9 @@ function EternityCityFashionStage.setup(model: Model, palette: any, center: Vect
 		"FashionStageRoot",
 		Vector3.new(36, 0.5, 52),
 		CFrame.new(stageCenter),
-		palette.Midnight,
-		Enum.Material.SmoothPlastic,
-		0.15
+		palette.Pearl,
+		Enum.Material.Marble,
+		0.12
 	)
 	root:SetAttribute("FashionStage", true)
 	root:SetAttribute("FashionState", "Idle")

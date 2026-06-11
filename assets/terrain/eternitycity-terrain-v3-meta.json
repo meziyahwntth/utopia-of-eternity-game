@@ -1,0 +1,97 @@
+{
+  "version": "v3",
+  "MapSize": 2048,
+  "HeightmapResolution": 1024,
+  "RegionHeight": 256,
+  "ImportPositionY": 128,
+  "PlateauHeightMap": 70,
+  "SeaLevelHeightMap": 52,
+  "PlateauY": 72,
+  "SeaLevelY": 53,
+  "BayRadius": 340,
+  "PlateauRadii": [
+    450,
+    420
+  ],
+  "PlateauCenterPixel": [
+    480,
+    543
+  ],
+  "BayCenterPixel": [
+    940,
+    103
+  ],
+  "PlateauCenterStud": [
+    -64.0,
+    72,
+    62.0
+  ],
+  "BayCenterStud": [
+    856.0,
+    53,
+    -818.0
+  ],
+  "verticalFlipApplied": true,
+  "heightRange": [
+    16.3,
+    246.6
+  ],
+  "zoneStats": {
+    "sea_pct": 17.2,
+    "beach_pct": 57.0,
+    "beach_ring_pct": 5.7,
+    "plateau_pct": 55.7,
+    "mount_pct": 6.3,
+    "method": "sea=h<52, beach=52<=h<72, plateau=plateau>0.65 & 68<=h<=76, mount=h>150"
+  },
+  "colormapMaterials": {
+    "grass": {
+      "rgb": [
+        106,
+        127,
+        63
+      ],
+      "material": "Grass"
+    },
+    "sand": {
+      "rgb": [
+        194,
+        178,
+        128
+      ],
+      "material": "Sand"
+    },
+    "water": {
+      "rgb": [
+        13,
+        105,
+        172
+      ],
+      "material": "Water"
+    },
+    "plateau": {
+      "rgb": [
+        127,
+        127,
+        127
+      ],
+      "material": "Pavement"
+    },
+    "rock": {
+      "rgb": [
+        99,
+        100,
+        99
+      ],
+      "material": "Rock"
+    },
+    "snow": {
+      "rgb": [
+        248,
+        248,
+        248
+      ],
+      "material": "Snow"
+    }
+  }
+}

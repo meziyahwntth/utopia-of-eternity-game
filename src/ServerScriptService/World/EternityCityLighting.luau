@@ -1,39 +1,48 @@
 --!strict
 --[[
 	Eternity City ambient lighting — pearl/gold/cyan solarpunk.
+	Values driven by GameConfig.CityLighting; landmark lights snap to TerrainProfile.
 ]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local GameConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("GameConfig"))
 
 local EternityCityLighting = {}
 
-function EternityCityLighting.apply(model: Model, palette: { Pearl: Color3, Gold: Color3, Cyan: Color3 })
+function EternityCityLighting.apply(model: Model, palette: { Pearl: Color3, Gold: Color3, Cyan: Color3, Twilight: Color3 })
+	local cfg = GameConfig.CityLighting
+	local landmarks = GameConfig.TerrainProfile.Landmarks
+
 	local lighting = game:GetService("Lighting")
-	lighting.ClockTime = 16.5
-	lighting.Brightness = 1.2
-	lighting.Ambient = Color3.fromRGB(120, 130, 150)
-	lighting.OutdoorAmbient = Color3.fromRGB(140, 150, 170)
-	lighting.EnvironmentDiffuseScale = 0.4
-	lighting.EnvironmentSpecularScale = 0.6
+	lighting.ClockTime = cfg.ClockTime
+	lighting.GeographicLatitude = cfg.GeographicLatitude
+	lighting.Brightness = cfg.Brightness
+	lighting.Ambient = cfg.Ambient
+	lighting.OutdoorAmbient = cfg.OutdoorAmbient
+	lighting.EnvironmentDiffuseScale = cfg.EnvironmentDiffuseScale
+	lighting.EnvironmentSpecularScale = cfg.EnvironmentSpecularScale
 
 	local atmosphere = lighting:FindFirstChildOfClass("Atmosphere")
 	if not atmosphere then
 		atmosphere = Instance.new("Atmosphere")
 		atmosphere.Parent = lighting
 	end
-	atmosphere.Density = 0.28
-	atmosphere.Offset = 0.15
+	atmosphere.Density = cfg.Atmosphere.Density
+	atmosphere.Offset = cfg.Atmosphere.Offset
 	atmosphere.Color = palette.Twilight
 	atmosphere.Decay = palette.Cyan
-	atmosphere.Glare = 0.35
-	atmosphere.Haze = 1.2
+	atmosphere.Glare = cfg.Atmosphere.Glare
+	atmosphere.Haze = cfg.Atmosphere.Haze
 
 	local bloom = lighting:FindFirstChildOfClass("BloomEffect")
 	if not bloom then
 		bloom = Instance.new("BloomEffect")
 		bloom.Parent = lighting
 	end
-	bloom.Intensity = 0.45
-	bloom.Size = 18
-	bloom.Threshold = 0.85
+	bloom.Intensity = cfg.Bloom.Intensity
+	bloom.Size = cfg.Bloom.Size
+	bloom.Threshold = cfg.Bloom.Threshold
 
 	local folder = model:FindFirstChild("EternityLighting")
 	if not folder then
@@ -47,25 +56,33 @@ function EternityCityLighting.apply(model: Model, palette: { Pearl: Color3, Gold
 		if existing then
 			existing:Destroy()
 		end
+		local anchor = Instance.new("Part")
+		anchor.Anchored = true
+		anchor.CanCollide = false
+		anchor.Transparency = 1
+		anchor.Size = Vector3.new(1, 1, 1)
+		anchor.CFrame = cf
+		anchor.Name = name .. "_Anchor"
+		anchor.Parent = folder
+
 		local light = Instance.new("PointLight")
 		light.Name = name
 		light.Color = color
 		light.Range = range
 		light.Brightness = brightness
-		light.Parent = Instance.new("Part")
-		light.Parent.Anchored = true
-		light.Parent.CanCollide = false
-		light.Parent.Transparency = 1
-		light.Parent.Size = Vector3.new(1, 1, 1)
-		light.Parent.CFrame = cf
-		light.Parent.Name = name .. "_Anchor"
-		light.Parent.Parent = folder
+		light.Parent = anchor
 	end
 
-	addLight("SanctuaryGlow", CFrame.new(0, 40, 0), palette.Cyan, 280, 2)
-	addLight("AuroraSpireGlow", CFrame.new(0, 80, -120), palette.Gold, 200, 1.8)
-	addLight("MarinaGlow", CFrame.new(180, 20, -80), palette.Cyan, 160, 1.2)
-	addLight("SkyRailGlow", CFrame.new(0, 35, -40), palette.Gold, 120, 1)
+	for _, spec in cfg.PointLights do
+		local landmark = landmarks[spec.landmarkKey]
+		if landmark then
+			local color = palette[spec.colorKey]
+			if color then
+				local pos = Vector3.new(landmark.X, landmark.Y + spec.yOffset, landmark.Z)
+				addLight(spec.name, CFrame.new(pos), color, spec.range, spec.brightness)
+			end
+		end
+	end
 end
 
 return EternityCityLighting

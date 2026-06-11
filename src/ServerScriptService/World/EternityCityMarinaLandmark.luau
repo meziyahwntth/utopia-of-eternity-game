@@ -84,8 +84,8 @@ local function buildDockArc(marina: Folder, ctx: BuildContext)
 			"DockSegment_" .. i,
 			Vector3.new(width, 1.2, length),
 			CFrame.lookAt(pos, pos + tangent),
-			palette.Slate,
-			Enum.Material.SmoothPlastic
+			palette.Pearl,
+			Enum.Material.Marble
 		)
 
 		local railPos = pos + Vector3.new(0, 1.1, 0)
@@ -129,8 +129,8 @@ local function buildBoardwalk(marina: Folder, ctx: BuildContext)
 	local palette = ctx.profile.Palette
 	MicroCurveBuilder:fillCircle(ctx.center + Vector3.new(0, 1.4, 0), 62, 2.4, {
 		voxelStuds = ctx.profile.VoxelStuds,
-		color = palette.Steel,
-		material = Enum.Material.Slate,
+		color = palette.Pearl,
+		material = Enum.Material.Marble,
 		parent = marina,
 		filled = false,
 		budget = ctx.budget,
@@ -161,8 +161,8 @@ local function buildYachtSilhouettes(marina: Folder, ctx: BuildContext)
 			"YachtHull_" .. index,
 			Vector3.new(14, 4, 28),
 			CFrame.new(pos) * CFrame.Angles(0, slot.angle + math.pi / 2, 0),
-			palette.Steel,
-			Enum.Material.SmoothPlastic
+			palette.Pearl,
+			Enum.Material.Marble
 		)
 		addPart(
 			marina,
