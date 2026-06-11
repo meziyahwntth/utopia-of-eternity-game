@@ -5,6 +5,8 @@
 ]]
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 
 local WorldBuildConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("WorldBuildConfig"))
 local WorldBuildBudget = require(script.Parent.WorldBuildBudget)
@@ -74,7 +76,7 @@ local function trackBudget(ctx: BuildContext)
 	partCount = 0
 end
 
-local function buildAtriumFloor(district: Folder, ctx: BuildContext, floorY: number, label: string, isGlass: boolean)
+local function buildAtriumFloor(district: Folder, ctx: BuildContext, floorY: number, label: string, isGlass: boolean, escSide: number)
 	local palette = ctx.profile.Palette
 	local base = ctx.base
 	local outer = FLOOR_HALF
@@ -85,15 +87,26 @@ local function buildAtriumFloor(district: Folder, ctx: BuildContext, floorY: num
 	local trans = if isGlass then 0.42 else 0
 
 	-- Four quadrants around open atrium
-	local quadrants = {
-		{ name = "N", size = Vector3.new(outer * 2, thickness, outer - inner), offset = Vector3.new(0, floorY, inner + (outer - inner) / 2) },
-		{ name = "S", size = Vector3.new(outer * 2, thickness, outer - inner), offset = Vector3.new(0, floorY, -(inner + (outer - inner) / 2)) },
-		{ name = "E", size = Vector3.new(outer - inner, thickness, inner * 2), offset = Vector3.new(inner + (outer - inner) / 2, floorY, 0) },
-		{ name = "W", size = Vector3.new(outer - inner, thickness, inner * 2), offset = Vector3.new(-(inner + (outer - inner) / 2), floorY, 0) },
-	}
-	for _, q in quadrants do
-		addPart(district, "Floor_" .. label .. "_" .. q.name, q.size, base * CFrame.new(q.offset), col, mat, { transparency = trans })
+	-- quadrant ฝั่งบันไดเลื่อนขาเข้า (escSide=±1) แบ่ง 3 ชิ้น เว้นช่อง x[3,9] (รอบ x=6*s) z|36..46| ให้ ramp ทะลุ + landing
+	local function quadrantNS(s: number)
+		local qName = if s == 1 then "N" else "S"
+		local cz = s * (inner + (outer - inner) / 2)
+		if escSide ~= s then
+			addPart(district, "Floor_" .. label .. "_" .. qName, Vector3.new(outer * 2, thickness, outer - inner), base * CFrame.new(0, floorY, cz), col, mat, { transparency = trans })
+			return
+		end
+		local xc = 6 * s
+		-- ชิ้นซ้ายของช่อง (x -46..xc-3), ชิ้นขวา (xc+3..46), ชิ้นแถบใกล้ atrium (x ช่อง, z 11..36)
+		addPart(district, "Floor_" .. label .. "_" .. qName .. "1", Vector3.new((xc - 3) + outer, thickness, outer - inner), base * CFrame.new(((xc - 3) - outer) / 2, floorY, cz), col, mat, { transparency = trans })
+		addPart(district, "Floor_" .. label .. "_" .. qName .. "2", Vector3.new(outer - (xc + 3), thickness, outer - inner), base * CFrame.new(((xc + 3) + outer) / 2, floorY, cz), col, mat, { transparency = trans })
+		-- แถบใกล้ atrium (z 11..32) + แถบรับปลาย ramp (z 42.5..46) — ช่องโล่ง z 32..42.5 ให้ ramp+หัวผู้เล่นผ่าน
+		addPart(district, "Floor_" .. label .. "_" .. qName .. "3", Vector3.new(6, thickness, 21), base * CFrame.new(xc, floorY, s * (inner + 10.5)), col, mat, { transparency = trans })
+		addPart(district, "Floor_" .. label .. "_" .. qName .. "4", Vector3.new(6, thickness, 3.5), base * CFrame.new(xc, floorY, s * 44.25), col, mat, { transparency = trans })
 	end
+	quadrantNS(1)
+	quadrantNS(-1)
+	addPart(district, "Floor_" .. label .. "_E", Vector3.new(outer - inner, thickness, inner * 2), base * CFrame.new(inner + (outer - inner) / 2, floorY, 0), col, mat, { transparency = trans })
+	addPart(district, "Floor_" .. label .. "_W", Vector3.new(outer - inner, thickness, inner * 2), base * CFrame.new(-(inner + (outer - inner) / 2), floorY, 0), col, mat, { transparency = trans })
 
 	-- Gold trim + level sign
 	for _, zSide in { -outer + 1, outer - 1 } do
@@ -111,9 +124,10 @@ end
 local function buildEscalator(district: Folder, ctx: BuildContext, fromY: number, toY: number, side: number)
 	local palette = ctx.profile.Palette
 	local rise = toY - fromY
-	local run = rise * 2.8
+	-- run 1.75×rise (slope ~30°) span z 14..42: โคนบนวงพื้นล่าง, ปลายบนโผล่ช่องพื้น (32..42.5) ต่อแถบรับ z 42.5..46
+	local run = rise * 1.75
 	local midY = fromY + rise / 2
-	local z = side * (FLOOR_HALF - 4)
+	local z = side * 28
 	local angle = math.atan(rise / run)
 
 	addPart(
@@ -135,20 +149,38 @@ local function buildEscalator(district: Folder, ctx: BuildContext, fromY: number
 	)
 end
 
+-- บันไดโรงแรมแบบ switchback ในช่องบันได x[-3,3] z[-42,-18] (corridor เริ่ม z=-14 จึงเปิดโล่งทุกชั้น)
 local function buildHotelStairs(district: Folder, ctx: BuildContext, fromY: number, toY: number)
 	local palette = ctx.profile.Palette
-	local steps = 8
-	local rise = (toY - fromY) / steps
+	local half = (toY - fromY) / 2
+	local steps = 10
+	local depth = 2.2
+	-- flight 1 (x=-1.6): z -18 → -40 ขึ้นครึ่งแรก
 	for i = 1, steps do
 		addPart(
 			district,
-			string.format("HotelStair_%d_%d", fromY, i),
-			Vector3.new(6, rise, 2.5),
-			ctx.base * CFrame.new(-FLOOR_HALF + 8, fromY + rise * (i - 0.5), -FLOOR_HALF + 6 + i * 2.5),
+			string.format("HotelStairA_%d_%d", fromY, i),
+			Vector3.new(2.9, half / steps, depth),
+			ctx.base * CFrame.new(-1.6, fromY + (half / steps) * (i - 0.5), -18 - (i - 0.5) * depth),
 			palette.Pearl,
 			Enum.Material.Marble
 		)
 	end
+	-- ชานพักกลาง (เต็มกว้าง) ที่ z[-43,-40]
+	addPart(district, string.format("HotelStairMid_%d", fromY), Vector3.new(6, 1, 3.4), ctx.base * CFrame.new(0, fromY + half - 0.5, -41.5), palette.Pearl, Enum.Material.Marble)
+	-- flight 2 (x=+1.6): z -40 → -18 ขึ้นครึ่งหลัง
+	for i = 1, steps do
+		addPart(
+			district,
+			string.format("HotelStairB_%d_%d", fromY, i),
+			Vector3.new(2.9, half / steps, depth),
+			ctx.base * CFrame.new(1.6, fromY + half + (half / steps) * (i - 0.5), -40 + (i - 0.5) * depth),
+			palette.Pearl,
+			Enum.Material.Marble
+		)
+	end
+	-- ชานพักทางออก เชื่อมเข้า corridor (z -18..-14)
+	addPart(district, string.format("HotelStairTop_%d", fromY), Vector3.new(6, 1, 4.4), ctx.base * CFrame.new(0, toY - 0.5, -16), palette.Pearl, Enum.Material.Marble)
 end
 
 local function buildShopFacades(district: Folder, ctx: BuildContext, floorY: number, floorNum: number)
@@ -220,10 +252,38 @@ local function buildExpressElevator(district: Folder, ctx: BuildContext)
 		prompt.Parent = door
 
 		prompt.Triggered:Connect(function()
+			if platform:GetAttribute("LiftMoving") == true then
+				return
+			end
+			platform:SetAttribute("LiftMoving", true)
 			local targetY = if y == floor1Y then roofY else floor1Y
+
+			-- เก็บผู้เล่นที่ยืนบนแท่น แล้วพาไปด้วยระหว่าง tween (tween แท่น Anchored ไม่พา character เอง)
+			local riders: { [Model]: CFrame } = {}
+			for _, pl in Players:GetPlayers() do
+				local chr = pl.Character
+				if chr then
+					local pivot = chr:GetPivot()
+					if (pivot.Position - platform.Position).Magnitude < 9 then
+						riders[chr] = platform.CFrame:ToObjectSpace(pivot)
+					end
+				end
+			end
+
 			local tween = TweenService:Create(platform, TweenInfo.new(6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
 				CFrame = ctx.base * CFrame.new(shaftX, targetY, 0),
 			})
+			local conn = RunService.Heartbeat:Connect(function()
+				for chr, rel in riders do
+					if chr.Parent then
+						chr:PivotTo(platform.CFrame * rel)
+					end
+				end
+			end)
+			tween.Completed:Once(function()
+				conn:Disconnect()
+				platform:SetAttribute("LiftMoving", false)
+			end)
 			tween:Play()
 		end)
 	end
@@ -263,6 +323,8 @@ end
 
 local function buildEntrances(district: Folder, ctx: BuildContext)
 	local palette = ctx.profile.Palette
+	-- พื้น threshold เชื่อมขอบพื้น F1 (z=46) กับลานหน้าตึก — กันตกช่องว่างหน้าประตู
+	addPart(district, "EntranceThreshold", Vector3.new(44, 1.2, 10), ctx.base * CFrame.new(0, 0.6, FLOOR_HALF + 4), palette.Pearl, Enum.Material.Marble)
 	for _, x in { -14, 14 } do
 		CityArtKit.archRib({ parent = district, palette = palette, budget = ctx.budget }, ctx.base * CFrame.new(x, 0, FLOOR_HALF + 2), 16)
 		addPart(district, "EntranceVoid_" .. x, Vector3.new(10, 10, 2), ctx.base * CFrame.new(x, 5, FLOOR_HALF + 1), palette.Midnight, Enum.Material.SmoothPlastic, { transparency = 1, collide = false })
@@ -281,10 +343,11 @@ end
 
 local function buildHotelFloor(district: Folder, ctx: BuildContext, floorY: number, floorNum: number)
 	local palette = ctx.profile.Palette
-	addPart(district, "HotelHall_" .. floorNum, Vector3.new(10, 0.8, FLOOR_HALF * 2 - 8), ctx.base * CFrame.new(0, floorY, 0), palette.Pearl, Enum.Material.Marble)
+	-- corridor เริ่ม z=-14 เว้นช่องบันได switchback (z -42..-18)
+	addPart(district, "HotelHall_" .. floorNum, Vector3.new(10, 0.8, 56), ctx.base * CFrame.new(0, floorY, 14), palette.Pearl, Enum.Material.Marble)
 	for _, side in { -1, 1 } do
 		for room = 1, 4 do
-			local z = -FLOOR_HALF + 10 + room * 10
+			local z = -10 + room * 12
 			local door = addPart(
 				district,
 				string.format("Room_F%d_%d", floorNum, room),
@@ -312,7 +375,8 @@ function UtopiaPlazaBuilder.build(ctx: BuildContext): Folder
 
 	for floor = 1, MALL_FLOORS do
 		local floorY = (floor - 1) * MALL_FLOOR_H + 0.6
-		buildAtriumFloor(district, ctx, floorY, "LEVEL " .. floor, floor >= 3)
+		local escSide = if floor == 1 then 0 else (if (floor - 1) % 2 == 0 then 1 else -1)
+		buildAtriumFloor(district, ctx, floorY, "LEVEL " .. floor, floor >= 3, escSide)
 		buildShopFacades(district, ctx, floorY, floor)
 		if floor < MALL_FLOORS then
 			local nextY = floor * MALL_FLOOR_H + 0.6
@@ -321,6 +385,9 @@ function UtopiaPlazaBuilder.build(ctx: BuildContext): Folder
 	end
 
 	local hotelBaseY = MALL_FLOORS * MALL_FLOOR_H
+	-- บันไดเชื่อม mall F5 → hotel F6 (สเปก: ชั้นโรงแรมขึ้นด้วยบันไดเท่านั้น)
+	local mallTopY = (MALL_FLOORS - 1) * MALL_FLOOR_H + 0.6
+	buildHotelStairs(district, ctx, mallTopY, hotelBaseY + 0.6)
 	for h = 1, HOTEL_FLOORS do
 		local floorY = hotelBaseY + (h - 1) * HOTEL_FLOOR_H + 0.6
 		buildHotelFloor(district, ctx, floorY, 5 + h)

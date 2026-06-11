@@ -71,19 +71,31 @@ local function trackBudget(ctx: BuildContext)
 	partCount = 0
 end
 
+-- พื้นชั้น: ชั้น 1 เต็มแผ่น / ชั้น 2+ แบ่ง 5 ชิ้นเว้นช่องบันได (East z[-27,1]) และ escalator (West z[12,26])
+local function buildFloorPlate(district: Folder, ctx: BuildContext, name: string, plateY: number, thickness: number, withOpenings: boolean)
+	local palette = ctx.profile.Palette
+	if not withOpenings then
+		addPart(district, name, Vector3.new(FLOOR_HALF_X * 2, thickness, FLOOR_HALF_Z * 2), ctx.base * CFrame.new(0, plateY, 0), palette.Pearl, Enum.Material.Marble)
+		return
+	end
+	local segs = {
+		{ sx = 14, sz = 44, cx = -37, cz = -10 }, -- W1 (ถึงขอบช่อง escalator z=12)
+		{ sx = 14, sz = 6, cx = -37, cz = 29 }, -- W2 (หลังช่อง z=26)
+		{ sx = 60, sz = FLOOR_HALF_Z * 2, cx = 0, cz = 0 }, -- MID เต็ม
+		{ sx = 14, sz = 5, cx = 37, cz = -29.5 }, -- E1 (ก่อนช่องบันได z=-27)
+		{ sx = 14, sz = 31, cx = 37, cz = 16.5 }, -- E2 (หลังช่อง z=1)
+	}
+	for i, s in segs do
+		addPart(district, name .. "_" .. i, Vector3.new(s.sx, thickness, s.sz), ctx.base * CFrame.new(s.cx, plateY, s.cz), palette.Pearl, Enum.Material.Marble)
+	end
+end
+
 local function buildShowroomFloor(district: Folder, ctx: BuildContext, floorIndex: number)
 	local palette = ctx.profile.Palette
 	local floorY = (floorIndex - 1) * FLOOR_H + 0.5
 	local label = "SHOWROOM " .. floorIndex
 
-	addPart(
-		district,
-		"FloorPlate_" .. floorIndex,
-		Vector3.new(FLOOR_HALF_X * 2, 1, FLOOR_HALF_Z * 2),
-		ctx.base * CFrame.new(0, floorY, 0),
-		palette.Pearl,
-		Enum.Material.Marble
-	)
+	buildFloorPlate(district, ctx, "FloorPlate_" .. floorIndex, floorY, 1, floorIndex >= 2)
 
 	for _, zSide in { -FLOOR_HALF_Z + 1, FLOOR_HALF_Z - 1 } do
 		addPart(
@@ -124,30 +136,33 @@ local function buildShowroomFloor(district: Folder, ctx: BuildContext, floorInde
 	end
 
 	if floorIndex < FLOORS then
-		local steps = 8
+		local nextY = floorIndex * FLOOR_H + 0.5
+		-- บันได: z -26 → -2 (12 ขั้น) + ชานพักเชื่อมพื้นชั้นถัดไป (ช่องพื้นฝั่ง East z[-27,1])
+		local steps = 12
 		local rise = FLOOR_H / steps
 		for s = 1, steps do
 			addPart(
 				district,
 				string.format("Stair_F%d_%d", floorIndex, s),
-				Vector3.new(6, rise, 2.5),
-				ctx.base * CFrame.new(FLOOR_HALF_X - 8, floorY + rise * (s - 0.5), -FLOOR_HALF_Z + 6 + s * 2.5),
+				Vector3.new(6, rise, 2.0),
+				ctx.base * CFrame.new(FLOOR_HALF_X - 8, floorY + rise * (s - 0.5), -26 + (s - 0.5) * 2.0),
 				palette.Pearl,
 				Enum.Material.Marble
 			)
 		end
-		-- Escalator on opposite side
-		local nextY = floorIndex * FLOOR_H + 0.5
-		local run = FLOOR_H * 2.5
+		addPart(district, string.format("StairLanding_F%d", floorIndex), Vector3.new(6, 1, 3.5), ctx.base * CFrame.new(FLOOR_HALF_X - 8, nextY + 0.05, -0.5), palette.Pearl, Enum.Material.Marble)
+		-- Escalator ฝั่ง West: z -4 → 24 (run 28, ~30°) + ชานพักบน (ช่องพื้นฝั่ง West z[12,26])
+		local run = FLOOR_H * 1.75
 		local angle = math.atan(FLOOR_H / run)
 		addPart(
 			district,
 			string.format("Escalator_F%d", floorIndex),
 			Vector3.new(5, 0.5, run),
-			ctx.base * CFrame.new(-FLOOR_HALF_X + 8, floorY + FLOOR_H / 2, FLOOR_HALF_Z - 8) * CFrame.Angles(-angle, 0, 0),
+			ctx.base * CFrame.new(-FLOOR_HALF_X + 8, floorY + FLOOR_H / 2, 10) * CFrame.Angles(-angle, 0, 0),
 			palette.Steel,
 			Enum.Material.Metal
 		)
+		addPart(district, string.format("EscalatorLanding_F%d", floorIndex), Vector3.new(5, 1, 3), ctx.base * CFrame.new(-FLOOR_HALF_X + 8, nextY + 0.05, 24.5), palette.Steel, Enum.Material.Metal)
 	end
 
 	local levelSign = addPart(district, "LevelSign_" .. floorIndex, Vector3.new(10, 3, 0.4), ctx.base * CFrame.new(0, floorY + 6, -FLOOR_HALF_Z + 3), palette.Gold, Enum.Material.Neon, { transparency = 0.1 })
@@ -159,13 +174,14 @@ local function buildConcertZone(district: Folder, ctx: BuildContext, roofY: numb
 	local base = ctx.base * CFrame.new(0, roofY, FLOOR_HALF_Z - 8)
 
 	addPart(district, "StageDeck", Vector3.new(28, 1.2, 14), base * CFrame.new(0, 0.6, 0), palette.Pearl, Enum.Material.Marble)
-	addPart(district, "StageBackdrop", Vector3.new(30, 12, 1.5), base * CFrame.new(0, 7, -8), palette.Midnight, Enum.Material.SmoothPlastic)
-	addPart(district, "StageArch", Vector3.new(32, 14, 1), base * CFrame.new(0, 8, -8.5), palette.Gold, Enum.Material.Neon, { transparency = 0.12 })
+	-- backdrop/arch อยู่ขอบนอก (+Z) — คนดูฝั่งใจกลางดาดฟ้ามองเห็นเวทีเต็ม
+	addPart(district, "StageBackdrop", Vector3.new(30, 12, 1.5), base * CFrame.new(0, 7, 7), palette.Midnight, Enum.Material.SmoothPlastic)
+	addPart(district, "StageArch", Vector3.new(32, 14, 1), base * CFrame.new(0, 8, 7.5), palette.Gold, Enum.Material.Neon, { transparency = 0.12 })
 
 	for i = 1, 4 do
 		local x = (i - 2.5) * 6
-		local truss = addPart(district, "StageLight_" .. i, Vector3.new(1, 8, 1), base * CFrame.new(x, 10, -4), palette.Steel, Enum.Material.Metal)
-		local lamp = addPart(district, "StageLamp_" .. i, Vector3.new(2, 1, 2), base * CFrame.new(x, 14.5, -4), palette.Amber, Enum.Material.Neon, { transparency = 0.1 })
+		local truss = addPart(district, "StageLight_" .. i, Vector3.new(1, 8, 1), base * CFrame.new(x, 10, 4), palette.Steel, Enum.Material.Metal)
+		local lamp = addPart(district, "StageLamp_" .. i, Vector3.new(2, 1, 2), base * CFrame.new(x, 14.5, 4), palette.Amber, Enum.Material.Neon, { transparency = 0.1 })
 		local spot = Instance.new("SpotLight")
 		spot.Brightness = 2
 		spot.Range = 24
@@ -175,7 +191,7 @@ local function buildConcertZone(district: Folder, ctx: BuildContext, roofY: numb
 		truss.CanCollide = false
 	end
 
-	-- Tiered audience lawn (front / +Z from stage)
+	-- ลานคนดูขั้นบันได หันหน้าเข้าเวที (ฝั่งใจกลางดาดฟ้า ไล่ลาดออกจากเวที)
 	for row = 1, 4 do
 		for col = 1, 6 do
 			local x = (col - 3.5) * 4.5
@@ -184,7 +200,7 @@ local function buildConcertZone(district: Folder, ctx: BuildContext, roofY: numb
 				district,
 				string.format("AudienceStep_R%d_C%d", row, col),
 				Vector3.new(4, 0.8 + row * 0.35, 3.5),
-				ctx.base * CFrame.new(x, roofY + 0.5 + row * 0.35, FLOOR_HALF_Z - 8 + z),
+				ctx.base * CFrame.new(x, roofY + 0.5 + row * 0.35, FLOOR_HALF_Z - 8 - z),
 				palette.Slate,
 				Enum.Material.Slate
 			)
@@ -232,7 +248,7 @@ end
 
 local function buildHelipadZone(district: Folder, ctx: BuildContext, roofY: number)
 	local palette = ctx.profile.Palette
-	local padCenter = ctx.base * CFrame.new(0, roofY, -FLOOR_HALF_Z + 10)
+	local padCenter = ctx.base * CFrame.new(0, roofY, -FLOOR_HALF_Z + 13) -- deck 26 กว้าง: ขอบหลังพอดี z=-32 ไม่ยื่นพ้นดาดฟ้า
 
 	addPart(district, "HelipadDeck", Vector3.new(26, 0.6, 26), padCenter * CFrame.new(0, 0.3, 0), palette.Pearl, Enum.Material.Marble)
 	addPart(district, "HelipadMark", Vector3.new(20, 0.15, 20), padCenter * CFrame.new(0, 0.65, 0), palette.Gold, Enum.Material.Neon, { transparency = 0.2 })
@@ -258,14 +274,7 @@ local function buildRooftop(district: Folder, ctx: BuildContext)
 	local roofY = (FLOORS - 1) * FLOOR_H + 1
 	local palette = ctx.profile.Palette
 
-	addPart(
-		district,
-		"RooftopPlate",
-		Vector3.new(FLOOR_HALF_X * 2, 0.8, FLOOR_HALF_Z * 2),
-		ctx.base * CFrame.new(0, roofY, 0),
-		palette.Pearl,
-		Enum.Material.Marble
-	)
+	buildFloorPlate(district, ctx, "RooftopPlate", roofY, 0.8, true)
 
 	buildConcertZone(district, ctx, roofY + 0.8)
 	buildHelipadZone(district, ctx, roofY + 0.8)
