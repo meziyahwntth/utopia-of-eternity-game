@@ -140,6 +140,9 @@
         },
         "EternityCityFashionStage": {
           "$path": "src/ServerScriptService/World/EternityCityFashionStage.luau"
+        },
+        "EternityTerrainSetup": {
+          "$path": "src/ServerScriptService/World/EternityTerrainSetup.luau"
         }
       },
       "Shuttle": {

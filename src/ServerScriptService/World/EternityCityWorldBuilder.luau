@@ -35,6 +35,7 @@ local EternityCityPhotoZones = require(script.Parent.EternityCityPhotoZones)
 local FestivalCountdownService = require(ServerScriptService:WaitForChild("FestivalCountdownService"))
 local EternityCityQuestBoard = require(script.Parent.EternityCityQuestBoard)
 local EternityCityFashionStage = require(script.Parent.EternityCityFashionStage)
+local EternityTerrainSetup = require(script.Parent.EternityTerrainSetup)
 
 local EternityCityWorldBuilder = {}
 
@@ -48,16 +49,6 @@ local function hasStatic(staticName: string): boolean
 end
 
 local MARINA_CENTER = Vector3.new(180, 0, -80)
-local AURORA_ORIGIN = CFrame.new(0, 0, -120)
-
-local function orientSanctuarySpawns(parent: Instance)
-	for _, inst in parent:GetDescendants() do
-		if inst:IsA("SpawnLocation") and string.find(inst.Name, "SanctuarySpawn") then
-			local pos = inst.Position
-			inst.CFrame = CFrame.lookAt(pos, Vector3.new(MARINA_CENTER.X, pos.Y, MARINA_CENTER.Z))
-		end
-	end
-end
 
 local function buildMountainBackdrop(_profile: WorldBuildConfig.PlaceProfile)
 	local terrain = workspace.Terrain
@@ -78,7 +69,12 @@ local function buildCoastline(profile: WorldBuildConfig.PlaceProfile)
 	terrain:FillBlock(CFrame.new(160, -3, -120), Vector3.new(120, 6, 120), Enum.Material.Water)
 end
 
-local function buildMarinaRing(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+local function buildMarinaRing(
+	parent: Instance,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget,
+	center: Vector3
+)
 	if hasStatic("Static_MarinaRing") then
 		print("[Utopia] skip greybox: MarinaRing (static found)")
 		return
@@ -87,12 +83,17 @@ local function buildMarinaRing(parent: Instance, profile: WorldBuildConfig.Place
 		parent = parent,
 		profile = profile,
 		budget = budget,
-		center = MARINA_CENTER,
+		center = center,
 	})
 	EternityCityAccessGuard.tagDistrict(marina, 11, "MarinaRing")
 end
 
-local function buildAuroraSpireCluster(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+local function buildAuroraSpireCluster(
+	parent: Instance,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget,
+	origin: CFrame
+)
 	if hasStatic("Static_AuroraSpire") then
 		print("[Utopia] skip greybox: AuroraSpire (static found)")
 		return
@@ -101,14 +102,17 @@ local function buildAuroraSpireCluster(parent: Instance, profile: WorldBuildConf
 		parent = parent,
 		profile = profile,
 		budget = budget,
-		origin = AURORA_ORIGIN,
+		origin = origin,
 	})
 	EternityCityAccessGuard.tagDistrict(district, 0, "AuroraSpire")
 end
 
-local MEGAMALL_BASE = CFrame.new(-30, 0, -150)
-
-local function buildAuroraMegaMall(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+local function buildAuroraMegaMall(
+	parent: Instance,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget,
+	base: CFrame
+)
 	if hasStatic("Static_AuroraMegaMall") then
 		print("[Utopia] skip greybox: AuroraMegaMall (static found)")
 		return
@@ -117,12 +121,17 @@ local function buildAuroraMegaMall(parent: Instance, profile: WorldBuildConfig.P
 		parent = parent,
 		profile = profile,
 		budget = budget,
-		base = MEGAMALL_BASE,
+		base = base,
 	})
 	EternityCityAccessGuard.tagDistrict(district, 20, "AuroraMegaMall")
 end
 
-local function buildCanalPromenade(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+local function buildCanalPromenade(
+	parent: Instance,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget,
+	pathOffset: Vector3
+)
 	if hasStatic("Static_CanalPromenade") then
 		print("[Utopia] skip greybox: CanalPromenade (static found)")
 		return
@@ -131,6 +140,7 @@ local function buildCanalPromenade(parent: Instance, profile: WorldBuildConfig.P
 		parent = parent,
 		profile = profile,
 		budget = budget,
+		pathOffset = pathOffset,
 	})
 	EternityCityAccessGuard.tagDistrict(district, 11, "CanalPromenade")
 end
@@ -168,9 +178,12 @@ local function buildReflectivePlaza(parent: Instance, profile: WorldBuildConfig.
 	end
 end
 
-local SKYRAIL_ORIGIN = CFrame.new(0, 0, 40)
-
-local function buildSkyRailPlaza(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+local function buildSkyRailPlaza(
+	parent: Instance,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget,
+	origin: CFrame
+)
 	if hasStatic("Static_SkyRailPlaza") then
 		print("[Utopia] skip greybox: SkyRailPlaza (static found)")
 		return
@@ -179,15 +192,14 @@ local function buildSkyRailPlaza(parent: Instance, profile: WorldBuildConfig.Pla
 		parent = parent,
 		profile = profile,
 		budget = budget,
-		origin = SKYRAIL_ORIGIN,
+		origin = origin,
 	})
 	EternityCityAccessGuard.tagDistrict(district, 15, "SkyRailPlaza")
 
-	-- Shuttle transit stop within the plaza (UtopiaShuttle name for ShuttleScheduler discovery)
 	local shuttleFolder = Instance.new("Folder")
 	shuttleFolder.Name = "UtopiaShuttle"
 	shuttleFolder.Parent = district
-	ShuttleGreyboxBuilder:BuildEternityVariant(shuttleFolder, SKYRAIL_ORIGIN * CFrame.new(0, 0, -35))
+	ShuttleGreyboxBuilder:BuildEternityVariant(shuttleFolder, origin * CFrame.new(0, 0, -35))
 	WorldBuildBudget:add(budget, 60)
 end
 
@@ -276,9 +288,12 @@ shop.Parent = parent
 	WorldBuildBudget:add(budget, 2)
 end
 
-local TWILIGHT_ORIGIN = CFrame.new(-100, 0, 80)
-
-local function buildTwilightOverpass(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
+local function buildTwilightOverpass(
+	parent: Instance,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget,
+	origin: CFrame
+)
 	if hasStatic("Static_TwilightOverpass") then
 		print("[Utopia] skip greybox: TwilightOverpass (static found)")
 		return
@@ -287,7 +302,7 @@ local function buildTwilightOverpass(parent: Instance, profile: WorldBuildConfig
 		parent = parent,
 		profile = profile,
 		budget = budget,
-		origin = TWILIGHT_ORIGIN,
+		origin = origin,
 	})
 	EternityCityAccessGuard.tagDistrict(district, 10, "TwilightOverpass")
 end
@@ -318,6 +333,9 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 
 	print("[Utopia] Eternity City build starting… PlaceId=", game.PlaceId)
 
+	EternityTerrainSetup.prepareForBuild()
+	local useTerrain = EternityTerrainSetup.hasRealTerrain()
+
 	local profile = WorldBuildConfig:GetProfile("EternityCity")
 	local budget = WorldBuildBudget:new(profile.MaxParts)
 
@@ -325,30 +343,54 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	model.Name = "UtopiaEternityCity"
 	model.Parent = workspace
 
-	WorldBuildShared:makeGround(model, profile.GroundSizeStuds, profile.Palette.Twilight, Enum.Material.Slate)
-	WorldBuildBudget:add(budget, 1)
+	if not useTerrain then
+		WorldBuildShared:makeGround(model, profile.GroundSizeStuds, profile.Palette.Twilight, Enum.Material.Slate)
+		WorldBuildBudget:add(budget, 1)
+		buildCoastline(profile)
+		buildMountainBackdrop(profile)
+	else
+		model:SetAttribute("TerrainLayout", "imported-v2")
+	end
+
+	local marinaCenter = EternityTerrainSetup.getLandmarkPosition("MarinaCenter", MARINA_CENTER)
+	local auroraOrigin = CFrame.new(EternityTerrainSetup.getLandmarkPosition("AuroraOrigin", Vector3.new(0, 0, -120)))
+	local skyRailOrigin = CFrame.new(EternityTerrainSetup.getLandmarkPosition("SkyRailOrigin", Vector3.new(0, 0, 40)))
+	local twilightOrigin = CFrame.new(EternityTerrainSetup.getLandmarkPosition("TwilightOrigin", Vector3.new(-100, 0, 80)))
+	local megaMallBase = CFrame.new(EternityTerrainSetup.getLandmarkPosition("MegaMallBase", Vector3.new(-30, 0, -150)))
+	local loadoutPlaza = EternityTerrainSetup.getLandmarkPosition("LoadoutPlaza", Vector3.new(0, 0, 42))
+	local fashionCenter = EternityTerrainSetup.getLandmarkPosition("FashionStage", Vector3.new(-130, 1.2, 115))
+	local canalOffset = if useTerrain
+		then GameConfig.TerrainProfile.Landmarks.CanalPathOffset
+		else Vector3.new(0, 0, 0)
+
+	local function orientSpawnsToMarina(parent: Instance)
+		for _, inst in parent:GetDescendants() do
+			if inst:IsA("SpawnLocation") and string.find(inst.Name, "SanctuarySpawn") then
+				local pos = inst.Position
+				inst.CFrame = CFrame.lookAt(pos, Vector3.new(marinaCenter.X, pos.Y, marinaCenter.Z))
+			end
+		end
+	end
 
 	local sanctuaryRadius = WorldBuildShared:getSanctuaryRadius("EternityCity")
 	WorldBuildShared:makeSanctuaryZone(model, sanctuaryRadius, budget, profile)
 	WorldBuildShared:addSanctuarySpawns(model, GameConfig.Sanctuary.EternityCityMinSpawnPoints, sanctuaryRadius, budget)
-	orientSanctuarySpawns(model)
-	WorldBuildShared:buildOrganicCanopy(CFrame.new(0, 0, 0), model, profile, budget)
+	orientSpawnsToMarina(model)
+	WorldBuildShared:buildOrganicCanopy(CFrame.new(auroraOrigin.Position), model, profile, budget)
 
-	buildCoastline(profile)
-	buildMountainBackdrop(profile)
-	buildMarinaRing(model, profile, budget)
-	buildAuroraSpireCluster(model, profile, budget)
-	buildAuroraMegaMall(model, profile, budget)
-	buildCanalPromenade(model, profile, budget)
-	buildSkyRailPlaza(model, profile, budget)
+	buildMarinaRing(model, profile, budget, marinaCenter)
+	buildAuroraSpireCluster(model, profile, budget, auroraOrigin)
+	buildAuroraMegaMall(model, profile, budget, megaMallBase)
+	buildCanalPromenade(model, profile, budget, canalOffset)
+	buildSkyRailPlaza(model, profile, budget, skyRailOrigin)
 	buildHoverShowroom(model, profile, budget)
 	buildVehicleShop(model, profile, budget)
-	buildTwilightOverpass(model, profile, budget)
+	buildTwilightOverpass(model, profile, budget, twilightOrigin)
 	buildMarinaShowroomStrip(model, profile, budget)
 	CommerceDistrictBuilder:BuildAll(model, profile, budget)
 
 	LoadoutPlazaKit.addPlaza(model, {
-		origin = Vector3.new(0, 0, 42),
+		origin = loadoutPlaza,
 		wardrobeLabel = "Eternity Wardrobe",
 		mirrorLabel = "Plaza Mirror",
 		autoRotate = true,
@@ -382,7 +424,7 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	EternityCityPhotoZones.setup(model, profile.Palette)
 	FestivalCountdownService.setup(model, profile.Palette)
 	EternityCityQuestBoard.setup(model, profile.Palette)
-	EternityCityFashionStage.setup(model, profile.Palette)
+	EternityCityFashionStage.setup(model, profile.Palette, fashionCenter)
 
 	WorldBuildBudget:report("EternityCity", budget)
 

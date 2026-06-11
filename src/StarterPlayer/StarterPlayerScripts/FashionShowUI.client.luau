@@ -115,6 +115,20 @@ resultLabel.Visible = false
 resultLabel.Parent = root
 
 local latestInfo: { [string]: any }? = nil
+local countdownEndsAt = 0
+local displayRound = 0
+local displayState = "Idle"
+
+local function updateStatusLabel(remaining: number)
+	statusLabel.Text = string.format("Round %d · %s · %ds left", displayRound, displayState, remaining)
+end
+
+local function syncCountdownFromInfo(info: { [string]: any })
+	displayRound = info.round :: number
+	displayState = info.state :: string
+	countdownEndsAt = os.clock() + math.max(0, info.secondsRemaining :: number)
+	updateStatusLabel(math.max(0, math.ceil(countdownEndsAt - os.clock())))
+end
 
 local function clearVoteButtons()
 	for _, child in voteList:GetChildren() do
@@ -126,18 +140,17 @@ end
 
 local function refreshUi(info: { [string]: any })
 	latestInfo = info
-	local state = info.state :: string
-	local round = info.round :: number
-	local remaining = info.secondsRemaining :: number
+	syncCountdownFromInfo(info)
 	local theme = info.themeSet :: { id: string, displayName: string }
 
-	statusLabel.Text = string.format("Round %d · %s · %ds left", round, state, remaining)
 	themeLabel.Text = "Theme: " .. theme.displayName
 
 	actionBtn.Visible = false
 	voteList.Visible = false
 	resultLabel.Visible = false
 	clearVoteButtons()
+
+	local state = info.state :: string
 
 	if state == "Registration" and not info.isRegistered then
 		actionBtn.Visible = true
@@ -211,6 +224,15 @@ end)
 task.spawn(function()
 	while true do
 		getFashionInfo:FireServer()
-		task.wait(3)
+		task.wait(10)
+	end
+end)
+
+task.spawn(function()
+	while true do
+		if countdownEndsAt > 0 then
+			updateStatusLabel(math.max(0, math.ceil(countdownEndsAt - os.clock())))
+		end
+		task.wait(1)
 	end
 end)

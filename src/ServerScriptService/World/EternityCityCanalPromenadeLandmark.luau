@@ -14,20 +14,22 @@ export type BuildContext = {
 	parent: Instance,
 	profile: WorldBuildConfig.PlaceProfile,
 	budget: WorldBuildBudget.Budget,
+	pathOffset: Vector3?,
 }
 
 local SAMPLE_COUNT = 24
 
-local function samplePath(t: number): Vector3
-	local x = 20 + t * 140
-	local z = 60 + math.sin(t * math.pi * 2.5) * 16
-	return Vector3.new(x, 1.2, z)
+local function samplePath(t: number, offset: Vector3): Vector3
+	local x = offset.X + 20 + t * 140
+	local z = offset.Z + 60 + math.sin(t * math.pi * 2.5) * 16
+	local y = offset.Y + 1.2
+	return Vector3.new(x, y, z)
 end
 
-local function buildBoardwalkPoints(): { Vector3 }
+local function buildBoardwalkPoints(offset: Vector3): { Vector3 }
 	local points: { Vector3 } = {}
 	for i = 0, SAMPLE_COUNT do
-		table.insert(points, samplePath(i / SAMPLE_COUNT))
+		table.insert(points, samplePath(i / SAMPLE_COUNT, offset))
 	end
 	return points
 end
@@ -77,13 +79,18 @@ local function addBillboard(parent: BasePart, text: string)
 	corner.Parent = label
 end
 
+local function pathOffset(ctx: BuildContext): Vector3
+	return if ctx.pathOffset then ctx.pathOffset else Vector3.new(0, 0, 0)
+end
+
 local function buildCanalWater(district: Folder, ctx: BuildContext)
 	local palette = ctx.profile.Palette
+	local offset = pathOffset(ctx)
 	for i = 0, SAMPLE_COUNT - 1 do
 		local t0 = i / SAMPLE_COUNT
 		local t1 = (i + 1) / SAMPLE_COUNT
-		local p0 = samplePath(t0)
-		local p1 = samplePath(t1)
+		local p0 = samplePath(t0, offset)
+		local p1 = samplePath(t1, offset)
 		local mid = (p0 + p1) * 0.5
 		local delta = p1 - p0
 		local length = delta.Magnitude + 2
@@ -103,7 +110,7 @@ end
 
 local function buildBoardwalk(district: Folder, ctx: BuildContext)
 	local palette = ctx.profile.Palette
-	local points = buildBoardwalkPoints()
+	local points = buildBoardwalkPoints(pathOffset(ctx))
 	MicroCurveBuilder:fillArc(points, 3, {
 		voxelStuds = ctx.profile.VoxelStuds,
 		color = palette.Slate,
@@ -124,8 +131,9 @@ end
 
 local function buildLanterns(district: Folder, ctx: BuildContext)
 	local palette = ctx.profile.Palette
+	local offset = pathOffset(ctx)
 	for i = 0, SAMPLE_COUNT, 3 do
-		local pos = samplePath(i / SAMPLE_COUNT) + Vector3.new(0, 2.5, 5)
+		local pos = samplePath(i / SAMPLE_COUNT, offset) + Vector3.new(0, 2.5, 5)
 		local post = addPart(
 			district,
 			"LanternPost_" .. i,
@@ -155,7 +163,7 @@ end
 
 local function buildGateArch(district: Folder, ctx: BuildContext)
 	local palette = ctx.profile.Palette
-	local gatePos = samplePath(0) + Vector3.new(0, 0, -8)
+	local gatePos = samplePath(0, pathOffset(ctx)) + Vector3.new(0, 0, -8)
 	local left = addPart(
 		district,
 		"CanalGateLeft",
@@ -192,8 +200,9 @@ end
 
 local function buildBridges(district: Folder, ctx: BuildContext)
 	local palette = ctx.profile.Palette
+	local offset = pathOffset(ctx)
 	for _, t in { 0.35, 0.72 } do
-		local center = samplePath(t)
+		local center = samplePath(t, offset)
 		local deck = addPart(
 			district,
 			"CanalBridge_" .. tostring(math.floor(t * 100)),

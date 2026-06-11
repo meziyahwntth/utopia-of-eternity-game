@@ -2,6 +2,8 @@
 --[[
 	Per-place world build profiles — Hybrid microcurve pipeline.
 ]]
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local WorldBuildConfig = {}
 
 export type PlaceKey = "Hub" | "Solhaven" | "Nocturne" | "EternityCity" | "DeathValley"
@@ -99,7 +101,33 @@ WorldBuildConfig.Profiles = {
 } :: { [PlaceKey]: PlaceProfile }
 
 function WorldBuildConfig:GetProfile(placeKey: PlaceKey): PlaceProfile
-	return self.Profiles[placeKey]
+	local profile = self.Profiles[placeKey]
+	if placeKey == "EternityCity" then
+		local GameConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("GameConfig"))
+		local cityPalette = GameConfig.CityPalette
+		return {
+			PlaceKey = profile.PlaceKey,
+			Theme = profile.Theme,
+			VoxelStuds = profile.VoxelStuds,
+			MaxParts = profile.MaxParts,
+			LodDistanceStuds = profile.LodDistanceStuds,
+			MicroTrimDistanceStuds = profile.MicroTrimDistanceStuds,
+			StreamingTargetRadius = profile.StreamingTargetRadius,
+			GroundSizeStuds = profile.GroundSizeStuds,
+			Palette = {
+				Pearl = cityPalette.Pearl,
+				Gold = cityPalette.Gold,
+				Cyan = cityPalette.Cyan,
+				Twilight = cityPalette.Twilight,
+				Amber = cityPalette.Amber,
+				Steel = cityPalette.Steel,
+				Slate = cityPalette.Slate,
+				Midnight = cityPalette.Midnight,
+				Teal = cityPalette.Teal,
+			},
+		}
+	end
+	return profile
 end
 
 return WorldBuildConfig

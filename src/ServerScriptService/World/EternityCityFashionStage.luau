@@ -6,8 +6,6 @@
 ]]
 local EternityCityFashionStage = {}
 
-local STAGE_CENTER = Vector3.new(-130, 1.2, 115)
-
 local function addPart(
 	parent: Instance,
 	name: string,
@@ -37,8 +35,8 @@ local function buildRunway(parent: Folder, palette: any, center: Vector3)
 		"FashionRunway",
 		Vector3.new(8, 0.35, 42),
 		CFrame.new(center + Vector3.new(0, 0.2, 0)),
-		palette.Midnight,
-		Enum.Material.SmoothPlastic
+		palette.Pearl,
+		Enum.Material.Marble
 	)
 	for _, zOff in { -20, -10, 0, 10, 20 } do
 		addPart(
@@ -60,8 +58,8 @@ local function buildPodiums(parent: Folder, palette: any, center: Vector3)
 			"ShowcasePodium_" .. i,
 			Vector3.new(5, 1.2, 5),
 			CFrame.new(center + Vector3.new(xOff * 14, 0.8, 18)),
-			palette.Slate,
-			Enum.Material.Slate
+			palette.Pearl,
+			Enum.Material.Marble
 		)
 		podium:SetAttribute("FashionPodium", true)
 		addPart(
@@ -70,7 +68,7 @@ local function buildPodiums(parent: Folder, palette: any, center: Vector3)
 			Vector3.new(5.4, 0.2, 5.4),
 			CFrame.new(center + Vector3.new(xOff * 14, 1.5, 18)),
 			palette.Gold,
-			Enum.Material.Neon,
+			Enum.Material.Metal,
 			0.05
 		)
 	end
@@ -162,7 +160,9 @@ local function buildSign(parent: Folder, palette: any, center: Vector3)
 	label.Parent = gui
 end
 
-function EternityCityFashionStage.setup(model: Model, palette: any)
+function EternityCityFashionStage.setup(model: Model, palette: any, center: Vector3?)
+	local stageCenter = center or Vector3.new(-130, 1.2, 115)
+
 	local stage = Instance.new("Folder")
 	stage.Name = "UtopiaFashionStage"
 	stage.Parent = model
@@ -171,7 +171,7 @@ function EternityCityFashionStage.setup(model: Model, palette: any)
 		stage,
 		"FashionStageRoot",
 		Vector3.new(36, 0.5, 52),
-		CFrame.new(STAGE_CENTER),
+		CFrame.new(stageCenter),
 		palette.Midnight,
 		Enum.Material.SmoothPlastic,
 		0.15
@@ -180,11 +180,11 @@ function EternityCityFashionStage.setup(model: Model, palette: any)
 	root:SetAttribute("FashionState", "Idle")
 	root:SetAttribute("FashionRound", 0)
 
-	buildRunway(stage, palette, STAGE_CENTER)
-	buildPodiums(stage, palette, STAGE_CENTER)
-	buildSpotlights(stage, palette, STAGE_CENTER)
-	buildAudience(stage, palette, STAGE_CENTER)
-	buildSign(stage, palette, STAGE_CENTER)
+	buildRunway(stage, palette, stageCenter)
+	buildPodiums(stage, palette, stageCenter)
+	buildSpotlights(stage, palette, stageCenter)
+	buildAudience(stage, palette, stageCenter)
+	buildSign(stage, palette, stageCenter)
 
 	workspace:SetAttribute("FashionState", "Idle")
 	workspace:SetAttribute("FashionRound", 0)

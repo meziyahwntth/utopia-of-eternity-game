@@ -8,6 +8,10 @@ local GameConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChil
 
 local ShuttleGreyboxBuilder = {}
 
+local function cityColors()
+	return GameConfig.CityPalette
+end
+
 export type ShuttleBuild = {
 	Model: Model,
 	Root: BasePart,
@@ -30,6 +34,7 @@ local function part(name: string, size: Vector3, cf: CFrame, color: Color3, mate
 end
 
 function ShuttleGreyboxBuilder:BuildStop(parent: Instance, origin: CFrame): (Model, CFrame, CFrame)
+	local colors = cityColors()
 	local stop = Instance.new("Model")
 	stop.Name = "PrismTransitStop"
 	stop.Parent = parent
@@ -49,7 +54,7 @@ function ShuttleGreyboxBuilder:BuildStop(parent: Instance, origin: CFrame): (Mod
 			"GlowLane_" .. i,
 			Vector3.new(24, 0.2, 0.8),
 			dock * CFrame.new(0, 0.15, i * 4),
-			Color3.fromRGB(212, 175, 55),
+			colors.Gold,
 			Enum.Material.Neon
 		)
 		lane.Parent = stop
@@ -59,7 +64,7 @@ function ShuttleGreyboxBuilder:BuildStop(parent: Instance, origin: CFrame): (Mod
 		"Canopy",
 		Vector3.new(26, 1.5, 14),
 		dock * CFrame.new(0, 10, 6),
-		Color3.fromRGB(55, 68, 88),
+		colors.Slate,
 		Enum.Material.Slate
 	)
 	canopy.Parent = stop
@@ -68,7 +73,7 @@ function ShuttleGreyboxBuilder:BuildStop(parent: Instance, origin: CFrame): (Mod
 		"CanopyGlow",
 		Vector3.new(24, 0.4, 12),
 		dock * CFrame.new(0, 9.2, 6),
-		Color3.fromRGB(212, 175, 55),
+		colors.Gold,
 		Enum.Material.Neon
 	)
 	canopyGlow.Transparency = 0.35
@@ -78,7 +83,7 @@ function ShuttleGreyboxBuilder:BuildStop(parent: Instance, origin: CFrame): (Mod
 		"GlassWall",
 		Vector3.new(0.5, 8, 12),
 		dock * CFrame.new(-8, 5, 6),
-		Color3.fromRGB(0, 200, 255),
+		colors.Cyan,
 		Enum.Material.Glass
 	)
 	glass.Transparency = 0.45
@@ -88,7 +93,7 @@ function ShuttleGreyboxBuilder:BuildStop(parent: Instance, origin: CFrame): (Mod
 		"Sign",
 		Vector3.new(12, 3, 0.5),
 		dock * CFrame.new(0, 7, -2),
-		Color3.fromRGB(0, 229, 255),
+		colors.CyanBright,
 		Enum.Material.Neon
 	)
 	sign.Parent = stop
@@ -109,6 +114,7 @@ function ShuttleGreyboxBuilder:BuildStop(parent: Instance, origin: CFrame): (Mod
 end
 
 function ShuttleGreyboxBuilder:BuildShuttle(parent: Instance, dockCFrame: CFrame): ShuttleBuild
+	local colors = cityColors()
 	local shuttle = Instance.new("Model")
 	shuttle.Name = "PrismHoverShuttle"
 	shuttle.Parent = parent
@@ -117,7 +123,7 @@ function ShuttleGreyboxBuilder:BuildShuttle(parent: Instance, dockCFrame: CFrame
 		"ShuttleRoot",
 		Vector3.new(14, 4, 28),
 		dockCFrame,
-		Color3.fromRGB(90, 105, 125),
+		colors.Steel,
 		Enum.Material.SmoothPlastic
 	)
 	root.Anchored = true
@@ -128,7 +134,7 @@ function ShuttleGreyboxBuilder:BuildShuttle(parent: Instance, dockCFrame: CFrame
 		"CockpitGlass",
 		Vector3.new(12, 3.5, 0.5),
 		dockCFrame * CFrame.new(0, 1.5, -13),
-		Color3.fromRGB(80, 90, 110),
+		colors.Midnight,
 		Enum.Material.Glass
 	)
 	glassFront.Transparency = 0.35
@@ -138,7 +144,7 @@ function ShuttleGreyboxBuilder:BuildShuttle(parent: Instance, dockCFrame: CFrame
 		"GoldStrip",
 		Vector3.new(14.2, 0.4, 28.2),
 		dockCFrame * CFrame.new(0, -1.8, 0),
-		Color3.fromRGB(212, 175, 55),
+		colors.Gold,
 		Enum.Material.Neon
 	)
 	goldStrip.Parent = shuttle
@@ -148,7 +154,7 @@ function ShuttleGreyboxBuilder:BuildShuttle(parent: Instance, dockCFrame: CFrame
 			"HoverRing",
 			Vector3.new(1.2, 3, 3),
 			dockCFrame * CFrame.new(side * 7.5, 0, 0),
-			Color3.fromRGB(0, 229, 255),
+			colors.CyanBright,
 			Enum.Material.Neon
 		)
 		ring.Transparency = 0.2
@@ -206,17 +212,17 @@ function ShuttleGreyboxBuilder:BuildShuttle(parent: Instance, dockCFrame: CFrame
 end
 
 function ShuttleGreyboxBuilder:BuildEternityVariant(parent: Instance, origin: CFrame): ShuttleBuild
+	local colors = cityColors()
 	local _stop, dock, shuttleDock = self:BuildStop(parent, origin)
 	local build = self:BuildShuttle(parent, shuttleDock)
 
-	-- Eternity recolor: stop canopy must not be near-white (city recolor pass)
 	local stopCanopy = _stop:FindFirstChild("Canopy")
 	if stopCanopy and stopCanopy:IsA("BasePart") then
-		stopCanopy.Color = Color3.fromRGB(55, 68, 88)
+		stopCanopy.Color = colors.Slate
 	end
 
 	local root = build.Root
-	root.Color = Color3.fromRGB(90, 105, 125)
+	root.Color = colors.Steel
 	root.Material = Enum.Material.SmoothPlastic
 
 	local glassBand = Instance.new("Part")
@@ -226,7 +232,7 @@ function ShuttleGreyboxBuilder:BuildEternityVariant(parent: Instance, origin: CF
 	glassBand.Anchored = false
 	glassBand.CanCollide = false
 	glassBand.Transparency = 0.35
-	glassBand.Color = Color3.fromRGB(0, 229, 255)
+	glassBand.Color = colors.Cyan
 	glassBand.Material = Enum.Material.Glass
 	glassBand.Parent = build.Model
 	local weld = Instance.new("WeldConstraint")
@@ -242,7 +248,7 @@ function ShuttleGreyboxBuilder:BuildEternityVariant(parent: Instance, origin: CF
 		wing.Anchored = false
 		wing.CanCollide = false
 		wing.Transparency = 0.25
-		wing.Color = Color3.fromRGB(212, 175, 55)
+		wing.Color = colors.Gold
 		wing.Material = Enum.Material.Glass
 		wing.Parent = build.Model
 		local w = Instance.new("WeldConstraint")

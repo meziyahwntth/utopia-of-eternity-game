@@ -1,0 +1,33 @@
+{
+  "MapSize": 2048,
+  "HeightmapResolution": 1024,
+  "RegionHeight": 256,
+  "ImportPositionY": 128,
+  "PlateauHeightMap": 70,
+  "SeaLevelHeightMap": 52,
+  "PlateauY": 72,
+  "SeaLevelY": 53,
+  "PlateauCenterPixel": [
+    460,
+    553
+  ],
+  "BayCenterPixel": [
+    860,
+    223
+  ],
+  "PlateauCenterStud": [
+    -104.0,
+    72,
+    82.0
+  ],
+  "BayCenterStud": [
+    696.0,
+    53,
+    -578.0
+  ],
+  "verticalFlipApplied": true,
+  "heightRange": [
+    16.2,
+    250.0
+  ]
+}

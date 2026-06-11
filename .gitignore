@@ -17,6 +17,7 @@ src/ServerScriptService/Secrets/CatalogSecrets.luau
 *.pem
 .rojo-api-key
 .publish-venv/
+.terrain-venv/
 
 # OS / editor
 .DS_Store
