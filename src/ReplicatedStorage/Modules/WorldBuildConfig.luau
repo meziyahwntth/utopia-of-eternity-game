@@ -80,7 +80,8 @@ WorldBuildConfig.Profiles = {
 		PlaceKey = "EternityCity",
 		Theme = "solarpunk_flagship",
 		VoxelStuds = 0.1,
-		MaxParts = 16000,
+		-- 16k greybox + ~1k hero landmark interiors (UtopiaPlaza/EternityTower); was 16k → budget exhausted before heroes
+		MaxParts = 18500,
 		LodDistanceStuds = 640,
 		MicroTrimDistanceStuds = 128,
 		StreamingTargetRadius = 640,

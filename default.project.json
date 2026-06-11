@@ -143,6 +143,18 @@
         },
         "EternityTerrainSetup": {
           "$path": "src/ServerScriptService/World/EternityTerrainSetup.luau"
+        },
+        "CityArtKit": {
+          "$path": "src/ServerScriptService/World/CityArtKit.luau"
+        },
+        "HeroMeshKit": {
+          "$path": "src/ServerScriptService/World/HeroMeshKit.luau"
+        },
+        "UtopiaPlazaBuilder": {
+          "$path": "src/ServerScriptService/World/UtopiaPlazaBuilder.luau"
+        },
+        "EternityTowerBuilder": {
+          "$path": "src/ServerScriptService/World/EternityTowerBuilder.luau"
         }
       },
       "Shuttle": {
@@ -528,6 +540,9 @@
         "ArchRibKit": {
           "$path": "src/ServerStorage/WorldKits/ArchRibKit.luau"
         }
+      },
+      "HeroMeshes": {
+        "$className": "Folder"
       }
     },
     "HttpService": {

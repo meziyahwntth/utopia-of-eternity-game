@@ -227,3 +227,102 @@ DV content เหลือ: POI art pass (Whispering Grove, Hollow Lake) + Zone 
 - Commit 22e6084 ค้าง local — ตรวจรับแล้ว push ได้รอบถัดไป
 - แผนต่อ (DESIGN-RESEARCH): เฟส 2 daily streak + quest board → fashion show →
   mount trading → Eternity Pass
+
+## เฟส 2 Daily Streak + Quest Board — ตรวจรับผ่าน (รอบแก้ remotes)
+
+- รอบแรก FAIL: remote 5 ตัวไม่ถูกสร้าง (SecurityRemoteBootstrap WaitForChild("Remotes")
+  ไม่มี timeout + boot order ไม่การันตี → infinite yield ทั้ง UI)
+- Fix 579273b: FindFirstChild + Instance.new idempotent ตาม pattern RemoteGuard
+- Playtest: `[P2F] remotes=5/5 quests=3 streak=1` + countdown client loop ✓
+- ระบบที่ได้: streak 7 วัน (5→30 shards + title), quest board 3/วัน จาก pool 8
+  (track server-side ทั้งหมด), claim ผ่าน RemoteGuard rate-limit
+- **11 มิ.ย.: Praphan Save Limited & Public สำเร็จ — ข้อห้าม publish ยกเลิกทั้งหมด**
+  (ดู CURSOR-PROMPT-P2-CLOUD-HANDOFF.md) — ถัดไป: push 2 commits + publish + cloud test
+
+## 2026-06-11 — Cloud-test EternityCity v2 (PASS)
+
+- Publish fix (Cursor 27f7c30): rojo build + Open Cloud API POST แทน rojo upload; key ใหม่ universe-places:write
+- เปิด place 94486544638073 จาก cloud: Asset Manager (list view) → double-click "Utopia of Eternity" → หน้าต่างใหม่ DataModel version=2
+- Play ผล:
+  - [CT2] streak=1 qb=1 cd=12 remotes=5 (ClaimQuestBonus,GetStreakInfo,GetQuestInfo,ClaimQuestReward,ClaimStreakReward)
+  - [Q] quests=3 (GetQuestInfo round-trip จริง)
+  - [CT4] showroom=34 display=7 (3× Model:DisplayVehicle) billboards=24
+  - Daily Streak popup แสดงเอง + Claim สำเร็จ → "Day 1 streak: +5 Luminite"
+  - FestivalCountdown client loop started
+- Minor: nearwhite=3 — DomeShell (อนุญาต) + UtopiaShuttle.PrismTransitStop.Canopy + PrismHoverShuttle.ShuttleRoot (2 ชิ้นควร recolor รอบหน้า)
+- Minor: [DeathValley] PlayerStore.load returned nil for PorscheUTP — skipping seed (Studio cloud context)
+- DV cloud test: N/A — place DV ยังไม่ publish (นโยบาย: publish เฉพาะ EternityCity)
+
+## 2026-06-11 — Fashion Show + shuttle recolor (961f2f3) — PASS
+
+- Solo playtest TestMode: Round 25 วิ่งครบ Registration→Dressing→Runway→Voting→Results (ไม่ cancel หลัง Join)
+- Round ที่ไม่มีคน join: cancelled 0/1 players ถูกต้อง วน Idle→Registration ต่อเนื่อง (Round 1→28)
+- [FS] Registration 28 stage=true remotes=4/4 lum=3 (participant reward) title=nil (solo ไม่มีโหวต — ตามดีไซน์) nw=1 DomeShell
+- Shuttle recolor ผ่าน: nearwhite เหลือ DomeShell ชิ้นเดียว
+- Minor (แจ้ง Cursor รอบหน้า): UI countdown แสดง "0s left" ค้างบ่อย (อัปเดตเฉพาะตอนเปลี่ยน state?) — Round 24 เคยแสดง 7s ถูกต้อง
+- หมายเหตุ env: Chrome แย่ง frontmost เป็นพักๆ ระหว่าง playtest (น่าจะจาก deeplink handler) — แก้โดย minimize start page window แล้วคลิกหน้าต่าง playtest ตรงๆ
+
+## 2026-06-11 — Heightmap Importer test (place ใหม่) — PASS
+
+ทดสอบ import `assets/terrain/eternitycity-heightmap-v1.png` + colormap (1024×1024 16-bit) ใน place เปล่า
+Size 2048×256×2048, Position default (0,0,0)
+
+**ผล:** terrain ครบทุกองค์ประกอบ — city plateau วงกลมเรียบ, อ่าวทะเล, คลองเชื่อม plateau→อ่าว, beach ring, แนวภูเขาขอบแมพ
+
+**ข้อค้นพบสำคัญ (สำหรับรอบ production):**
+1. Importer **ไม่เติมน้ำ** — ต้อง `Terrain:ReplaceMaterial(region, 4, Air, Water)` ใต้ sea level เอง (ทดสอบแล้วเวิร์ค)
+2. ภาพถูก **flip แกนตั้ง** ตอน import — อ่าวออกแบบไว้ SE ไปโผล่ NW → ต้อง flip PNG ตอน generate (v2)
+3. Position Y=0 → terrain กิน -128..+128 → **Baseplate บังเกือบหมด** — production ควรตั้ง Position Y=128 ให้ terrain อยู่ 0..256
+4. Colormap จับคู่ material ได้ (grass/rock ตรง) แต่ concrete plateau ออกขาว — ปรับสี colormap ให้ใกล้ material จริงขึ้น
+5. ดู terrain ใน Studio: ลบ Atmosphere + FogEnd=100000 ก่อน ไม่งั้นหมอกบังหมด
+6. Place ทดสอบ ไม่ save
+
+Gen script เก็บเข้า repo แล้ว: `scripts/gen-eternity-terrain.py`
+
+## 2026-06-11 — Publish v3 + Terrain v2 acceptance — PASS
+
+**Publish:** EternityCity 94486544638073 → **v3** (HTTP 200, build จาก 9f9ac9a)
+- แก้ publish-place.sh 2 จุด: `set -a` ครอบ source .env (python subprocess ไม่เห็น key เพราะไม่ export — root cause "KEY missing" ทั้งที่ key อยู่ครบ) + mktemp macOS ไม่รองรับ suffix หลัง XXXXXX
+
+**Terrain v2 acceptance (local, utopia-playtest.rbxlx จาก 9f9ac9a):**
+- Import: Size 2048×256×2048, Position (0,128,0) — heightmap+colormap v2
+- `[T2] plateau nonair=9` ที่ PlateauCenterStud (-104,72,82) ✓
+- `[A1] bayWater=4186` ที่ BayCenterStud (696,53,-578) ✓ — fillWater อัตโนมัติจาก prepareForBuild, orientation v2 ตรง design แล้ว
+- `layout=imported-v2` ✓ builder ข้าม greybox ground/coast/mountains
+- Fashion Stage snap (-234,70,197) บน plateau ✓
+- `[A2] nearwhite=0` ✓ (ดีกว่า spec ≤1)
+- Countdown ticking: Registration 7s→3s→Idle 4s ✓ ทุกวินาที
+- Minor (ไม่ block): บางจังหวะหลัง state transition ขึ้น "0s left" สั้นๆ ก่อน poll 10s รอบใหม่ sync — เด่นเฉพาะ TestMode ที่ state สั้น (5s) กว่า poll
+- Sentinel จับ speed exploit จากการพิมพ์ WASD ลง viewport — security ทำงานปกติ
+- Terrain v2 save ลง utopia-playtest.rbxlx แล้ว (save ก่อน Play)
+
+**ค้าง:** publish terrain ขึ้น cloud ต้อง Save place ที่มี terrain (rbxlx build จาก rojo ไม่มี terrain — ต้อง import ใน Studio แล้ว Publish to Roblox As หรือใช้ rbxlx ที่ save แล้ว POST เอง — รอผู้ใช้ตัดสิน)
+
+## 2026-06-11 — Art pass v3 acceptance (fc3859f) — PASS
+
+**Heightmap v3 สัดส่วน (วัดอิสระโดย Cowork):** sea 17.6% · land 82.4% · ที่ราบ 68-76 = 60.4% · mount 6.0%
+— แก้ปัญหา "ทะเลเยอะเกินครึ่ง" ตามผู้ใช้สั่ง (v2: sea 38% + beach 28%)
+
+**Acceptance (local, build fc3859f + terrain v3 import Pos Y=128):**
+- `[T3] plateau nonair=18` ที่ PlateauCenterStud ใหม่ (-64,72,62) ✓
+- `[B1] bayWater=4784` ที่ BayCenterStud ใหม่ (856,53,-818) ✓ fillWater อัตโนมัติ
+- Fashion Stage snap (-194,70,177) ตาม TerrainProfile ใหม่ ✓
+- nearwhite=0 ✓
+- Countdown: ค่าแม่นทันทีหลัง state เปลี่ยน (10s→…) ticking ทุกวินาที ไม่มี "0s left" ค้าง ✓ (fix AttributeChangedSignal ทำงาน)
+- Pearl & Gold มองเห็นจริง: spires เป็น pearl-white + cyan glow (เดิม silhouette ดำ), stage marble+gold trim ✓
+- Terrain v3 save ลง utopia-playtest.rbxlx แล้ว
+
+**หมายเหตุ (minor, ไม่ block):**
+1. attribute `TerrainLayout` ยังรายงานสตริง "imported-v2" ทั้งที่เป็น v3 — แค่ label, ฝากแก้รอบหน้า
+2. แสง PointLight ที่ Fashion Stage จ้าจัด ภาพ wash เป็นขาวทอง — ฝากลด intensity รอบจูนถัดไป
+
+**สถานะ publish:** terrain ยัง local ตามคำสั่งผู้ใช้ — cloud = v3 (9f9ac9a code) ยังไม่มี terrain/art pass (fc3859f ยังไม่ publish)
+
+## 11 มิ.ย. 2026 — UtopiaPlaza + EternityTower acceptance PASS (FIX-4)
+
+- Hero mesh pipeline: Meshy Image-to-3D → decimate local → MeshId `103489658289034` (UtopiaPlaza, ×15) / `110883199256677` (EternityTower, ×60)
+- Debug 4 รอบ: (1) wiring ขาด → (2) augment ผิด branch/hydrate timing → (3) MeshId เขียนรันไทม์ไม่ได้ → CreateMeshPartAsync + pcall isolation + budget 18,500 → (4) ScaleTo ใช้กับ MeshPart ไม่ได้ → Size=MeshSize×Scale + แยกอาคาร procedural ออกจาก mesh step
+- ผลรัน (Studio Run): UtopiaPlaza 3,048 parts · EternityTower 223 parts · HeroMeshActive="UtopiaPlaza,EternityTower" · hero mesh ×2 ปรากฏ · SpawnService ready=true · ไม่มี CONTRACT_FAIL
+- โครงสร้าง: UP escalator=8, lift=6, skylight=1, LEVEL signs=40 · ET stage=11, helipad=10, helicopter=1, glass rail=8
+- ค้าง: เดิน playtest จริง (ลิฟท์ tween, บันไดเลื่อน collision) ตอน cloud-test · terrain v3 ต้อง re-import ก่อน publish รอบเดียว
+- Meshy pipeline อัตโนมัติพร้อม: scripts/meshy-hero-mesh.py + MESHY_API_KEY ใน bridge/.env (วางโดยผู้ใช้)

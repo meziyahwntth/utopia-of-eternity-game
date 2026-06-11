@@ -36,6 +36,9 @@ local FestivalCountdownService = require(ServerScriptService:WaitForChild("Festi
 local EternityCityQuestBoard = require(script.Parent.EternityCityQuestBoard)
 local EternityCityFashionStage = require(script.Parent.EternityCityFashionStage)
 local EternityTerrainSetup = require(script.Parent.EternityTerrainSetup)
+local UtopiaPlazaBuilder = require(script.Parent.UtopiaPlazaBuilder)
+local EternityTowerBuilder = require(script.Parent.EternityTowerBuilder)
+local HeroMeshKit = require(script.Parent.HeroMeshKit)
 
 local EternityCityWorldBuilder = {}
 
@@ -307,6 +310,206 @@ local function buildTwilightOverpass(
 	EternityCityAccessGuard.tagDistrict(district, 10, "TwilightOverpass")
 end
 
+local function buildUtopiaPlaza(
+	parent: Instance,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget,
+	base: CFrame
+)
+	if parent:FindFirstChild("UtopiaPlaza") then
+		return parent:FindFirstChild("UtopiaPlaza") :: Folder
+	end
+	if hasStatic("Static_UtopiaPlaza") then
+		print("[Utopia] skip greybox: UtopiaPlaza (static found)")
+		return nil
+	end
+	local district = UtopiaPlazaBuilder.build({
+		parent = parent,
+		profile = profile,
+		budget = budget,
+		base = base,
+	})
+	EternityCityAccessGuard.tagDistrict(district, 22, "UtopiaPlaza")
+	local parts = district:GetAttribute("PartCount")
+	print(string.format("[UtopiaPlaza] built parts=%s", tostring(parts or "?")))
+	return district
+end
+
+local function buildEternityTower(
+	parent: Instance,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget,
+	base: CFrame
+)
+	if parent:FindFirstChild("EternityTower") then
+		return parent:FindFirstChild("EternityTower") :: Folder
+	end
+	if hasStatic("Static_EternityTower") then
+		print("[Utopia] skip greybox: EternityTower (static found)")
+		return nil
+	end
+	local district = EternityTowerBuilder.build({
+		parent = parent,
+		profile = profile,
+		budget = budget,
+		base = base,
+	})
+	EternityCityAccessGuard.tagDistrict(district, 18, "EternityTower")
+	local parts = district:GetAttribute("PartCount")
+	print(string.format("[EternityTower] built parts=%s", tostring(parts or "?")))
+	return district
+end
+
+local function applyHeroMeshActive(model: Model, plazaDistrict: Folder?, towerDistrict: Folder?)
+	local keys: { string } = {}
+	if plazaDistrict then
+		table.insert(keys, "UtopiaPlaza")
+	end
+	if towerDistrict then
+		table.insert(keys, "EternityTower")
+	end
+	if model:FindFirstChild("UtopiaPlaza") and not table.find(keys, "UtopiaPlaza") then
+		table.insert(keys, "UtopiaPlaza")
+	end
+	if model:FindFirstChild("EternityTower") and not table.find(keys, "EternityTower") then
+		table.insert(keys, "EternityTower")
+	end
+	if #keys > 0 then
+		model:SetAttribute("HeroMeshActive", table.concat(keys, ","))
+	end
+end
+
+local function resolveHeroLandmarkBases(): (CFrame, CFrame)
+	local utopiaPlazaBase = CFrame.new(EternityTerrainSetup.getLandmarkPosition("UtopiaPlaza", Vector3.new(-134, 72, -68)))
+	local eternityTowerBase = CFrame.new(EternityTerrainSetup.getLandmarkPosition("EternityTower", Vector3.new(60, 72, 140)))
+	return utopiaPlazaBase, eternityTowerBase
+end
+
+local GREYBOX_MARKER = "AuroraMegaMall"
+
+local function findEternityCityModels(): { Model }
+	local out: { Model } = {}
+	for _, child in workspace:GetChildren() do
+		if child:IsA("Model") and child.Name == "UtopiaEternityCity" then
+			table.insert(out, child)
+		end
+	end
+	return out
+end
+
+local function pickCanonicalCity(models: { Model }): Model
+	if #models == 1 then
+		return models[1]
+	end
+	local best = models[1]
+	local bestScore = -1
+	for _, candidate in models do
+		local score = 0
+		if candidate:FindFirstChild("UtopiaPlaza") then
+			score += 1000
+		end
+		if candidate:FindFirstChild("EternityTower") then
+			score += 1000
+		end
+		if candidate:FindFirstChild(GREYBOX_MARKER) or candidate:FindFirstChild("MarinaRing") then
+			score += 100
+		end
+		score += #candidate:GetChildren()
+		if score > bestScore then
+			bestScore = score
+			best = candidate
+		end
+	end
+	return best
+end
+
+local function removeDuplicateCities(keep: Model)
+	for _, model in findEternityCityModels() do
+		if model ~= keep then
+			warn("[Utopia] removing duplicate UtopiaEternityCity — kept canonical model")
+			model:Destroy()
+		end
+	end
+end
+
+-- rbxlx saved workspace may hydrate a frame after GameBootstrap starts
+local function waitForEternityCityModel(timeoutSec: number): Model?
+	local deadline = os.clock() + timeoutSec
+	while os.clock() < deadline do
+		local models = findEternityCityModels()
+		if #models > 0 then
+			return pickCanonicalCity(models)
+		end
+		task.wait(0.05)
+	end
+	return nil
+end
+
+local function hasGreyboxCore(model: Model): boolean
+	return model:FindFirstChild(GREYBOX_MARKER) ~= nil or model:FindFirstChild("MarinaRing") ~= nil
+end
+
+local function assertHeroMeshContract(model: Model)
+	local missing: { string } = {}
+	if model:FindFirstChild("UtopiaPlaza") == nil then
+		table.insert(missing, "UtopiaPlaza")
+	end
+	if model:FindFirstChild("EternityTower") == nil then
+		table.insert(missing, "EternityTower")
+	end
+	if #missing > 0 then
+		warn("[Utopia] HERO_MESH_CONTRACT_FAIL: missing " .. table.concat(missing, ", ") .. " under UtopiaEternityCity")
+	end
+	if model:GetAttribute("HeroMeshActive") == nil then
+		warn("[Utopia] HERO_MESH_CONTRACT_FAIL: HeroMeshActive attribute is nil after Build")
+	end
+end
+
+local function attachHeroMeshSafe(district: Folder, key: string, baseCf: CFrame)
+	local ok, err = pcall(function()
+		local result = HeroMeshKit.attachExterior(district, key, baseCf)
+		if result then
+			district:SetAttribute("HeroMeshSource", result.source)
+		else
+			warn(string.format("[Utopia] hero mesh exterior skipped for %s (procedural district kept)", key))
+		end
+	end)
+	if not ok then
+		warn(string.format("[Utopia] hero mesh exterior failed for %s (procedural district kept): %s", key, tostring(err)))
+	end
+end
+
+local function ensureHeroLandmarks(
+	model: Model,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget
+): (Folder?, Folder?)
+	local utopiaPlazaBase, eternityTowerBase = resolveHeroLandmarkBases()
+
+	-- Step 1: procedural districts (must succeed — never wrapped in mesh pcall)
+	local plazaDistrict = buildUtopiaPlaza(model, profile, budget, utopiaPlazaBase)
+	local towerDistrict = buildEternityTower(model, profile, budget, eternityTowerBase)
+	applyHeroMeshActive(model, plazaDistrict, towerDistrict)
+
+	-- Step 2: hero mesh exterior (optional — pcall per landmark)
+	if plazaDistrict then
+		attachHeroMeshSafe(plazaDistrict, "UtopiaPlaza", utopiaPlazaBase)
+	end
+	if towerDistrict then
+		attachHeroMeshSafe(towerDistrict, "EternityTower", eternityTowerBase)
+	end
+
+	return plazaDistrict, towerDistrict
+end
+
+local function ensureHeroLandmarksSafe(
+	model: Model,
+	profile: WorldBuildConfig.PlaceProfile,
+	budget: WorldBuildBudget.Budget
+)
+	ensureHeroLandmarks(model, profile, budget)
+end
+
 local function buildMarinaShowroomStrip(parent: Instance, profile: WorldBuildConfig.PlaceProfile, budget: WorldBuildBudget.Budget)
 	if hasStatic("Static_MarinaShowroom") then
 		print("[Utopia] skip greybox: MarinaShowroom (static found)")
@@ -326,22 +529,58 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 		warn("[Utopia] EternityCityWorldBuilder skipped — ShouldBuild=false PlaceId=", game.PlaceId)
 		return WorldBuilderTypes.skip("not this place")
 	end
-	if WorldPlaceGuard:ModelExists("UtopiaEternityCity") then
-		print("[Utopia] Eternity City already built — skipping")
-		return WorldBuilderTypes.skip("UtopiaEternityCity already built")
-	end
-
-	print("[Utopia] Eternity City build starting… PlaceId=", game.PlaceId)
 
 	EternityTerrainSetup.prepareForBuild()
-	local useTerrain = EternityTerrainSetup.hasRealTerrain()
 
 	local profile = WorldBuildConfig:GetProfile("EternityCity")
 	local budget = WorldBuildBudget:new(profile.MaxParts)
 
-	local model = Instance.new("Model")
-	model.Name = "UtopiaEternityCity"
-	model.Parent = workspace
+	-- Wait for rbxlx-hydrated city; avoid creating a duplicate while saved workspace loads
+	local model = waitForEternityCityModel(3)
+	local createdNew = false
+	if model then
+		removeDuplicateCities(model)
+	else
+		model = Instance.new("Model")
+		model.Name = "UtopiaEternityCity"
+		model.Parent = workspace
+		createdNew = true
+		task.wait(0.15)
+		local lateModels = findEternityCityModels()
+		if #lateModels > 1 then
+			model = pickCanonicalCity(lateModels)
+			removeDuplicateCities(model)
+			createdNew = false
+		end
+	end
+
+	local needsPlaza = model:FindFirstChild("UtopiaPlaza") == nil
+	local needsTower = model:FindFirstChild("EternityTower") == nil
+	local hasGreybox = hasGreyboxCore(model)
+
+	if not createdNew and hasGreybox and not needsPlaza and not needsTower then
+		print("[Utopia] Eternity City already built — skipping")
+		assertHeroMeshContract(model)
+		return WorldBuilderTypes.skip("UtopiaEternityCity already built")
+	end
+
+	if not createdNew and hasGreybox and (needsPlaza or needsTower) then
+		print(
+			string.format(
+				"[Utopia] Eternity City exists — augmenting hero landmarks (plaza=%s tower=%s)",
+				tostring(needsPlaza),
+				tostring(needsTower)
+			)
+		)
+		ensureHeroLandmarksSafe(model, profile, budget)
+		assertHeroMeshContract(model)
+		WorldBuildBudget:report("EternityCity-augment", budget)
+		return WorldBuilderTypes.success(model)
+	end
+
+	print("[Utopia] Eternity City build starting… PlaceId=", game.PlaceId)
+
+	local useTerrain = EternityTerrainSetup.hasRealTerrain()
 
 	if not useTerrain then
 		WorldBuildShared:makeGround(model, profile.GroundSizeStuds, profile.Palette.Twilight, Enum.Material.Slate)
@@ -376,6 +615,10 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	WorldBuildShared:makeSanctuaryZone(model, sanctuaryRadius, budget, profile)
 	WorldBuildShared:addSanctuarySpawns(model, GameConfig.Sanctuary.EternityCityMinSpawnPoints, sanctuaryRadius, budget)
 	orientSpawnsToMarina(model)
+
+	-- Hero landmarks before heavy MicroVoxel/organic passes (budget/time guard)
+	ensureHeroLandmarksSafe(model, profile, budget)
+
 	WorldBuildShared:buildOrganicCanopy(CFrame.new(auroraOrigin.Position), model, profile, budget)
 
 	buildMarinaRing(model, profile, budget, marinaCenter)
@@ -425,6 +668,9 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	FestivalCountdownService.setup(model, profile.Palette)
 	EternityCityQuestBoard.setup(model, profile.Palette)
 	EternityCityFashionStage.setup(model, profile.Palette, fashionCenter)
+
+	ensureHeroLandmarksSafe(model, profile, budget)
+	assertHeroMeshContract(model)
 
 	WorldBuildBudget:report("EternityCity", budget)
 
