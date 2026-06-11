@@ -334,3 +334,14 @@ Gen script เก็บเข้า repo แล้ว: `scripts/gen-eternity-ter
 - Terrain v3 re-import ใน Studio: heightmap+colormap v3, CELLS=4,294,468, ใต้เมือง flat y=69, MAXY 171 → Save to File
 - Publish ผ่าน Open Cloud API ด้วยไฟล์ที่เซฟ (มี terrain — ไม่ใช้ rojo build ที่ทับ terrain): `utopia-publish-eternitycity.command` → HTTP 200, placeId=94486544638073, **versionNumber=4**, log ใน PUBLISH-ETERNITYCITY-LOG.txt
 - งานถัดไป: Landmark #4 Sky Rail Plaza (ใช้ meshy-hero-mesh.py), recolor Shuttle canopy, DV combat loop
+
+## 12 มิ.ย. 2026 — Backlog 3 งาน + Publish v5 ✅
+
+- **Shuttle recolor**: ตรวจพบทำเสร็จแล้วตั้งแต่ 961f2f3 (nearwhite=0 ใน v3 acceptance) — backlog stale ปิดได้เลย
+- **DV combat loop** (commit ก่อน publish): config Combat (BaseDamage 20, range 16, cooldown 0.45s, shards Whisper 2/Stalker 3/LegionEcho 8) · WraithFactory: applyDamage/findNearestActive/setOnKilled (hit flash + ตายแล้วลบจาก active ทันที → wave จบเร็วผ่าน getActiveCount()==0 เดิม) · DeathValleyCombatService (server-authoritative, no-P2W) · remotes AttackWraith/WraithKilled + rate limit 12/6s · CombatHUD client: ปุ่ม F bind เฉพาะช่วง wave (กัน conflict DungeonZone1HUD), toast +shards, mobile ContextActionService
+  - Playtest จริง (SimulatePlaceKey=DeathValley in-memory): ATK1 "Hit — 20 HP left" → cooldown block → ATK3 "Wraith destroyed! +2 shards" → shards 30→32, kills=1, HUD "Wraith Wave (2)" อัปเดต, NIGHT_SURVIVED=1 ✓
+  - หมายเหตุ: wave ไม่ spawn ถ้า Beacon Fuel=0 (Breach loop) — เติมผ่าน DepositBeaconFuel ก่อนทดสอบ; fuel drain เร็ว (~2/s?) ควรรีวิวภายหลัง
+- **Landmark #4 Sky Rail Plaza hero mesh**: ภาพ concept จากผู้ใช้ → Meshy ผ่าน utopia-meshy-skyrailplaza.command (Mac-side, สคริปต์ meshy-hero-mesh.py, gen 100% + download 32MB) → decimate ใน sandbox: ต้อง merge_vertices ก่อน (Meshy OBJ เป็น triangle soup 2.85 v/f, ไม่งั้น cull พังเหลือ 20 faces) + cull แบบ relative → 17,745 faces, 1 component, area 99.9% → SkyRailPlaza-18k.obj → 3D Importer upload → **rbxassetid://106585159616794** → GameConfig.HeroMeshes (Scale 55 → 105×27×28) + attach 2 จุด (fresh-build หลัง buildSkyRailPlaza + augment ใน ensureHeroLandmarks) — สคริปต์ patch แล้ว
+  - Playtest: SRP_MESH=true (104.6×27×28.2) + UP/ET mesh ครบ, SpawnService ready ✓
+- **Publish**: terrain v3 re-import (CELLS 4,294,468) → Save to File (2.88MB) → POST ผ่าน utopia-publish-eternitycity.command → **HTTP 200, versionNumber=5**
+- command bar ใต้ dock ใช้ไม่ได้ → ลาก handle ⋮ ให้ลอย แล้วใช้ triple_click+cmd+a+type+คลิก Run ของ bar ลอย
