@@ -513,6 +513,24 @@ GameConfig.TerrainProfile = {
 		FashionStage = Vector3.new(-194, 72, 177),
 		LoadoutPlaza = Vector3.new(-64, 72, 82),
 		MegaMallBase = Vector3.new(-94, 72, -88),
+		UtopiaPlaza = Vector3.new(-134, 72, -68),
+		EternityTower = Vector3.new(60, 72, 140),
+	},
+}
+
+-- Hero mesh landmarks — MeshId fallback when ServerStorage.HeroMeshes.<key> absent
+GameConfig.HeroMeshes = {
+	UtopiaPlaza = {
+		MeshId = "rbxassetid://103489658289034",
+		Scale = 15,
+		YOffset = 0,
+		Rotation = Vector3.zero,
+	},
+	EternityTower = {
+		MeshId = "rbxassetid://110883199256677",
+		Scale = 60,
+		YOffset = 0,
+		Rotation = Vector3.zero,
 	},
 }
 
