@@ -45,8 +45,10 @@ fi
 
 BRIDGE_ENV="${ROOT}/bridge/.env"
 if [[ -f "$BRIDGE_ENV" ]]; then
+  set -a  # auto-export: python subprocess needs the key in its environment
   # shellcheck disable=SC1090
   source "$BRIDGE_ENV"
+  set +a
 fi
 if [[ -z "${ROBLOX_OPEN_CLOUD_API_KEY:-}" ]]; then
   echo "ERROR: ROBLOX_OPEN_CLOUD_API_KEY not set — check bridge/.env" >&2
@@ -56,8 +58,8 @@ fi
 cd "$ROOT"
 python3 scripts/validate-p0-publish.py
 
-RBXLX="$(mktemp /tmp/utopia-publish-XXXXXX.rbxlx)"
-trap 'rm -f "$RBXLX"' EXIT
+RBXLX="$(mktemp /tmp/utopia-publish-XXXXXX).rbxlx"  # macOS mktemp ไม่รองรับ suffix หลัง XXXXXX
+trap 'rm -f "$RBXLX" "${RBXLX%.rbxlx}"' EXIT
 
 echo "=== Building $PLACE_KEY for publish ==="
 rojo build -o "$RBXLX"

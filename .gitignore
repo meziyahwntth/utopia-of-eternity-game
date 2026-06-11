@@ -18,6 +18,11 @@ src/ServerScriptService/Secrets/CatalogSecrets.luau
 .rojo-api-key
 .publish-venv/
 .terrain-venv/
+.meshy-venv/
+
+# Meshy pipeline raw downloads (decimated OBJ in assets/City/ is tracked)
+assets/City/*_generate.*
+assets/City/*_raw.*
 
 # OS / editor
 .DS_Store
@@ -26,3 +31,4 @@ src/ServerScriptService/Secrets/CatalogSecrets.luau
 
 # Build artifacts
 node_modules/
+__pycache__/
