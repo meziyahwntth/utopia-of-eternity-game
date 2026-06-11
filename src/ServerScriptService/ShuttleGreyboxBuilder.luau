@@ -59,8 +59,8 @@ function ShuttleGreyboxBuilder:BuildStop(parent: Instance, origin: CFrame): (Mod
 		"Canopy",
 		Vector3.new(26, 1.5, 14),
 		dock * CFrame.new(0, 10, 6),
-		Color3.fromRGB(240, 245, 255),
-		Enum.Material.SmoothPlastic
+		Color3.fromRGB(55, 68, 88),
+		Enum.Material.Slate
 	)
 	canopy.Parent = stop
 
@@ -117,7 +117,7 @@ function ShuttleGreyboxBuilder:BuildShuttle(parent: Instance, dockCFrame: CFrame
 		"ShuttleRoot",
 		Vector3.new(14, 4, 28),
 		dockCFrame,
-		Color3.fromRGB(235, 240, 250),
+		Color3.fromRGB(90, 105, 125),
 		Enum.Material.SmoothPlastic
 	)
 	root.Anchored = true

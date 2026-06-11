@@ -3,9 +3,11 @@
 	Prism Hover Shuttle — departs every 15 minutes, does not wait for full seats.
 ]]
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Workspace = game:GetService("Workspace")
 
 local GameConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("GameConfig"))
+local WorldPlaceGuard = require(ServerScriptService:WaitForChild("World"):WaitForChild("WorldPlaceGuard"))
 
 local ShuttleGreyboxBuilder = require(script.Parent.Parent.ShuttleGreyboxBuilder)
 local ShuttleJourney = require(script.Parent.ShuttleJourney)
@@ -69,7 +71,11 @@ local function ensureShuttle(): ShuttleGreyboxBuilder.ShuttleBuild
 		folder.Name = "UtopiaShuttle"
 		folder.Parent = Workspace
 	end
-	shuttleBuild = ShuttleGreyboxBuilder:BuildAtSanctuary(folder, origin)
+	if WorldPlaceGuard:ShouldBuild("EternityCity") then
+		shuttleBuild = ShuttleGreyboxBuilder:BuildEternityVariant(folder, origin)
+	else
+		shuttleBuild = ShuttleGreyboxBuilder:BuildAtSanctuary(folder, origin)
+	end
 	return shuttleBuild
 end
 

@@ -439,6 +439,32 @@ GameConfig.WorldBuild = {
 	ReadyTimeoutSeconds = 60,
 }
 
+-- Fashion Show — Dress-to-Impress style contest (Eternity City festival zone)
+GameConfig.FashionShow = {
+	RoundIntervalSeconds = 1800, -- production: 30 min per full cycle
+	MinPlayersProduction = 3,
+	MinPlayersTestMode = 1,
+	StateDurationsProduction = {
+		Idle = 30,
+		Registration = 240,
+		Dressing = 360,
+		Runway = 240,
+		Voting = 600,
+		Results = 360,
+	},
+	StateDurationsTestMode = {
+		Idle = 5,
+		Registration = 15,
+		Dressing = 15,
+		Runway = 12,
+		Voting = 18,
+		Results = 10,
+	},
+	WinnerLuminite = 15,
+	ParticipantLuminite = 3,
+	WinnerTitle = "Fashion Star",
+}
+
 -- Studio: when PlaceId == 0, simulate this place for world build (set nil for Hub)
 GameConfig.StudioDev = {
 	SimulatePlaceKey = "EternityCity" :: string?,

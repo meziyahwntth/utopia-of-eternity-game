@@ -137,6 +137,9 @@
         },
         "EternityCityQuestBoard": {
           "$path": "src/ServerScriptService/World/EternityCityQuestBoard.luau"
+        },
+        "EternityCityFashionStage": {
+          "$path": "src/ServerScriptService/World/EternityCityFashionStage.luau"
         }
       },
       "Shuttle": {
@@ -206,6 +209,12 @@
         },
         "FestivalPersistence": {
           "$path": "src/ServerScriptService/Progression/FestivalPersistence.server.luau"
+        },
+        "FashionShowService": {
+          "$path": "src/ServerScriptService/Progression/FashionShowService.luau"
+        },
+        "FashionShowRunner": {
+          "$path": "src/ServerScriptService/Progression/FashionShowRunner.server.luau"
         }
       },
       "Dungeon": {

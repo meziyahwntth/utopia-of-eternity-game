@@ -34,6 +34,7 @@ local EternityCityFestivalStage = require(script.Parent.EternityCityFestivalStag
 local EternityCityPhotoZones = require(script.Parent.EternityCityPhotoZones)
 local FestivalCountdownService = require(ServerScriptService:WaitForChild("FestivalCountdownService"))
 local EternityCityQuestBoard = require(script.Parent.EternityCityQuestBoard)
+local EternityCityFashionStage = require(script.Parent.EternityCityFashionStage)
 
 local EternityCityWorldBuilder = {}
 
@@ -182,9 +183,9 @@ local function buildSkyRailPlaza(parent: Instance, profile: WorldBuildConfig.Pla
 	})
 	EternityCityAccessGuard.tagDistrict(district, 15, "SkyRailPlaza")
 
-	-- Shuttle transit stop within the plaza
+	-- Shuttle transit stop within the plaza (UtopiaShuttle name for ShuttleScheduler discovery)
 	local shuttleFolder = Instance.new("Folder")
-	shuttleFolder.Name = "EternityTransit"
+	shuttleFolder.Name = "UtopiaShuttle"
 	shuttleFolder.Parent = district
 	ShuttleGreyboxBuilder:BuildEternityVariant(shuttleFolder, SKYRAIL_ORIGIN * CFrame.new(0, 0, -35))
 	WorldBuildBudget:add(budget, 60)
@@ -381,6 +382,7 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	EternityCityPhotoZones.setup(model, profile.Palette)
 	FestivalCountdownService.setup(model, profile.Palette)
 	EternityCityQuestBoard.setup(model, profile.Palette)
+	EternityCityFashionStage.setup(model, profile.Palette)
 
 	WorldBuildBudget:report("EternityCity", budget)
 

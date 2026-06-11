@@ -237,3 +237,63 @@ RemoteGuard:Register("ClaimQuestBonus", {
 })
 
 print("[Utopia] RemoteGuard: Festival daily remotes registered")
+
+-- ─── [4] Fashion Show Remotes ────────────────────────────────────────────────
+
+local FashionShowService = require(ServerScriptService:WaitForChild("Progression"):WaitForChild("FashionShowService"))
+
+local getFashionInfoEv = ensureRemote("GetFashionInfo")
+getFashionInfoEv.OnServerEvent:Connect(function(player: Player)
+	getFashionInfoEv:FireClient(player, FashionShowService.getInfo(player))
+end)
+
+RemoteGuard:Register("JoinFashionShow", {
+	rateLimit = {
+		maxTokens = 5,
+		refillPerSecond = 0.5,
+	},
+	schema = {},
+	handler = function(player: Player)
+		local ok, msg = FashionShowService.join(player)
+		local ev = remotes:FindFirstChild("JoinFashionShow") :: RemoteEvent?
+		if ev then
+			ev:FireClient(player, { ok = ok, message = msg })
+		end
+	end,
+})
+
+RemoteGuard:Register("SubmitOutfit", {
+	rateLimit = {
+		maxTokens = 5,
+		refillPerSecond = 0.5,
+	},
+	schema = {
+		{ name = "setId", type = "string", maxLen = 64 },
+	},
+	handler = function(player: Player, setId: string)
+		local ok, msg = FashionShowService.submitOutfit(player, setId)
+		local ev = remotes:FindFirstChild("SubmitOutfit") :: RemoteEvent?
+		if ev then
+			ev:FireClient(player, { ok = ok, message = msg })
+		end
+	end,
+})
+
+RemoteGuard:Register("CastFashionVote", {
+	rateLimit = {
+		maxTokens = 5,
+		refillPerSecond = 0.5,
+	},
+	schema = {
+		{ name = "targetUserId", type = "number", min = 1, max = 1e15 },
+	},
+	handler = function(player: Player, targetUserId: number)
+		local ok, msg = FashionShowService.castVote(player, targetUserId)
+		local ev = remotes:FindFirstChild("CastFashionVote") :: RemoteEvent?
+		if ev then
+			ev:FireClient(player, { ok = ok, message = msg })
+		end
+	end,
+})
+
+print("[Utopia] RemoteGuard: Fashion Show remotes registered")
