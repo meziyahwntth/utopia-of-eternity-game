@@ -326,3 +326,11 @@ Gen script เก็บเข้า repo แล้ว: `scripts/gen-eternity-ter
 - โครงสร้าง: UP escalator=8, lift=6, skylight=1, LEVEL signs=40 · ET stage=11, helipad=10, helicopter=1, glass rail=8
 - ค้าง: เดิน playtest จริง (ลิฟท์ tween, บันไดเลื่อน collision) ตอน cloud-test · terrain v3 ต้อง re-import ก่อน publish รอบเดียว
 - Meshy pipeline อัตโนมัติพร้อม: scripts/meshy-hero-mesh.py + MESHY_API_KEY ใน bridge/.env (วางโดยผู้ใช้)
+
+## 11 มิ.ย. 2026 (กลางคืน) — Walkability pass + Terrain v3 + Publish v4 ✅
+
+- แก้ walkability เอง (user อนุมัติข้าม Cursor): lift Heartbeat rider-follow, escalator span แก้หลุดตึก, ramp เจาะช่องพื้น (quadrant holes), บันได hotel switchback ต่อ corridor, ET floor plate เจาะช่องบันได/บันไดเลื่อน, เวที/audience/helipad จัดตำแหน่งใหม่ — commit 45e047e
+- เดินทดสอบจริงผ่านหมด: UP escalator y=92, lift 74↔214 (พา player), hotel F6 y=156, ET stairs+escalator y=92, concert deck 142, helipad 141 + helicopter
+- Terrain v3 re-import ใน Studio: heightmap+colormap v3, CELLS=4,294,468, ใต้เมือง flat y=69, MAXY 171 → Save to File
+- Publish ผ่าน Open Cloud API ด้วยไฟล์ที่เซฟ (มี terrain — ไม่ใช้ rojo build ที่ทับ terrain): `utopia-publish-eternitycity.command` → HTTP 200, placeId=94486544638073, **versionNumber=4**, log ใน PUBLISH-ETERNITYCITY-LOG.txt
+- งานถัดไป: Landmark #4 Sky Rail Plaza (ใช้ meshy-hero-mesh.py), recolor Shuttle canopy, DV combat loop
