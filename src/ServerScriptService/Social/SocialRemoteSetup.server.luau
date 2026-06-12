@@ -23,4 +23,16 @@ end
 -- Whisper
 ensure("RemoteFunction", "WhisperSend")
 ensure("RemoteEvent", "WhisperReceive")
--- (Party/Clan remotes — เพิ่มภายหลัง)
+-- Audio Settings
+ensure("RemoteFunction", "AudioGet")
+ensure("RemoteEvent", "AudioSet")
+-- Party
+ensure("RemoteFunction", "PartyInviteSend") -- (targetName) -> ok,msg
+ensure("RemoteFunction", "PartyAccept") -- () -> ok,msg
+ensure("RemoteEvent", "PartyDecline") -- ()
+ensure("RemoteEvent", "PartyLeave") -- ()
+ensure("RemoteFunction", "PartyChatSend") -- (message) -> ok,msg
+ensure("RemoteEvent", "PartyInviteReceived") -- server->client
+ensure("RemoteEvent", "PartyStateChanged") -- server->client
+ensure("RemoteEvent", "PartyChatReceived") -- server->client
+-- (Clan remotes — เพิ่มภายหลัง)

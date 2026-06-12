@@ -24,6 +24,12 @@
         "WhisperService": {
           "$path": "src/ServerScriptService/Social/WhisperService.luau"
         },
+        "AudioSettingsService": {
+          "$path": "src/ServerScriptService/Social/AudioSettingsService.luau"
+        },
+        "PartyService": {
+          "$path": "src/ServerScriptService/Social/PartyService.luau"
+        },
         "SocialHandlers": {
           "$path": "src/ServerScriptService/Social/SocialHandlers.server.luau"
         }
