@@ -16,6 +16,18 @@
       "AirTransportBootstrap": {
         "$path": "src/ServerScriptService/AirTransportBootstrap.server.luau"
       },
+      "Social": {
+        "$className": "Folder",
+        "SocialRemoteSetup": {
+          "$path": "src/ServerScriptService/Social/SocialRemoteSetup.server.luau"
+        },
+        "WhisperService": {
+          "$path": "src/ServerScriptService/Social/WhisperService.luau"
+        },
+        "SocialHandlers": {
+          "$path": "src/ServerScriptService/Social/SocialHandlers.server.luau"
+        }
+      },
       "HubGreyboxBuilder": {
         "$path": "src/ServerScriptService/HubGreyboxBuilder.luau"
       },
