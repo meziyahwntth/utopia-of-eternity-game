@@ -6,7 +6,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local WorldBuildConfig = {}
 
-export type PlaceKey = "Hub" | "Solhaven" | "Nocturne" | "EternityCity" | "DeathValley"
+export type PlaceKey = "Hub" | "Solhaven" | "Nocturne" | "EternityCity" | "DeathValley" | "NeonUtopia"
 
 export type PlaceProfile = {
 	PlaceKey: PlaceKey,
@@ -17,6 +17,8 @@ export type PlaceProfile = {
 	MicroTrimDistanceStuds: number,
 	StreamingTargetRadius: number,
 	GroundSizeStuds: number,
+	-- V2: ยกเมืองลอยฟ้าเหนือเมฆ (0 = ไม่ลอย). EternityCity = สรวงสวรรค์ลอยฟ้า
+	SkyAltitude: number,
 	Palette: {
 		Pearl: Color3,
 		Gold: Color3,
@@ -52,6 +54,7 @@ WorldBuildConfig.Profiles = {
 		MicroTrimDistanceStuds = 128,
 		StreamingTargetRadius = 512,
 		GroundSizeStuds = 512,
+		SkyAltitude = 0,
 		Palette = PALETTE,
 	},
 	Solhaven = {
@@ -63,6 +66,7 @@ WorldBuildConfig.Profiles = {
 		MicroTrimDistanceStuds = 128,
 		StreamingTargetRadius = 512,
 		GroundSizeStuds = 480,
+		SkyAltitude = 0,
 		Palette = PALETTE,
 	},
 	Nocturne = {
@@ -74,18 +78,21 @@ WorldBuildConfig.Profiles = {
 		MicroTrimDistanceStuds = 128,
 		StreamingTargetRadius = 480,
 		GroundSizeStuds = 400,
+		SkyAltitude = 0,
 		Palette = PALETTE,
 	},
 	EternityCity = {
 		PlaceKey = "EternityCity",
 		Theme = "solarpunk_flagship",
 		VoxelStuds = 0.1,
-		-- 16k greybox + ~1k hero landmark interiors (UtopiaPlaza/EternityTower); was 16k → budget exhausted before heroes
-		MaxParts = 18500,
+		-- ~19.7k measured (greybox + heroes + shop units 336); headroom for Phase B decals
+		MaxParts = 20500,
 		LodDistanceStuds = 640,
 		MicroTrimDistanceStuds = 128,
 		StreamingTargetRadius = 640,
 		GroundSizeStuds = 1024,
+		-- V2: เมืองสรวงสวรรค์ลอยฟ้าเหนือเมฆ
+		SkyAltitude = 2000,
 		Palette = PALETTE,
 	},
 	DeathValley = {
@@ -97,6 +104,20 @@ WorldBuildConfig.Profiles = {
 		MicroTrimDistanceStuds = 128,
 		StreamingTargetRadius = 480,
 		GroundSizeStuds = 400,
+		SkyAltitude = 0,
+		Palette = PALETTE,
+	},
+	-- V2: เมืองมนุษย์ neon — จุดเกิดแรกของผู้เล่นใหม่ (ก่อนขึ้นเครื่องบินไป Utopia ลอยฟ้า)
+	NeonUtopia = {
+		PlaceKey = "NeonUtopia",
+		Theme = "neon_luxe_coastal",
+		VoxelStuds = 0.12,
+		MaxParts = 8000,
+		LodDistanceStuds = 512,
+		MicroTrimDistanceStuds = 128,
+		StreamingTargetRadius = 512,
+		GroundSizeStuds = 640,
+		SkyAltitude = 0,
 		Palette = PALETTE,
 	},
 } :: { [PlaceKey]: PlaceProfile }
@@ -115,6 +136,7 @@ function WorldBuildConfig:GetProfile(placeKey: PlaceKey): PlaceProfile
 			MicroTrimDistanceStuds = profile.MicroTrimDistanceStuds,
 			StreamingTargetRadius = profile.StreamingTargetRadius,
 			GroundSizeStuds = profile.GroundSizeStuds,
+			SkyAltitude = profile.SkyAltitude,
 			Palette = {
 				Pearl = cityPalette.Pearl,
 				Gold = cityPalette.Gold,

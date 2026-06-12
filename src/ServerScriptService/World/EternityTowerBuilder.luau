@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WorldBuildConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("WorldBuildConfig"))
 local WorldBuildBudget = require(script.Parent.WorldBuildBudget)
 local CityArtKit = require(script.Parent.CityArtKit)
+local ShopUnitKit = require(script.Parent.ShopUnitKit)
 
 local EternityTowerBuilder = {}
 
@@ -304,6 +305,7 @@ function EternityTowerBuilder.build(ctx: BuildContext): Folder
 		buildShowroomFloor(district, ctx, floor)
 	end
 	buildRooftop(district, ctx)
+	ShopUnitKit.addShopUnits(district, ctx, "ET")
 
 	local savedParts = partCount
 	district:SetAttribute("PartCount", savedParts)

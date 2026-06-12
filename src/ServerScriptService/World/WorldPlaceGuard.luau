@@ -11,7 +11,8 @@ function WorldPlaceGuard:GetCurrentPlaceKey(): WorldBuildConfig.PlaceKey
 	if game.PlaceId == 0 and GameConfig.StudioDev and GameConfig.StudioDev.SimulatePlaceKey then
 		return GameConfig.StudioDev.SimulatePlaceKey :: WorldBuildConfig.PlaceKey
 	end
-	local route: { PlaceTeleport.PlaceKey } = { "Hub", "Solhaven", "Nocturne", "EternityCity", "DeathValley" }
+	local route: { PlaceTeleport.PlaceKey } =
+		{ "Hub", "Solhaven", "Nocturne", "EternityCity", "DeathValley", "NeonUtopia" }
 	for _, key in route do
 		local id = PlaceTeleport:GetPlaceId(key)
 		if id and id > 0 and id == game.PlaceId then

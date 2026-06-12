@@ -456,6 +456,24 @@ MarketplaceService.ProcessReceipt = function(receipt)
 		return packDecision
 	end
 
+	-- Shop rental lease (Phase A)
+	local rentOk, rentDecision = pcall(function()
+		local ShopRentalService = require(ServerScriptService:WaitForChild("Commerce"):WaitForChild("ShopRentalService"))
+		return ShopRentalService.tryProcessReceipt(receipt)
+	end)
+	if rentOk and rentDecision then
+		return rentDecision
+	end
+
+	-- Air transport fare via robux (V2 P2)
+	local airOk, airDecision = pcall(function()
+		local AirTransportService = require(ServerScriptService:WaitForChild("World"):WaitForChild("AirTransportService"))
+		return AirTransportService.tryProcessReceipt(receipt)
+	end)
+	if airOk and airDecision then
+		return airDecision
+	end
+
 	-- Player must be online to grant
 	local player = Players:GetPlayerByUserId(receipt.PlayerId)
 	if not player then

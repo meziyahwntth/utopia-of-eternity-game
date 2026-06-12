@@ -42,6 +42,16 @@ end
 
 function HellboundTerminalService.depart(player: Player, mode: string?): (boolean, string)
 	local transportMode = mode or "PublicAirplane"
+
+	-- V2 P2: เก็บค่าโดยสาร Hyper Space (ตั๋วโดยสาร) ก่อนข้ามมิติไป Hellbound
+	local AirTransportService =
+		require(game:GetService("ServerScriptService"):WaitForChild("World"):WaitForChild("AirTransportService"))
+	local paid, fareMsg = AirTransportService.payFareTickets(player, "UtopiaToHellbound")
+	if not paid then
+		player:SetAttribute("AirTransportMsg", fareMsg)
+		return false, fareMsg
+	end
+
 	local deathValleyId = PlaceTeleport:GetPlaceId("DeathValley")
 
 	fireSpectator(transportMode)

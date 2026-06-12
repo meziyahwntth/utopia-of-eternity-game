@@ -39,6 +39,8 @@ local EternityTerrainSetup = require(script.Parent.EternityTerrainSetup)
 local UtopiaPlazaBuilder = require(script.Parent.UtopiaPlazaBuilder)
 local EternityTowerBuilder = require(script.Parent.EternityTowerBuilder)
 local HeroMeshKit = require(script.Parent.HeroMeshKit)
+local ShopPromoterNpcKit = require(script.Parent.ShopPromoterNpcKit)
+local SkyCityLift = require(script.Parent.SkyCityLift)
 
 local EternityCityWorldBuilder = {}
 
@@ -507,6 +509,13 @@ local function ensureHeroLandmarks(
 		attachHeroMeshSafe(skyRailDistrict, "SkyRailPlaza", skyRailBase)
 	end
 
+	-- Landmark #5: Aurora MegaMall — hero mesh station (augment path)
+	local auroraDistrict = model:FindFirstChild("AuroraMegaMall")
+	if auroraDistrict and auroraDistrict:IsA("Folder") and not auroraDistrict:FindFirstChild("AuroraMegaMallHeroMesh") then
+		local auroraBase = CFrame.new(EternityTerrainSetup.getLandmarkPosition("MegaMallBase", Vector3.new(-30, 0, -150)))
+		attachHeroMeshSafe(auroraDistrict, "AuroraMegaMall", auroraBase)
+	end
+
 	return plazaDistrict, towerDistrict
 end
 
@@ -547,10 +556,12 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	local model = waitForEternityCityModel(3)
 	local createdNew = false
 	if model then
+		model.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
 		removeDuplicateCities(model)
 	else
 		model = Instance.new("Model")
 		model.Name = "UtopiaEternityCity"
+		model.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
 		model.Parent = workspace
 		createdNew = true
 		task.wait(0.15)
@@ -569,6 +580,7 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	if not createdNew and hasGreybox and not needsPlaza and not needsTower then
 		print("[Utopia] Eternity City already built — skipping")
 		assertHeroMeshContract(model)
+		SkyCityLift.apply(model, profile.SkyAltitude)
 		return WorldBuilderTypes.skip("UtopiaEternityCity already built")
 	end
 
@@ -583,6 +595,7 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 		ensureHeroLandmarksSafe(model, profile, budget)
 		assertHeroMeshContract(model)
 		WorldBuildBudget:report("EternityCity-augment", budget)
+		SkyCityLift.apply(model, profile.SkyAltitude)
 		return WorldBuilderTypes.success(model)
 	end
 
@@ -640,6 +653,12 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 			attachHeroMeshSafe(skyRailDistrict, "SkyRailPlaza", skyRailOrigin)
 		end
 	end
+	do -- Landmark #5 Aurora MegaMall hero mesh — fresh-build path
+		local auroraDistrict = model:FindFirstChild("AuroraMegaMall")
+		if auroraDistrict and auroraDistrict:IsA("Folder") and not auroraDistrict:FindFirstChild("AuroraMegaMallHeroMesh") then
+			attachHeroMeshSafe(auroraDistrict, "AuroraMegaMall", megaMallBase)
+		end
+	end
 	buildHoverShowroom(model, profile, budget)
 	buildVehicleShop(model, profile, budget)
 	buildTwilightOverpass(model, profile, budget, twilightOrigin)
@@ -651,6 +670,12 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 		wardrobeLabel = "Eternity Wardrobe",
 		mirrorLabel = "Plaza Mirror",
 		autoRotate = true,
+	})
+	ShopPromoterNpcKit.addPromoter({
+		parent = model,
+		origin = loadoutPlaza,
+		palette = profile.Palette,
+		budget = budget,
 	})
 
 	EternityCityLighting.apply(model, profile.Palette)
@@ -688,7 +713,8 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 
 	WorldBuildBudget:report("EternityCity", budget)
 
-	print("[Utopia] Eternity City built — aurora · marina · canal · gates · Sky Lounge 50 · loadout plaza")
+	SkyCityLift.apply(model, profile.SkyAltitude)
+	print("[Utopia] Eternity City built — aurora · marina · canal · gates · Sky Lounge 50 · loadout plaza · ลอยฟ้า")
 	return WorldBuilderTypes.success(model)
 end
 

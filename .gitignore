@@ -33,3 +33,8 @@ assets/City/*-raw.*
 # Build artifacts
 node_modules/
 __pycache__/
+
+# Build/pipeline logs
+*-LOG.txt
+BUILD-PLAYTEST-LOG.txt
+MESHY-*-LOG.txt

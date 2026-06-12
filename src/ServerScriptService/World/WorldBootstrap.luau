@@ -10,6 +10,7 @@ local BUILDERS = {
 	Nocturne = require(script.Parent.NocturneWorldBuilder),
 	EternityCity = require(script.Parent.EternityCityWorldBuilder),
 	DeathValley = require(script.Parent.DeathValleyWorldBuilder),
+	NeonUtopia = require(script.Parent.NeonUtopiaWorldBuilder),
 }
 
 -- Expose ให้ BuildOrchestrator ใช้ routing table เดียวกัน (Blueprint §5 — additive)

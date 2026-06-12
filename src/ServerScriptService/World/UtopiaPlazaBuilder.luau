@@ -11,6 +11,7 @@ local Players = game:GetService("Players")
 local WorldBuildConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("WorldBuildConfig"))
 local WorldBuildBudget = require(script.Parent.WorldBuildBudget)
 local CityArtKit = require(script.Parent.CityArtKit)
+local ShopUnitKit = require(script.Parent.ShopUnitKit)
 
 local UtopiaPlazaBuilder = {}
 
@@ -399,6 +400,7 @@ function UtopiaPlazaBuilder.build(ctx: BuildContext): Folder
 	buildSkylight(district, ctx)
 	buildExpressElevator(district, ctx)
 	buildRooftopRestaurant(district, ctx)
+	ShopUnitKit.addShopUnits(district, ctx, "UP")
 
 	local savedParts = partCount
 	district:SetAttribute("PartCount", savedParts)

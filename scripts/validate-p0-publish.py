@@ -9,6 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SECRETS = ROOT / "src/ServerScriptService/Secrets"
 PLACE_KEYS = ["Hub", "Solhaven", "Nocturne", "EternityCity", "DeathValley"]
+SHOP_RENT_PRODUCT_KEYS = ["shop_rent_7d", "shop_rent_30d"]
+
 P0_PRODUCT_KEYS = [
     "dv_pack_survivor_starter",
     "dv_pack_hellbound_elite",
@@ -55,6 +57,10 @@ def main() -> int:
     for key in P0_PRODUCT_KEYS:
         if catalog.get(key, 0) <= 0:
             errors.append(f"CatalogSecrets.{key} not set (still 0)")
+
+    for key in SHOP_RENT_PRODUCT_KEYS:
+        if catalog.get(key, 0) <= 0:
+            warnings.append(f"CatalogSecrets.{key} not set — shop rental disabled until configured")
 
     print("=== P0 Publish Validation ===")
     print(f"PlaceSecrets: {place_path}")

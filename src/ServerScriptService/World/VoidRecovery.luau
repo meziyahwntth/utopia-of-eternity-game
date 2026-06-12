@@ -27,6 +27,7 @@ local WORLD_MODEL_NAMES = {
 	"UtopiaNocturne",
 	"UtopiaEternityCity",
 	"UtopiaDeathValley",
+	"UtopiaNeonCity",
 }
 
 local function findSpawnLocation(): SpawnLocation?

@@ -18,4 +18,8 @@ return {
 	-- Optional — Hellbound travel
 	hellbound_private_jet = 0,
 	hellbound_public_airplane = 0,
+
+	-- Shop rental Phase A — create on Creator Dashboard then paste IDs
+	shop_rent_7d = 0,
+	shop_rent_30d = 0,
 }

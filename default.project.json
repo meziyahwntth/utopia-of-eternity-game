@@ -13,6 +13,9 @@
       "GameBootstrap": {
         "$path": "src/ServerScriptService/GameBootstrap.server.luau"
       },
+      "AirTransportBootstrap": {
+        "$path": "src/ServerScriptService/AirTransportBootstrap.server.luau"
+      },
       "HubGreyboxBuilder": {
         "$path": "src/ServerScriptService/HubGreyboxBuilder.luau"
       },
@@ -62,6 +65,15 @@
         },
         "EternityCityWorldBuilder": {
           "$path": "src/ServerScriptService/World/EternityCityWorldBuilder.luau"
+        },
+        "SkyCityLift": {
+          "$path": "src/ServerScriptService/World/SkyCityLift.luau"
+        },
+        "NeonUtopiaWorldBuilder": {
+          "$path": "src/ServerScriptService/World/NeonUtopiaWorldBuilder.luau"
+        },
+        "AirTransportService": {
+          "$path": "src/ServerScriptService/World/AirTransportService.luau"
         },
         "EternityCityLighting": {
           "$path": "src/ServerScriptService/World/EternityCityLighting.luau"
@@ -155,6 +167,12 @@
         },
         "EternityTowerBuilder": {
           "$path": "src/ServerScriptService/World/EternityTowerBuilder.luau"
+        },
+        "ShopUnitKit": {
+          "$path": "src/ServerScriptService/World/ShopUnitKit.luau"
+        },
+        "ShopPromoterNpcKit": {
+          "$path": "src/ServerScriptService/World/ShopPromoterNpcKit.luau"
         }
       },
       "Shuttle": {
@@ -179,6 +197,12 @@
         },
         "CommerceShopService": {
           "$path": "src/ServerScriptService/Commerce/CommerceShopService.server.luau"
+        },
+        "ShopRentalService": {
+          "$path": "src/ServerScriptService/Commerce/ShopRentalService.luau"
+        },
+        "ShopRentalHandlers": {
+          "$path": "src/ServerScriptService/Commerce/ShopRentalHandlers.server.luau"
         }
       },
       "Face": {
@@ -191,6 +215,9 @@
         "$className": "Folder",
         "PrismKeyService": {
           "$path": "src/ServerScriptService/Progression/PrismKeyService.luau"
+        },
+        "TravelTicketWallet": {
+          "$path": "src/ServerScriptService/Progression/TravelTicketWallet.luau"
         },
         "PrismKeyPlayerStore": {
           "$path": "src/ServerScriptService/Progression/PrismKeyPlayerStore.luau"

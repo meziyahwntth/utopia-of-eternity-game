@@ -29,6 +29,13 @@ GameConfig.Places = {
 		dayMode = "eternal_night",
 		planet = "Hellbound",
 	},
+	-- V2: เมืองมนุษย์ neon — จุดเกิดแรก (TODO: ใส่ Place ID ใน PlaceSecrets เมื่อสร้าง Place แล้ว)
+	NeonUtopia = {
+		id = 0,
+		name = "Neon Utopia",
+		subtitle = "มหานครมนุษย์ · จุดเริ่มต้น",
+		dayMode = "radiant_day",
+	},
 }
 
 -- Roblox universe ID (filled from PlaceSecrets.UniverseId via BridgeBootstrap)
@@ -535,6 +542,12 @@ GameConfig.HeroMeshes = {
 	SkyRailPlaza = {
 		MeshId = "rbxassetid://106585159616794",
 		Scale = 55, -- native 1.90×0.49×0.51 → ~105×27×28 studs
+		YOffset = 0,
+		Rotation = Vector3.zero,
+	},
+	AuroraMegaMall = {
+		MeshId = "rbxassetid://98731633292150", -- AuroraMegaMall-18k uploaded 12 มิ.ย. 2026 (18,852 faces)
+		Scale = 85, -- native 1.90×1.66×1.00 → ~162×141×85 studs (megamall — ตึกใหญ่สุด)
 		YOffset = 0,
 		Rotation = Vector3.zero,
 	},

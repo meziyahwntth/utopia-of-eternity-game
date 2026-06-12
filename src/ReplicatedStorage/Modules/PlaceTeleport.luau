@@ -6,7 +6,7 @@ local GameConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChil
 
 local PlaceTeleport = {}
 
-export type PlaceKey = "Hub" | "Solhaven" | "Nocturne" | "EternityCity" | "DeathValley"
+export type PlaceKey = "Hub" | "Solhaven" | "Nocturne" | "EternityCity" | "DeathValley" | "NeonUtopia"
 
 local KEY_TO_CONFIG: { [PlaceKey]: string } = {
 	Hub = "Hub",
@@ -14,6 +14,7 @@ local KEY_TO_CONFIG: { [PlaceKey]: string } = {
 	Nocturne = "Nocturne",
 	EternityCity = "EternityCity",
 	DeathValley = "DeathValley",
+	NeonUtopia = "NeonUtopia",
 }
 
 function PlaceTeleport:GetPlaceId(placeKey: PlaceKey): number?
