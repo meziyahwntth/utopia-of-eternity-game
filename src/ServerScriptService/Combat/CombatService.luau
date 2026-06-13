@@ -152,7 +152,12 @@ function CombatService.processAttack(player: Player, npcId: any, skillId: any): 
 	end
 
 	local base = baseDamages[weaponTier]
-	local damage = math.floor(base * skillMultiplier(skillId) + 0.5)
+	local rawDamage = base * skillMultiplier(skillId)
+	local combatMod = player:GetAttribute("OverweightCombatMultiplier")
+	if typeof(combatMod) == "number" and combatMod > 0 then
+		rawDamage *= combatMod
+	end
+	local damage = math.floor(rawDamage + 0.5)
 	hum:TakeDamage(damage)
 
 	return {

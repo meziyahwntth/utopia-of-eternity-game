@@ -594,9 +594,20 @@ tradeRcv.OnClientEvent:Connect(function(data: any)
 		return
 	end
 	local fromName = tostring(data.fromName or "ผู้เล่น")
+	local fromUid = data.fromUserId
 	showConfirm(
-		string.format("💼 %s ขอแลกเปลี่ยนกับคุณ!\n(Trade เปิดใน P4)", fromName),
-		function() end
+		string.format("💼 %s ขอแลกเปลี่ยนกับคุณ!\nยอมรับหรือไม่?", fromName),
+		function()
+			if typeof(fromUid) == "number" then
+				local be = ReplicatedStorage:FindFirstChild("TradingClientAccept")
+				if be and be:IsA("BindableEvent") then
+					(be :: BindableEvent):Fire({
+						fromUserId = fromUid,
+						fromName = fromName,
+					})
+				end
+			end
+		end
 	)
 end)
 

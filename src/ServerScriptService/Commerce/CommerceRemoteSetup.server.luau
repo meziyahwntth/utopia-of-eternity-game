@@ -29,4 +29,13 @@ ensureRemote("RemoteFunction", "SetShopName")
 ensureRemote("RemoteEvent", "ShopLeaseChanged")
 ensureRemote("RemoteEvent", "OpenShopPromoterDialog")
 
+-- P4 P2P Trading
+ensureRemote("RemoteFunction", "TradeAccept")
+ensureRemote("RemoteFunction", "TradeUpdateOffer")
+ensureRemote("RemoteFunction", "TradeLock")
+ensureRemote("RemoteFunction", "TradeConfirm")
+ensureRemote("RemoteFunction", "TradeCancel")
+ensureRemote("RemoteFunction", "TradeGetInventory")
+ensureRemote("RemoteEvent", "TradeSessionUpdate")
+
 print("[Commerce] Remotes ready")

@@ -251,6 +251,12 @@
         },
         "ShopRentalHandlers": {
           "$path": "src/ServerScriptService/Commerce/ShopRentalHandlers.server.luau"
+        },
+        "TradingService": {
+          "$path": "src/ServerScriptService/Commerce/TradingService.luau"
+        },
+        "TradingHandlers": {
+          "$path": "src/ServerScriptService/Commerce/TradingHandlers.server.luau"
         }
       },
       "Face": {
@@ -305,6 +311,12 @@
         },
         "FashionShowRunner": {
           "$path": "src/ServerScriptService/Progression/FashionShowRunner.server.luau"
+        },
+        "PlayerItemStore": {
+          "$path": "src/ServerScriptService/Progression/PlayerItemStore.luau"
+        },
+        "WeightService": {
+          "$path": "src/ServerScriptService/Progression/WeightService.luau"
         }
       },
       "Dungeon": {
