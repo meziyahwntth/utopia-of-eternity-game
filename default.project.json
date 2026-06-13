@@ -407,6 +407,12 @@
         },
         "QuestHandlers": {
           "$path": "src/ServerScriptService/Progression/QuestHandlers.server.luau"
+        },
+        "CraftingService": {
+          "$path": "src/ServerScriptService/Progression/CraftingService.luau"
+        },
+        "CraftingHandlers": {
+          "$path": "src/ServerScriptService/Progression/CraftingHandlers.server.luau"
         }
       },
       "Dungeon": {
