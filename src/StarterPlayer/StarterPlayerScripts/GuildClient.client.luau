@@ -28,7 +28,7 @@ local guildInviteReceived = remotes:WaitForChild("GuildInviteReceived") :: Remot
 local guildStateChanged  = remotes:WaitForChild("GuildStateChanged")  :: RemoteEvent
 
 -- state ฝั่ง client
-local currentGuild: { [string]: any }? = nil
+local _currentGuild: { [string]: any }? = nil
 
 ----------------------------------------------------------------
 -- systemMsg helper (เหมือน PartyClient)
@@ -314,7 +314,7 @@ panelCmd.Triggered:Connect(function()
 	if not panel.Visible then
 		-- โหลดข้อมูลใหม่จาก server ก่อนเปิด
 		local state = guildGet:InvokeServer()
-		currentGuild = state
+		_currentGuild = state
 		rebuildPanel(state)
 		panel.Visible = true
 	else
@@ -337,7 +337,7 @@ guildStateChanged.OnClientEvent:Connect(function(state: any)
 		systemMsg("[แคลน] ⚠ " .. state.error)
 		return
 	end
-	currentGuild = state
+	_currentGuild = state
 	rebuildPanel(state)
 	-- ซ่อน panel อัตโนมัติถ้าออกจากแคลน
 	if state.id == "" and panel.Visible then
@@ -353,7 +353,7 @@ task.delay(2, function()
 		return guildGet:InvokeServer()
 	end)
 	if ok and typeof(state) == "table" then
-		currentGuild = state
+		_currentGuild = state
 		rebuildPanel(state)
 	end
 end)
