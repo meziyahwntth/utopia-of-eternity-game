@@ -120,10 +120,7 @@ task.spawn(function()
 		end
 		for _, drop in drops :: { DropResult } do
 			if drop.dropType == "pet" then
-				spawnNotif(
-					"🐾 ได้รับสัตว์เลี้ยง: " .. (drop.petId or drop.itemId) .. "!",
-					Color3.fromRGB(255, 180, 255)
-				)
+				continue
 			else
 				local icon = itemIcons[drop.itemId] or "📦"
 				local color = itemColors[drop.itemId] or Color3.fromRGB(200, 200, 200)

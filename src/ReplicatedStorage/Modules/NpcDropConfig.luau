@@ -28,6 +28,8 @@ NpcDropConfig.Profiles = {
 		dropTable = {
 			{ itemId = "StoneFragment", minQty = 1, maxQty = 3, chance = 0.70 },
 			{ itemId = "IronOre", minQty = 1, maxQty = 1, chance = 0.20 },
+			{ dropType = "pet", itemId = "crystal_rabbit", petId = "crystal_rabbit", minQty = 1, maxQty = 1, chance = 0.03 },
+			{ dropType = "pet", itemId = "ghost_jellyfish", petId = "ghost_jellyfish", minQty = 1, maxQty = 1, chance = 0.02 },
 		},
 	},
 	[2] = {
@@ -39,6 +41,7 @@ NpcDropConfig.Profiles = {
 			{ itemId = "IronOre", minQty = 1, maxQty = 2, chance = 0.30 },
 			{ itemId = "MagicCrystal", minQty = 1, maxQty = 1, chance = 0.05 },
 			{ dropType = "pet", itemId = "slime_blue", petId = "slime_blue", minQty = 1, maxQty = 1, chance = 0.02 },
+			{ dropType = "pet", itemId = "shadow_wolf_pup", petId = "shadow_wolf_pup", minQty = 1, maxQty = 1, chance = 0.015 },
 		},
 	},
 	[3] = {
@@ -60,6 +63,7 @@ NpcDropConfig.Profiles = {
 			{ itemId = "IronOre", minQty = 3, maxQty = 6, chance = 0.50 },
 			{ itemId = "MagicCrystal", minQty = 1, maxQty = 3, chance = 0.25 },
 			{ itemId = "StoneFragment", minQty = 5, maxQty = 10, chance = 0.40 },
+			{ dropType = "pet", itemId = "void_cat", petId = "void_cat", minQty = 1, maxQty = 1, chance = 0.008 },
 		},
 	},
 	[5] = {
@@ -73,6 +77,7 @@ NpcDropConfig.Profiles = {
 			{ dropType = "pet", itemId = "slime_blue", petId = "slime_blue", minQty = 1, maxQty = 1, chance = 0.10 },
 			{ dropType = "pet", itemId = "fox_fire", petId = "fox_fire", minQty = 1, maxQty = 1, chance = 0.04 },
 			{ dropType = "pet", itemId = "dragon_mini", petId = "dragon_mini", minQty = 1, maxQty = 1, chance = 0.01 },
+			{ dropType = "pet", itemId = "void_imp", petId = "void_imp", minQty = 1, maxQty = 1, chance = 0.005 },
 			{ dropType = "item", itemId = "CardCommon", petId = nil, minQty = 1, maxQty = 1, chance = 0.15 },
 			{ dropType = "item", itemId = "CardRare", petId = nil, minQty = 1, maxQty = 1, chance = 0.05 },
 			{ dropType = "item", itemId = "CardLegendary", petId = nil, minQty = 1, maxQty = 1, chance = 0.01 },
