@@ -61,6 +61,16 @@ function BountyService.post(poster: Player, targetId: number, amount: number): (
 		return false, "มี bounty บนผู้เล่นคนนี้เต็มแล้ว"
 	end
 
+	local balance = CurrencyService.getBalance(poster.UserId)
+	if balance < amount then
+		return false, string.format("credits ไม่พอ (มี %d, ต้องการ %d)", balance, amount)
+	end
+
+	local deducted, deductErr = CurrencyService.deductCredits(poster.UserId, amount)
+	if not deducted then
+		return false, "ตัด credits ล้มเหลว: " .. tostring(deductErr)
+	end
+
 	local id = makeBountyId()
 	local expirySecs = MercenaryConfig.BountyExpiryDays * 86400
 	bounties[id] = {
@@ -78,6 +88,10 @@ function BountyService.post(poster: Player, targetId: number, amount: number): (
 		local bounty = bounties[id]
 		if bounty and not bounty.claimed then
 			bounties[id] = nil
+			local refunded = CurrencyService.addCredits(bounty.posterId, bounty.amount)
+			if not refunded then
+				warn("[BountyService] refund failed for poster", bounty.posterId)
+			end
 		end
 	end)
 
