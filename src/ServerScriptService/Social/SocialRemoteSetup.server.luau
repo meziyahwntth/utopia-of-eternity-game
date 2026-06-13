@@ -133,3 +133,9 @@ ensure("RemoteEvent", "PetUnequipped")
 
 -- Progression: Level-up notification
 ensure("RemoteEvent", "LevelUp")
+
+-- Daily Quest (Retention)
+ensure("RemoteFunction", "GetDailyQuests")
+ensure("RemoteFunction", "ClaimQuestReward")
+ensure("RemoteEvent", "QuestUpdate")
+ensure("RemoteEvent", "QuestCompleted")

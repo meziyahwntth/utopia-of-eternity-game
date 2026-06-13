@@ -83,6 +83,16 @@ local function allPlayers(): { Player }
 	return Players:GetPlayers()
 end
 
+local function questChatProgress(player: Player)
+	pcall(function()
+		require(ServerScriptService:WaitForChild("Progression"):WaitForChild("QuestService")).recordProgress(
+			player,
+			"send_chat",
+			1
+		)
+	end)
+end
+
 local function partyMembers(player: Player): { Player }
 	return PartyService.getPartyMembers(player)
 end
@@ -243,26 +253,37 @@ chatSend.OnServerInvoke = function(player: Player, channelRaw: any, messageRaw: 
 
 	if channel == "General" then
 		broadcastTo(allPlayers(), "General", player.DisplayName, filtered, now)
+		questChatProgress(player)
 		return true, ""
 
 	elseif channel == "Party" then
 		local members = partyMembers(player)
 		if #members == 0 then return false, "คุณไม่ได้อยู่ใน party" end
 		broadcastTo(members, "Party", player.DisplayName, filtered, now)
+		questChatProgress(player)
 		return true, ""
 
 	elseif channel == "Clan" then
 		local ok, msg = GuildService.chat(player, filtered)
+		if ok then
+			questChatProgress(player)
+		end
 		return ok, msg
 
 	elseif channel == "Alliance" then
 		local ok, msg = GuildService.allianceChat(player, filtered)
+		if ok then
+			questChatProgress(player)
+		end
 		return ok, msg
 
 	elseif channel == "Whisper" then
 		local targetName = if typeof(extra) == "string" then extra else ""
 		if targetName == "" then return false, "ระบุชื่อผู้เล่นที่จะกระซิบ" end
 		local ok, msg = WhisperService.send(player, targetName, filtered)
+		if ok then
+			questChatProgress(player)
+		end
 		return ok, msg
 	end
 

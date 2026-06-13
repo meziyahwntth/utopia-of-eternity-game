@@ -395,6 +395,15 @@
         },
         "VisiblePowerHandlers": {
           "$path": "src/ServerScriptService/Progression/VisiblePowerHandlers.server.luau"
+        },
+        "QuestStore": {
+          "$path": "src/ServerScriptService/Progression/QuestStore.luau"
+        },
+        "QuestService": {
+          "$path": "src/ServerScriptService/Progression/QuestService.luau"
+        },
+        "QuestHandlers": {
+          "$path": "src/ServerScriptService/Progression/QuestHandlers.server.luau"
         }
       },
       "Dungeon": {

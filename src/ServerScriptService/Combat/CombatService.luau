@@ -141,6 +141,11 @@ local function grantKillExp(player: Player)
 	local mult = (pls :: any).getExpGainMultiplier(player)
 	local xpGain = math.floor(BASE_KILL_EXP * mult + 0.5)
 	;(pls :: any).addExp(player, xpGain)
+
+	local killBindable = ReplicatedStorage:FindFirstChild("NpcKillEvent") :: BindableEvent?
+	if killBindable then
+		killBindable:Fire(player)
+	end
 end
 
 function CombatService.findNpc(npcId: number): Model?

@@ -4,8 +4,19 @@
 ]]
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local EmoteConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("EmoteConfig"))
+
+local function questEmoteProgress(player: Player)
+	pcall(function()
+		require(ServerScriptService:WaitForChild("Progression"):WaitForChild("QuestService")).recordProgress(
+			player,
+			"use_emote",
+			1
+		)
+	end)
+end
 
 local EmoteService = {}
 
@@ -42,6 +53,7 @@ function EmoteService.playEmote(player: Player, emoteId: string): (boolean, stri
 			ev:FireAllClients(player.UserId, emoteId, emote.animationId, emote.looped, emote.durationSecs)
 		end
 	end
+	questEmoteProgress(player)
 	return true, emote.nameTH
 end
 

@@ -356,6 +356,17 @@ function TradingService.execute(sessionId: string): (boolean, string)
 	if playerB then
 		WeightService.refreshPlayer(playerB)
 	end
+
+	local tradeComplete = ReplicatedStorage:FindFirstChild("TradeCompleteEvent") :: BindableEvent?
+	if tradeComplete then
+		if playerA then
+			tradeComplete:Fire(playerA)
+		end
+		if playerB then
+			tradeComplete:Fire(playerB)
+		end
+	end
+
 	return true, "executed"
 end
 
