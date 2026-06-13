@@ -9,6 +9,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Workspace = game:GetService("Workspace")
 
 local CombatConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("CombatConfig"))
+local NpcDropService = require(script.Parent:WaitForChild("NpcDropService"))
 
 local CombatService = {}
 
@@ -129,18 +130,26 @@ local function computeDamage(player: Player, skillId: string): number
 	return math.floor(rawDamage + 0.5)
 end
 
-local function grantKillExp(player: Player)
+local function resolveNpcId(npc: Model, fallbackId: number): number
+	local attr = npc:GetAttribute(CombatConfig.NpcIdAttribute)
+	if typeof(attr) == "number" then
+		return math.floor(attr)
+	end
+	return fallbackId
+end
+
+local function grantKillRewards(player: Player, npcId: number)
 	local okPls, pls = pcall(function()
 		return require(ServerScriptService:WaitForChild("Progression"):WaitForChild("PlayerLevelService"))
 	end)
-	if not okPls or not pls then
-		return
+	if okPls and pls then
+		local baseXP = NpcDropService.getBaseXP(npcId)
+		local mult = (pls :: any).getExpGainMultiplier(player)
+		local xpGain = math.floor(baseXP * mult + 0.5)
+		;(pls :: any).addExp(player, xpGain)
 	end
 
-	local BASE_KILL_EXP = 25
-	local mult = (pls :: any).getExpGainMultiplier(player)
-	local xpGain = math.floor(BASE_KILL_EXP * mult + 0.5)
-	;(pls :: any).addExp(player, xpGain)
+	NpcDropService.grantDrops(player, npcId)
 
 	local killBindable = ReplicatedStorage:FindFirstChild("NpcKillEvent") :: BindableEvent?
 	if killBindable then
@@ -202,7 +211,7 @@ function CombatService.processAttack(player: Player, npcId: any, skillId: any): 
 	local damage = computeDamage(player, skillId)
 	local humAfter = applyDamage(npc, player.UserId, damage)
 	if humAfter and humAfter.Health <= 0 then
-		grantKillExp(player)
+		grantKillRewards(player, resolveNpcId(npc, npcId))
 	end
 
 	return {

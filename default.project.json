@@ -60,6 +60,9 @@
         "CombatService": {
           "$path": "src/ServerScriptService/Combat/CombatService.luau"
         },
+        "NpcDropService": {
+          "$path": "src/ServerScriptService/Combat/NpcDropService.luau"
+        },
         "AutoBattleService": {
           "$path": "src/ServerScriptService/Combat/AutoBattleService.luau"
         },
