@@ -7,7 +7,7 @@
 local PrismLegendaryWeaponsCatalog = require(script.Parent:WaitForChild("PrismLegendaryWeaponsCatalog"))
 
 export type WeaponTier = "Legendary" | "Premium"
-export type WeaponClass = "Dagger" | "AssaultRifle" | "LMG" | "Launcher" | "Hammer" | "Greatsword" | "Longsword" | "Spear" | "Fan"
+export type WeaponClass = "Dagger" | "AssaultRifle" | "LMG" | "Launcher" | "Hammer" | "Greatsword" | "Longsword" | "Spear" | "Fan" | "Bow" | "Staff"
 export type UnlockKind = "Key20Choice" | "RobuxShop" | "HellboundLoadout"
 
 export type WeaponEntry = {
@@ -36,6 +36,8 @@ local CLASS_MAP: { [string]: WeaponClass } = {
 	Longsword = "Longsword",
 	Spear = "Spear",
 	Fan = "Fan",
+	Bow = "Bow",
+	Staff = "Staff",
 }
 
 local function toEntry(def: PrismLegendaryWeaponsCatalog.LegendaryWeaponDef): WeaponEntry

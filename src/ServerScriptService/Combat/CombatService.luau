@@ -9,6 +9,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Workspace = game:GetService("Workspace")
 
 local CombatConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("CombatConfig"))
+local ItemTierConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("ItemTierConfig"))
 local NpcDropService = require(script.Parent:WaitForChild("NpcDropService"))
 
 local CombatService = {}
@@ -118,10 +119,32 @@ local function applyDamage(targetModel: Model, attackerUserId: number, damage: n
 	return hum
 end
 
+local function getPlayerItemStore()
+	return require(ServerScriptService:WaitForChild("Progression"):WaitForChild("PlayerItemStore"))
+end
+
+local function weaponDamageFromEquipped(player: Player): number?
+	local store = getPlayerItemStore()
+	local equipped = store.getEquipped(player.UserId)
+	for _, itemId in equipped do
+		local def = ItemTierConfig.get(itemId)
+		if def and def.weaponType ~= "None" and def.baseDamage then
+			return def.baseDamage
+		end
+	end
+	for itemId, _ in store.getInventory(player.UserId) do
+		local def = ItemTierConfig.get(itemId)
+		if def and def.weaponType ~= "None" and def.baseDamage then
+			return def.baseDamage
+		end
+	end
+	return nil
+end
+
 local function computeDamage(player: Player, skillId: string): number
 	local weaponTier: CombatConfig.WeaponTier = weaponTierFor(player)
 	local baseDamages: { [CombatConfig.WeaponTier]: number } = CombatConfig.BaseDamage
-	local base = baseDamages[weaponTier]
+	local base = weaponDamageFromEquipped(player) or baseDamages[weaponTier]
 	local rawDamage = base * skillMultiplier(skillId)
 	local combatMod = player:GetAttribute("OverweightCombatMultiplier")
 	if typeof(combatMod) == "number" and combatMod > 0 then
