@@ -341,11 +341,193 @@ function GuildService.addReputation(g: GuildData, amount: number)
 	pushState(g)
 end
 
+
+----------------------------------------------------------------
+-- chunk2: Clan Chat (/g)
+----------------------------------------------------------------
+function GuildService.chat(player: Player, message: any): (boolean, string)
+	if typeof(message) ~= "string" or string.gsub(message, "%s", "") == "" then
+		return false, "ข้อความว่าง"
+	end
+	if #message > 200 then
+		return false, "ข้อความยาวเกินไป (สูงสุด 200)"
+	end
+	local g = GuildService.getPlayerGuild(player)
+	if not g then
+		return false, "คุณไม่ได้อยู่ในแคลน"
+	end
+	local payload = {
+		guildId = g.id,
+		guildName = g.name,
+		fromName = player.DisplayName,
+		message = message,
+	}
+	local ev = remotesFolder():FindFirstChild("GuildChatReceived")
+	if ev and ev:IsA("RemoteEvent") then
+		for uidStr in g.members do
+			local uid = tonumber(uidStr)
+			if uid then
+				local target = Players:GetPlayerByUserId(uid)
+				if target then
+					(ev :: RemoteEvent):FireClient(target, payload)
+				end
+			end
+		end
+	end
+	task.spawn(function()
+		pcall(function()
+			MessagingService:PublishAsync(TOPIC, {
+				jobId = game.JobId,
+				action = "chat",
+				guildId = g.id,
+				guildName = g.name,
+				fromName = player.DisplayName,
+				message = message,
+			})
+		end)
+	end)
+	return true, ""
+end
+
+----------------------------------------------------------------
+-- chunk2: Alliance (<=3 clans)
+----------------------------------------------------------------
+local pendingAllianceInvite: { [string]: { fromGuildId: string, fromClanName: string, expiresAt: number } } = {}
+
+local function findGuildByName(name: string): GuildData?
+	local lower = string.lower(name)
+	for _, g in cache do
+		if string.lower(g.name) == lower then
+			return g
+		end
+	end
+	for _, p in Players:GetPlayers() do
+		local gid = GuildStore.getPlayerGuildId(p.UserId)
+		if gid and not cache[gid] then
+			local g = loadGuild(gid)
+			if g and string.lower(g.name) == lower then
+				return g
+			end
+		end
+	end
+	return nil
+end
+
+local function countAllianceMembers(allianceId: string): number
+	local count = 0
+	for _, g in cache do
+		if g.allianceId == allianceId then
+			count += 1
+		end
+	end
+	return count
+end
+
+local function fireAllianceUpdate(allianceId: string)
+	local ev = remotesFolder():FindFirstChild("AllianceStateChanged")
+	if not ev or not ev:IsA("RemoteEvent") then return end
+	local allied: { string } = {}
+	for gid, g in cache do
+		if g.allianceId == allianceId then
+			table.insert(allied, gid)
+		end
+	end
+	for _, g in cache do
+		if g.allianceId == allianceId then
+			for uidStr in g.members do
+				local uid = tonumber(uidStr)
+				if uid then
+					local target = Players:GetPlayerByUserId(uid)
+					if target then
+						(ev :: RemoteEvent):FireClient(target, { allianceId = allianceId, guildIds = allied })
+					end
+				end
+			end
+		end
+	end
+end
+
+function GuildService.allianceInvite(leader: Player, targetClanName: any): (boolean, string)
+	if typeof(targetClanName) ~= "string" or targetClanName == "" then
+		return false, "ระบุชื่อแคลน"
+	end
+	local myGuild = GuildService.getPlayerGuild(leader)
+	if not myGuild then return false, "คุณยังไม่มีแคลน" end
+	if myGuild.leaderId ~= leader.UserId then return false, "เฉพาะหัวหน้าแคลนชวนพันธมิตรได้" end
+	if myGuild.allianceId and myGuild.allianceId ~= "" then
+		local sz = countAllianceMembers(myGuild.allianceId)
+		if sz >= SocialConfig.Alliance.MaxClans then
+			return false, string.format("พันธมิตรเต็ม (สูงสุด %d แคลน)", SocialConfig.Alliance.MaxClans)
+		end
+	end
+	local targetGuild = findGuildByName(targetClanName)
+	if not targetGuild then return false, "ไม่พบแคลน '" .. targetClanName .. "' (ต้องมีสมาชิกออนไลน์)" end
+	if targetGuild.id == myGuild.id then return false, "ไม่สามารถชวนแคลนตัวเองได้" end
+	if targetGuild.allianceId and targetGuild.allianceId ~= "" then return false, "แคลนนั้นอยู่ในพันธมิตรอื่นแล้ว" end
+	pendingAllianceInvite[targetGuild.id] = {
+		fromGuildId = myGuild.id,
+		fromClanName = myGuild.name,
+		expiresAt = os.time() + 120,
+	}
+	fireTo(targetGuild.leaderId, "AllianceInviteReceived", {
+		fromClanName = myGuild.name,
+		fromLeaderName = leader.DisplayName,
+	})
+	return true, "ส่งคำเชิญพันธมิตรถึงแคลน " .. targetGuild.name
+end
+
+function GuildService.allianceAccept(player: Player): (boolean, string)
+	local myGuild = GuildService.getPlayerGuild(player)
+	if not myGuild then return false, "คุณยังไม่มีแคลน" end
+	if myGuild.leaderId ~= player.UserId then return false, "เฉพาะหัวหน้าแคลนตอบรับได้" end
+	local invite = pendingAllianceInvite[myGuild.id]
+	if not invite or os.time() > invite.expiresAt then
+		pendingAllianceInvite[myGuild.id] = nil
+		return false, "คำเชิญพันธมิตรหมดอายุ"
+	end
+	pendingAllianceInvite[myGuild.id] = nil
+	local fromGuild = loadGuild(invite.fromGuildId)
+	if not fromGuild then return false, "แคลนที่ชวนไม่มีแล้ว" end
+	local allianceId: string = if fromGuild.allianceId ~= nil and fromGuild.allianceId ~= ""
+		then fromGuild.allianceId else fromGuild.id
+	if countAllianceMembers(allianceId) >= SocialConfig.Alliance.MaxClans then
+		return false, string.format("พันธมิตรเต็ม (สูงสุด %d แคลน)", SocialConfig.Alliance.MaxClans)
+	end
+	myGuild.allianceId = allianceId
+	fromGuild.allianceId = allianceId
+	persist(myGuild)
+	persist(fromGuild)
+	fireAllianceUpdate(allianceId)
+	pushState(myGuild)
+	pushState(fromGuild)
+	return true, "เข้าร่วมพันธมิตรกับ " .. fromGuild.name .. " แล้ว"
+end
+
+function GuildService.allianceDecline(player: Player)
+	local myGuild = GuildService.getPlayerGuild(player)
+	if myGuild then pendingAllianceInvite[myGuild.id] = nil end
+end
+
+function GuildService.allianceLeave(leader: Player): (boolean, string)
+	local g = GuildService.getPlayerGuild(leader)
+	if not g then return false, "คุณยังไม่มีแคลน" end
+	if g.leaderId ~= leader.UserId then return false, "เฉพาะหัวหน้าแคลนออกจากพันธมิตรได้" end
+	if not g.allianceId or g.allianceId == "" then return false, "แคลนไม่ได้อยู่ในพันธมิตร" end
+	local oldId = g.allianceId
+	g.allianceId = nil
+	persist(g)
+	pushState(g)
+	fireAllianceUpdate(oldId)
+	return true, "ออกจากพันธมิตรแล้ว"
+end
+
 function GuildService.init()
 	if subscribed then
 		return
 	end
 	subscribed = true
+
+	-- cross-server MessagingService
 	task.spawn(function()
 		local ok = pcall(function()
 			MessagingService:SubscribeAsync(TOPIC, function(msg)
@@ -353,6 +535,7 @@ function GuildService.init()
 				if typeof(data) ~= "table" or data.jobId == game.JobId then
 					return
 				end
+				-- guild member invite
 				if data.action == "invite" and typeof(data.targetUserId) == "number" then
 					local target = Players:GetPlayerByUserId(data.targetUserId)
 					if target then
@@ -366,6 +549,27 @@ function GuildService.init()
 							fromPlayer = tostring(data.fromPlayer),
 						})
 					end
+				-- clan chat cross-server
+				elseif data.action == "chat" and typeof(data.guildId) == "string" then
+					local g = cache[data.guildId]
+					if not g then return end
+					local ev = remotesFolder():FindFirstChild("GuildChatReceived")
+					if not ev or not ev:IsA("RemoteEvent") then return end
+					local payload = {
+						guildId = tostring(data.guildId),
+						guildName = tostring(data.guildName),
+						fromName = tostring(data.fromName),
+						message = tostring(data.message),
+					}
+					for uidStr in g.members do
+						local uid = tonumber(uidStr)
+						if uid then
+							local target = Players:GetPlayerByUserId(uid)
+							if target then
+								(ev :: RemoteEvent):FireClient(target, payload)
+							end
+						end
+					end
 				end
 			end)
 		end)
@@ -373,6 +577,30 @@ function GuildService.init()
 			warn("[Social] Guild MessagingService subscribe failed (Studio API off?)")
 			subscribed = false
 		end
+	end)
+
+	-- member online notify: เมื่อมีสมาชิกแคลน join server
+	Players.PlayerAdded:Connect(function(newPlayer: Player)
+		task.delay(3, function()
+			local gid = GuildStore.getPlayerGuildId(newPlayer.UserId)
+			if not gid then return end
+			local g = loadGuild(gid)
+			if not g then return end
+			local ev = remotesFolder():FindFirstChild("GuildMemberJoined")
+			if not ev or not ev:IsA("RemoteEvent") then return end
+			for uidStr in g.members do
+				local uid = tonumber(uidStr)
+				if uid and uid ~= newPlayer.UserId then
+					local target = Players:GetPlayerByUserId(uid)
+					if target then
+						(ev :: RemoteEvent):FireClient(target, {
+							displayName = newPlayer.DisplayName,
+							userId = newPlayer.UserId,
+						})
+					end
+				end
+			end
+		end)
 	end)
 end
 

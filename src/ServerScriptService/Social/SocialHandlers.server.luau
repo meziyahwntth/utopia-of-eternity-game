@@ -128,10 +128,39 @@ guildGet.OnServerInvoke = function(player: Player)
 end
 
 ----------------------------------------------------------------
+-- Guild chunk2: Clan Chat + Alliance
+----------------------------------------------------------------
+local guildChatSend   = remotes:WaitForChild("GuildChatSend")    :: RemoteFunction
+local allianceCreate  = remotes:WaitForChild("AllianceCreate")   :: RemoteFunction
+local allianceAccept  = remotes:WaitForChild("AllianceAccept")   :: RemoteFunction
+local allianceDecline = remotes:WaitForChild("AllianceDecline")  :: RemoteEvent
+local allianceLeave   = remotes:WaitForChild("AllianceLeave")    :: RemoteEvent
+
+guildChatSend.OnServerInvoke = function(player: Player, message: any)
+	return GuildService.chat(player, message)
+end
+
+allianceCreate.OnServerInvoke = function(player: Player, targetClanName: any)
+	return GuildService.allianceInvite(player, targetClanName)
+end
+
+allianceAccept.OnServerInvoke = function(player: Player)
+	return GuildService.allianceAccept(player)
+end
+
+allianceDecline.OnServerEvent:Connect(function(player: Player)
+	GuildService.allianceDecline(player)
+end)
+
+allianceLeave.OnServerEvent:Connect(function(player: Player)
+	GuildService.allianceLeave(player)
+end)
+
+----------------------------------------------------------------
 -- Init all services
 ----------------------------------------------------------------
 WhisperService.init()
 PartyService.init()
 GuildService.init()
 
-print("[Social] handlers online — whisper + audio + party + guild/clan (P3-B)")
+print("[Social] handlers online — whisper + audio + party + guild/clan + alliance (P3-B)")

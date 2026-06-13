@@ -26,6 +26,15 @@ local guildLeave         = remotes:WaitForChild("GuildLeave")         :: RemoteE
 local guildGet           = remotes:WaitForChild("GuildGet")           :: RemoteFunction
 local guildInviteReceived = remotes:WaitForChild("GuildInviteReceived") :: RemoteEvent
 local guildStateChanged  = remotes:WaitForChild("GuildStateChanged")  :: RemoteEvent
+-- chunk2
+local guildChatSend      = remotes:WaitForChild("GuildChatSend")         :: RemoteFunction
+local guildChatReceived  = remotes:WaitForChild("GuildChatReceived")     :: RemoteEvent
+local guildMemberJoined  = remotes:WaitForChild("GuildMemberJoined")     :: RemoteEvent
+local allianceCreate     = remotes:WaitForChild("AllianceCreate")        :: RemoteFunction
+local allianceAccept     = remotes:WaitForChild("AllianceAccept")        :: RemoteFunction
+local allianceDecline    = remotes:WaitForChild("AllianceDecline")       :: RemoteEvent
+local allianceLeave      = remotes:WaitForChild("AllianceLeave")         :: RemoteEvent
+local allianceInviteReceived = remotes:WaitForChild("AllianceInviteReceived") :: RemoteEvent
 
 -- state ฝั่ง client
 local _currentGuild: { [string]: any }? = nil
@@ -343,6 +352,127 @@ guildStateChanged.OnClientEvent:Connect(function(state: any)
 	if state.id == "" and panel.Visible then
 		panel.Visible = false
 	end
+end)
+
+----------------------------------------------------------------
+-- chunk2: Slash Commands — Clan Chat + Alliance
+----------------------------------------------------------------
+
+-- /g <ข้อความ>
+local gCmd = makeCmd("ClanChatCommand", "/g", nil)
+gCmd.Triggered:Connect(function(_o, text)
+	local msg = string.gsub(text, "^/%S+%s*", "")
+	if msg == "" then return end
+	local ok, m = guildChatSend:InvokeServer(msg)
+	if not ok then
+		systemMsg("[ระบบ] " .. tostring(m))
+	end
+end)
+
+-- /allianceinvite <ชื่อแคลน>
+local aInviteCmd = makeCmd("AllianceInviteCommand", "/allianceinvite", nil)
+aInviteCmd.Triggered:Connect(function(_o, text)
+	local name = string.match(string.gsub(text, "^/%S+%s*", ""), "^(.-)%s*$")
+	if not name or name == "" then
+		systemMsg("[พันธมิตร] ใช้: /allianceinvite <ชื่อแคลน>")
+		return
+	end
+	local _ok, msg = allianceCreate:InvokeServer(name)
+	systemMsg("[พันธมิตร] " .. tostring(msg))
+end)
+
+-- /allianceleave
+local aLeaveCmd = makeCmd("AllianceLeaveCommand", "/allianceleave", nil)
+aLeaveCmd.Triggered:Connect(function()
+	allianceLeave:FireServer()
+	systemMsg("[พันธมิตร] ออกจากพันธมิตรแล้ว")
+end)
+
+----------------------------------------------------------------
+-- Alliance Invite Popup
+----------------------------------------------------------------
+local function showAllianceInvitePopup(data: any)
+	local clanName = if typeof(data) == "table" then tostring(data.fromClanName) else "แคลน"
+	local leaderName = if typeof(data) == "table" then tostring(data.fromLeaderName) else "ใครบางคน"
+
+	local popup = Instance.new("Frame")
+	popup.Size = UDim2.fromOffset(300, 130)
+	popup.Position = UDim2.new(0.5, 0, 0.35, 0)
+	popup.AnchorPoint = Vector2.new(0.5, 0.5)
+	popup.BackgroundColor3 = Color3.fromRGB(28, 18, 50)
+	popup.ZIndex = 10
+	popup.Parent = gui
+	local pc = Instance.new("UICorner")
+	pc.CornerRadius = UDim.new(0, 12)
+	pc.Parent = popup
+
+	local msg = Instance.new("TextLabel")
+	msg.Size = UDim2.new(1, -16, 0, 66)
+	msg.Position = UDim2.fromOffset(8, 8)
+	msg.BackgroundTransparency = 1
+	msg.Text = string.format("[%s] %s ชวนเป็นพันธมิตร", clanName, leaderName)
+	msg.TextColor3 = Color3.fromRGB(230, 200, 255)
+	msg.TextScaled = true
+	msg.TextWrapped = true
+	msg.Font = Enum.Font.GothamMedium
+	msg.ZIndex = 10
+	msg.Parent = popup
+
+	local acceptBtn = Instance.new("TextButton")
+	acceptBtn.Size = UDim2.new(0.45, 0, 0, 40)
+	acceptBtn.Position = UDim2.new(0.03, 0, 1, -48)
+	acceptBtn.Text = "รับ"
+	acceptBtn.BackgroundColor3 = Color3.fromRGB(80, 50, 160)
+	acceptBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	acceptBtn.TextScaled = true
+	acceptBtn.Font = Enum.Font.GothamBold
+	acceptBtn.ZIndex = 11
+	acceptBtn.Parent = popup
+	local ac = Instance.new("UICorner"); ac.CornerRadius = UDim.new(0, 8); ac.Parent = acceptBtn
+
+	local declineBtn = Instance.new("TextButton")
+	declineBtn.Size = UDim2.new(0.45, 0, 0, 40)
+	declineBtn.Position = UDim2.new(0.52, 0, 1, -48)
+	declineBtn.Text = "ปฏิเสธ"
+	declineBtn.BackgroundColor3 = Color3.fromRGB(100, 50, 50)
+	declineBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	declineBtn.TextScaled = true
+	declineBtn.Font = Enum.Font.GothamBold
+	declineBtn.ZIndex = 11
+	declineBtn.Parent = popup
+	local dc = Instance.new("UICorner"); dc.CornerRadius = UDim.new(0, 8); dc.Parent = declineBtn
+
+	acceptBtn.Activated:Connect(function()
+		popup:Destroy()
+		local _ok, m = allianceAccept:InvokeServer()
+		systemMsg("[พันธมิตร] " .. tostring(m))
+	end)
+	declineBtn.Activated:Connect(function()
+		popup:Destroy()
+		allianceDecline:FireServer()
+		systemMsg("[พันธมิตร] ปฏิเสธคำเชิญแล้ว")
+	end)
+	task.delay(90, function()
+		if popup.Parent then popup:Destroy() end
+	end)
+end
+
+----------------------------------------------------------------
+-- chunk2: Remote Listeners
+----------------------------------------------------------------
+guildChatReceived.OnClientEvent:Connect(function(data: any)
+	if typeof(data) ~= "table" then return end
+	systemMsg(string.format("[แคลน %s] %s: %s",
+		tostring(data.guildName), tostring(data.fromName), tostring(data.message)))
+end)
+
+guildMemberJoined.OnClientEvent:Connect(function(data: any)
+	if typeof(data) ~= "table" then return end
+	systemMsg("[แคลน] 🟢 " .. tostring(data.displayName) .. " ออนไลน์แล้ว")
+end)
+
+allianceInviteReceived.OnClientEvent:Connect(function(data: any)
+	showAllianceInvitePopup(data)
 end)
 
 ----------------------------------------------------------------

@@ -47,3 +47,14 @@ ensure("RemoteFunction", "GuildSetRank") -- (targetUserId, rank) -> ok,msg
 ensure("RemoteFunction", "GuildGet") -- () -> publicState?
 ensure("RemoteEvent", "GuildInviteReceived") -- server->client
 ensure("RemoteEvent", "GuildStateChanged") -- server->client
+-- Guild chunk2: Clan Chat
+ensure("RemoteFunction", "GuildChatSend")       -- (message) -> ok,msg
+ensure("RemoteEvent",   "GuildChatReceived")     -- server->client: {guildId,guildName,fromName,message}
+ensure("RemoteEvent",   "GuildMemberJoined")     -- server->client: {displayName,userId}  (online notify)
+-- Guild chunk2: Alliance
+ensure("RemoteFunction", "AllianceCreate")       -- (targetClanName) -> ok,msg  (ส่ง invite)
+ensure("RemoteFunction", "AllianceAccept")       -- () -> ok,msg
+ensure("RemoteEvent",   "AllianceDecline")       -- ()
+ensure("RemoteEvent",   "AllianceLeave")         -- ()
+ensure("RemoteEvent",   "AllianceInviteReceived") -- server->client: {fromClanName,fromLeaderName}
+ensure("RemoteEvent",   "AllianceStateChanged")  -- server->client: {allianceId,guildIds[]}
