@@ -1,36 +1,39 @@
 --!strict
 --[[
-	InteractionClient (P3-C) — Player Interaction Context Menu
-	  • คลิก/แตะตัวละครผู้เล่น → popup menu 9 ปุ่ม
-	  • ปุ่ม: View Equipment | Duel | Trade | Whisper | Add Friend |
-	           Party Invite | Clan Invite | Carry | Block/Report
-	  • Mobile: touch-friendly (ปุ่มสูง 44px)
-	  • Duel/Trade/Carry → แสดง popup ยืนยันที่ฝั่งเป้าหมาย
-	  • Follow → client-side (HumanoidRootPart lookAt loop)
+	InteractionClient (P3-C+) — Radial interaction wheel + target lock
+	  • คลิก/แตะตัวละครผู้เล่น → 8-direction radial menu
+	  • Trade | Whisper | Party | Clan | Follow | Carry | Block | Report
+	  • Mobile: touch zones ≥48×48px, tween open animation
+	  • Target lock: Highlight + name billboard while menu open
 ]]
-local Players           = game:GetService("Players")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterGui        = game:GetService("StarterGui")
-local UserInputService  = game:GetService("UserInputService")
-local RunService        = game:GetService("RunService")
-local Workspace         = game:GetService("Workspace")
+local StarterGui = game:GetService("StarterGui")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local Modules = ReplicatedStorage:WaitForChild("Modules")
+local RadialMenuConfig = require(Modules:WaitForChild("RadialMenuConfig"))
+
+type ActionId = RadialMenuConfig.ActionId
 
 local localPlayer = Players.LocalPlayer
 local camera = Workspace.CurrentCamera
 
 local remotes = ReplicatedStorage:WaitForChild("SocialRemotes")
-local duelSend     = remotes:WaitForChild("DuelSend")     :: RemoteFunction
-local duelAccept   = remotes:WaitForChild("DuelAccept")   :: RemoteFunction
-local duelRcv      = remotes:WaitForChild("DuelReceived") :: RemoteEvent
-local tradeSend    = remotes:WaitForChild("TradeSend")    :: RemoteFunction
-local tradeRcv     = remotes:WaitForChild("TradeReceived") :: RemoteEvent
-local carryReq     = remotes:WaitForChild("CarryRequest") :: RemoteFunction
-local uncarryReq   = remotes:WaitForChild("UncarryRequest") :: RemoteEvent
+local duelAccept = remotes:WaitForChild("DuelAccept") :: RemoteFunction
+local duelRcv = remotes:WaitForChild("DuelReceived") :: RemoteEvent
+local tradeSend = remotes:WaitForChild("TradeSend") :: RemoteFunction
+local tradeRcv = remotes:WaitForChild("TradeReceived") :: RemoteEvent
+local carryReq = remotes:WaitForChild("CarryRequest") :: RemoteFunction
+local uncarryReq = remotes:WaitForChild("UncarryRequest") :: RemoteEvent
 local carryStarted = remotes:WaitForChild("CarryStarted") :: RemoteEvent
-local carryEnded   = remotes:WaitForChild("CarryEnded")   :: RemoteEvent
-local blockPlayer  = remotes:WaitForChild("BlockPlayer")  :: RemoteFunction
-local partyInvite  = remotes:WaitForChild("InteractionPartyInvite") :: RemoteFunction
-local clanInvite   = remotes:WaitForChild("InteractionClanInvite")  :: RemoteFunction
+local carryEnded = remotes:WaitForChild("CarryEnded") :: RemoteEvent
+local blockPlayer = remotes:WaitForChild("BlockPlayer") :: RemoteFunction
+local partyInvite = remotes:WaitForChild("InteractionPartyInvite") :: RemoteFunction
+local clanInvite = remotes:WaitForChild("InteractionClanInvite") :: RemoteFunction
 
 ----------------------------------------------------------------
 -- GUI Setup
@@ -39,59 +42,60 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "InteractionClient"
 screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.DisplayOrder = 10  -- above ChatClient
+screenGui.DisplayOrder = 10
 screenGui.Parent = localPlayer:WaitForChild("PlayerGui")
 
--- Context menu frame
-local menuFrame = Instance.new("Frame")
-menuFrame.Name = "ContextMenu"
-menuFrame.Size = UDim2.new(0, 180, 0, 0)
-menuFrame.AutomaticSize = Enum.AutomaticSize.Y
-menuFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
-menuFrame.BackgroundTransparency = 0.08
-menuFrame.BorderSizePixel = 0
-menuFrame.Visible = false
-menuFrame.ZIndex = 20
-menuFrame.Parent = screenGui
+local wheelSize = RadialMenuConfig.WheelSize
+local btnSize = RadialMenuConfig.ButtonSize
+local radius = RadialMenuConfig.Radius
+
+local radialFrame = Instance.new("Frame")
+radialFrame.Name = "RadialWheel"
+radialFrame.Size = UDim2.fromOffset(wheelSize, wheelSize)
+radialFrame.BackgroundTransparency = 1
+radialFrame.Visible = false
+radialFrame.ZIndex = 20
+radialFrame.Parent = screenGui
+
+local radialScale = Instance.new("UIScale")
+radialScale.Scale = 0
+radialScale.Parent = radialFrame
+
+local hub = Instance.new("Frame")
+hub.Name = "Hub"
+hub.AnchorPoint = Vector2.new(0.5, 0.5)
+hub.Position = UDim2.fromScale(0.5, 0.5)
+hub.Size = UDim2.fromOffset(72, 72)
+hub.BackgroundColor3 = RadialMenuConfig.HubBackground
+hub.BackgroundTransparency = RadialMenuConfig.HubTransparency
+hub.BorderSizePixel = 0
+hub.ZIndex = 21
+hub.Parent = radialFrame
 do
 	local c = Instance.new("UICorner")
-	c.CornerRadius = UDim.new(0, 8)
-	c.Parent = menuFrame
-	local layout = Instance.new("UIListLayout")
-	layout.SortOrder = Enum.SortOrder.LayoutOrder
-	layout.Padding = UDim.new(0, 1)
-	layout.Parent = menuFrame
-	local pad = Instance.new("UIPadding")
-	pad.PaddingTop = UDim.new(0, 6)
-	pad.PaddingBottom = UDim.new(0, 6)
-	pad.PaddingLeft = UDim.new(0, 4)
-	pad.PaddingRight = UDim.new(0, 4)
-	pad.Parent = menuFrame
+	c.CornerRadius = UDim.new(1, 0)
+	c.Parent = hub
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(80, 110, 180)
+	stroke.Thickness = 1.5
+	stroke.Parent = hub
 end
 
--- Header label (target name)
 local headerLabel = Instance.new("TextLabel")
 headerLabel.Name = "Header"
-headerLabel.Size = UDim2.new(1, 0, 0, 24)
+headerLabel.Size = UDim2.new(1, -8, 1, -8)
+headerLabel.Position = UDim2.fromOffset(4, 4)
 headerLabel.BackgroundTransparency = 1
 headerLabel.Text = ""
 headerLabel.TextColor3 = Color3.fromRGB(255, 220, 100)
 headerLabel.Font = Enum.Font.GothamBold
-headerLabel.TextSize = 13
+headerLabel.TextSize = 11
+headerLabel.TextWrapped = true
 headerLabel.TextXAlignment = Enum.TextXAlignment.Center
-headerLabel.LayoutOrder = 0
-headerLabel.Parent = menuFrame
+headerLabel.TextYAlignment = Enum.TextYAlignment.Center
+headerLabel.ZIndex = 22
+headerLabel.Parent = hub
 
--- Divider
-local div = Instance.new("Frame")
-div.Name = "Divider"
-div.Size = UDim2.new(1, 0, 0, 1)
-div.BackgroundColor3 = Color3.fromRGB(60, 80, 130)
-div.BorderSizePixel = 0
-div.LayoutOrder = 1
-div.Parent = menuFrame
-
--- Confirmation popup (for Duel/Trade/Carry received)
 local confirmFrame = Instance.new("Frame")
 confirmFrame.Name = "ConfirmPopup"
 confirmFrame.Size = UDim2.new(0, 260, 0, 110)
@@ -157,9 +161,69 @@ end
 local _targetPlayer: Player? = nil
 local _carryingState = false
 local currentConfirmAction: (() -> ())? = nil
+local radialButtons: { TextButton } = {}
+local openTween: Tween? = nil
+
+local targetHighlight: Highlight? = nil
+local targetBillboard: BillboardGui? = nil
+
+local function clearTargetLock()
+	if targetHighlight then
+		targetHighlight:Destroy()
+		targetHighlight = nil
+	end
+	if targetBillboard then
+		targetBillboard:Destroy()
+		targetBillboard = nil
+	end
+end
+
+local function applyTargetLock(target: Player)
+	clearTargetLock()
+	local char = target.Character
+	if not char then
+		return
+	end
+
+	local hl = Instance.new("Highlight")
+	hl.FillColor = Color3.fromRGB(80, 140, 255)
+	hl.FillTransparency = 0.65
+	hl.OutlineColor = Color3.fromRGB(255, 220, 120)
+	hl.OutlineTransparency = 0
+	hl.Parent = char
+	targetHighlight = hl
+
+	local root = char:FindFirstChild("HumanoidRootPart") :: BasePart?
+	if not root then
+		return
+	end
+
+	local bb = Instance.new("BillboardGui")
+	bb.Size = UDim2.fromOffset(140, 22)
+	bb.StudsOffset = Vector3.new(0, 3.2, 0)
+	bb.AlwaysOnTop = true
+	bb.Adornee = root
+	bb.Parent = root
+	targetBillboard = bb
+
+	local nameLabel = Instance.new("TextLabel")
+	nameLabel.Size = UDim2.fromScale(1, 1)
+	nameLabel.BackgroundTransparency = 1
+	nameLabel.Text = "👤 " .. target.DisplayName
+	nameLabel.TextColor3 = Color3.fromRGB(255, 220, 120)
+	nameLabel.Font = Enum.Font.GothamBold
+	nameLabel.TextSize = 14
+	nameLabel.Parent = bb
+end
 
 local function closeMenu()
-	menuFrame.Visible = false
+	radialFrame.Visible = false
+	radialScale.Scale = 0
+	if openTween then
+		openTween:Cancel()
+		openTween = nil
+	end
+	clearTargetLock()
 	_targetPlayer = nil
 end
 
@@ -172,7 +236,6 @@ local function showConfirm(title: string, onAccept: () -> ())
 	confirmTitle.Text = title
 	currentConfirmAction = onAccept
 	confirmFrame.Visible = true
-	-- auto-expire in 30 seconds
 	task.delay(30, function()
 		if confirmFrame.Visible then
 			closeConfirm()
@@ -191,248 +254,7 @@ confirmDeclineBtn.MouseButton1Click:Connect(function()
 end)
 
 ----------------------------------------------------------------
--- Menu button builder
-----------------------------------------------------------------
-type MenuAction = {
-	label: string,
-	color: Color3,
-	order: number,
-	action: () -> (),
-}
-
-local function makeMenuBtn(item: MenuAction): TextButton
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(1, 0, 0, 38)
-	btn.BackgroundColor3 = Color3.fromRGB(18, 28, 55)
-	btn.BackgroundTransparency = 0.3
-	btn.BorderSizePixel = 0
-	btn.Text = item.label
-	btn.TextColor3 = item.color
-	btn.Font = Enum.Font.Gotham
-	btn.TextSize = 13
-	btn.TextXAlignment = Enum.TextXAlignment.Left
-	btn.LayoutOrder = item.order
-	btn.Parent = menuFrame
-	do
-		local pad = Instance.new("UIPadding")
-		pad.PaddingLeft = UDim.new(0, 10)
-		pad.Parent = btn
-		local c = Instance.new("UICorner")
-		c.CornerRadius = UDim.new(0, 4)
-		c.Parent = btn
-	end
-	btn.MouseEnter:Connect(function()
-		btn.BackgroundTransparency = 0.1
-	end)
-	btn.MouseLeave:Connect(function()
-		btn.BackgroundTransparency = 0.3
-	end)
-	btn.MouseButton1Click:Connect(function()
-		closeMenu()
-		task.defer(item.action)
-	end)
-	return btn
-end
-
-----------------------------------------------------------------
--- Build menu for target player
-----------------------------------------------------------------
-local function buildMenu(target: Player)
-	-- clear old buttons (keep header + divider)
-	for _, ch in menuFrame:GetChildren() do
-		if ch:IsA("TextButton") or (ch:IsA("TextLabel") and ch.Name ~= "Header") then
-			ch:Destroy()
-		end
-	end
-
-	headerLabel.Text = "👤 " .. target.DisplayName
-
-	local actions: { MenuAction } = {
-		{
-			label = "🗡 ท้าดวล (Duel)",
-			color = Color3.fromRGB(255, 140, 100),
-			order = 10,
-			action = function()
-				local ok, msg = duelSend:InvokeServer(target.UserId)
-				if not ok then
-					warn("[Interaction] duel: " .. tostring(msg))
-				end
-			end,
-		},
-		{
-			label = "💼 ขอแลกเปลี่ยน (Trade)",
-			color = Color3.fromRGB(160, 230, 255),
-			order = 20,
-			action = function()
-				local ok, msg = tradeSend:InvokeServer(target.UserId)
-				if not ok then
-					warn("[Interaction] trade: " .. tostring(msg))
-				end
-			end,
-		},
-		{
-			label = "💬 กระซิบ (Whisper)",
-			color = Color3.fromRGB(255, 220, 100),
-			order = 30,
-			action = function()
-				-- switch ChatClient to Whisper tab + pre-fill target name
-				-- ChatClient doesn't expose an API yet — use a BindableEvent pattern
-				-- For now: open chat and set whisper target via game.ReplicatedStorage signal
-				local be = ReplicatedStorage:FindFirstChild("ChatClientWhisperTo")
-				if be and be:IsA("BindableEvent") then
-					(be :: BindableEvent):Fire(target.Name)
-				end
-			end,
-		},
-		{
-			label = "🤝 เพิ่มเพื่อน",
-			color = Color3.fromRGB(150, 255, 150),
-			order = 40,
-			action = function()
-				pcall(function()
-					StarterGui:SetCore("PromptSendFriendRequest", target)
-				end)
-			end,
-		},
-		{
-			label = "🎉 ชวนเข้าปาร์ตี้",
-			color = Color3.fromRGB(100, 200, 255),
-			order = 50,
-			action = function()
-				local ok, msg = partyInvite:InvokeServer(target.Name)
-				if not ok then
-					warn("[Interaction] party invite: " .. tostring(msg))
-				end
-			end,
-		},
-		{
-			label = "⚔ ชวนเข้าแคลน",
-			color = Color3.fromRGB(130, 255, 160),
-			order = 60,
-			action = function()
-				local ok, msg = clanInvite:InvokeServer(target.Name)
-				if not ok then
-					warn("[Interaction] clan invite: " .. tostring(msg))
-				end
-			end,
-		},
-		{
-			label = "🫂 อุ้ม (Carry)",
-			color = Color3.fromRGB(220, 180, 255),
-			order = 70,
-			action = function()
-				local ok, msg = carryReq:InvokeServer(target.UserId)
-				if not ok then
-					warn("[Interaction] carry: " .. tostring(msg))
-				else
-					_carryingState = true
-				end
-			end,
-		},
-		{
-			label = "🚫 บล็อก",
-			color = Color3.fromRGB(255, 100, 100),
-			order = 80,
-			action = function()
-				showConfirm(
-					string.format("บล็อก %s?\nเขาจะไม่สามารถ whisper หรือ duel คุณได้", target.DisplayName),
-					function()
-						local ok, msg = blockPlayer:InvokeServer(target.UserId)
-						if not ok then warn("[Interaction] block: " .. tostring(msg)) end
-					end
-				)
-			end,
-		},
-		{
-			label = "🚩 รายงาน (Report)",
-			color = Color3.fromRGB(255, 80, 80),
-			order = 90,
-			action = function()
-				pcall(function()
-					StarterGui:SetCore("PromptReportPlayer", target :: any)
-				end)
-			end,
-		},
-	}
-
-	for _, item in actions do
-		makeMenuBtn(item)
-	end
-end
-
-----------------------------------------------------------------
--- Detect click on player character
-----------------------------------------------------------------
-local function getPlayerFromPart(part: Instance?): Player?
-	if not part then return nil end
-	for _, p in Players:GetPlayers() do
-		if p ~= localPlayer and p.Character and p.Character:IsAncestorOf(part) then
-			return p
-		end
-	end
-	return nil
-end
-
-local function screenPosForCharacter(char: Model): Vector2?
-	local root = char:FindFirstChild("HumanoidRootPart") :: BasePart?
-	if not root then return nil end
-	local pos, onScreen = camera:WorldToScreenPoint((root :: BasePart).Position + Vector3.new(0, 2.5, 0))
-	if onScreen then
-		return Vector2.new(pos.X, pos.Y)
-	end
-	return nil
-end
-
-local function showMenuAt(target: Player, screenPos: Vector2)
-	_targetPlayer = target
-	buildMenu(target)
-	-- clamp to screen
-	local vp = camera.ViewportSize
-	local menuW = 180
-	local x = math.clamp(screenPos.X, 0, vp.X - menuW)
-	local y = math.clamp(screenPos.Y, 0, vp.Y - 350)
-	menuFrame.Position = UDim2.new(0, x, 0, y)
-	menuFrame.Visible = true
-end
-
--- Mouse click
-UserInputService.InputBegan:Connect(function(input: InputObject, gpe: boolean)
-	if gpe then return end
-
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-		or input.UserInputType == Enum.UserInputType.Touch then
-
-		-- if menu is open and user clicks outside it → close
-		if menuFrame.Visible then
-			closeMenu()
-			return
-		end
-
-		-- Raycast to find character part
-		local unitRay = camera:ScreenPointToRay(input.Position.X, input.Position.Y)
-		local result = Workspace:Raycast(unitRay.Origin, unitRay.Direction * 500)
-		if not result then return end
-		local hitPlayer = getPlayerFromPart(result.Instance)
-		if not hitPlayer or not hitPlayer.Character then return end
-
-		local screenPos = screenPosForCharacter(hitPlayer.Character :: Model)
-		if screenPos then
-			showMenuAt(hitPlayer, screenPos)
-		end
-	end
-end)
-
--- Close menu on Escape
-UserInputService.InputBegan:Connect(function(input: InputObject, gpe: boolean)
-	if gpe then return end
-	if input.KeyCode == Enum.KeyCode.Escape then
-		closeMenu()
-		closeConfirm()
-	end
-end)
-
-----------------------------------------------------------------
--- Follow mode (client-side loop)
+-- Follow mode
 ----------------------------------------------------------------
 local followTarget: Player? = nil
 local followConn: RBXScriptConnection? = nil
@@ -465,7 +287,7 @@ local function startFollow(target: Player)
 			stopFollow()
 			return
 		end
-		local dist = (tRoot.Position - (myRoot :: BasePart).Position).Magnitude
+		local dist = (tRoot.Position - myRoot.Position).Magnitude
 		if dist > 4 then
 			local hum = myChar:FindFirstChildOfClass("Humanoid")
 			if hum then
@@ -475,31 +297,243 @@ local function startFollow(target: Player)
 	end)
 end
 
--- Expose follow toggle via interact menu button (add dynamically)
-local function addFollowButton(target: Player)
-	local isFollowing = followTarget == target
-	makeMenuBtn({
-		label = if isFollowing then "🛑 หยุดตาม" else "🏃 ตาม (Follow)",
-		color = Color3.fromRGB(200, 200, 255),
-		order = 65,
-		action = function()
-			if isFollowing then
-				stopFollow()
-			else
-				startFollow(target)
+----------------------------------------------------------------
+-- Radial action dispatch
+----------------------------------------------------------------
+local function runAction(actionId: ActionId, target: Player)
+	if actionId == "Trade" then
+		local ok, msg = tradeSend:InvokeServer(target.UserId)
+		if not ok then
+			warn("[Interaction] trade: " .. tostring(msg))
+		end
+	elseif actionId == "Whisper" then
+		local be = ReplicatedStorage:FindFirstChild("ChatClientWhisperTo")
+		if be and be:IsA("BindableEvent") then
+			(be :: BindableEvent):Fire(target.Name)
+		end
+	elseif actionId == "Party" then
+		local ok, msg = partyInvite:InvokeServer(target.Name)
+		if not ok then
+			warn("[Interaction] party invite: " .. tostring(msg))
+		end
+	elseif actionId == "Clan" then
+		local ok, msg = clanInvite:InvokeServer(target.Name)
+		if not ok then
+			warn("[Interaction] clan invite: " .. tostring(msg))
+		end
+	elseif actionId == "Follow" then
+		if followTarget == target then
+			stopFollow()
+		else
+			startFollow(target)
+		end
+	elseif actionId == "Carry" then
+		local ok, msg = carryReq:InvokeServer(target.UserId)
+		if not ok then
+			warn("[Interaction] carry: " .. tostring(msg))
+		else
+			_carryingState = true
+		end
+	elseif actionId == "Block" then
+		showConfirm(
+			string.format("บล็อก %s?\nเขาจะไม่สามารถ whisper หรือ duel คุณได้", target.DisplayName),
+			function()
+				local ok, msg = blockPlayer:InvokeServer(target.UserId)
+				if not ok then
+					warn("[Interaction] block: " .. tostring(msg))
+				end
 			end
-		end,
-	})
+		)
+	elseif actionId == "Report" then
+		pcall(function()
+			StarterGui:SetCore("PromptReportPlayer", target :: any)
+		end)
+	end
 end
--- Inject follow button into buildMenu
-local _origBuild = buildMenu
-buildMenu = function(target: Player)
-	_origBuild(target)
-	addFollowButton(target)
+
+local function clearRadialButtons()
+	for _, btn in radialButtons do
+		btn:Destroy()
+	end
+	table.clear(radialButtons)
+end
+
+local function makeRadialBtn(
+	spec: RadialMenuConfig.RadialAction,
+	displayIcon: string,
+	displayLabel: string,
+	onClick: () -> ()
+): TextButton
+	local rad = math.rad(spec.angleDeg - 90)
+	local offsetX = math.cos(rad) * radius
+	local offsetY = math.sin(rad) * radius
+
+	local btn = Instance.new("TextButton")
+	btn.Name = spec.id
+	btn.AnchorPoint = Vector2.new(0.5, 0.5)
+	btn.Size = UDim2.fromOffset(btnSize, btnSize)
+	btn.Position = UDim2.new(0.5, offsetX, 0.5, offsetY)
+	btn.BackgroundColor3 = Color3.fromRGB(18, 28, 55)
+	btn.BackgroundTransparency = 0.15
+	btn.BorderSizePixel = 0
+	btn.Text = displayIcon .. "\n" .. displayLabel
+	btn.TextColor3 = spec.color
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 10
+	btn.TextWrapped = true
+	btn.ZIndex = 23
+	btn.Parent = radialFrame
+	do
+		local c = Instance.new("UICorner")
+		c.CornerRadius = UDim.new(1, 0)
+		c.Parent = btn
+		local stroke = Instance.new("UIStroke")
+		stroke.Color = spec.color
+		stroke.Thickness = 1
+		stroke.Transparency = 0.35
+		stroke.Parent = btn
+	end
+	btn.MouseEnter:Connect(function()
+		btn.BackgroundTransparency = 0.05
+	end)
+	btn.MouseLeave:Connect(function()
+		btn.BackgroundTransparency = 0.15
+	end)
+	btn.MouseButton1Click:Connect(function()
+		closeMenu()
+		task.defer(onClick)
+	end)
+	table.insert(radialButtons, btn)
+	return btn
+end
+
+local function buildRadial(target: Player)
+	clearRadialButtons()
+	headerLabel.Text = target.DisplayName
+
+	for _, spec in RadialMenuConfig.Actions do
+		local icon = spec.icon
+		local label = spec.label
+		if spec.id == "Follow" and followTarget == target then
+			icon = "🛑"
+			label = "Stop"
+		end
+		makeRadialBtn(spec, icon, label, function()
+			runAction(spec.id, target)
+		end)
+	end
+end
+
+local function animateOpen()
+	radialScale.Scale = 0
+	if openTween then
+		openTween:Cancel()
+	end
+	local tween = TweenService:Create(
+		radialScale,
+		TweenInfo.new(RadialMenuConfig.OpenTweenDuration, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{ Scale = 1 }
+	)
+	openTween = tween
+	tween:Play()
 end
 
 ----------------------------------------------------------------
--- Carry controls (show uncarry button when carrying)
+-- Detect click on player character
+----------------------------------------------------------------
+local function getPlayerFromPart(part: Instance?): Player?
+	if not part then
+		return nil
+	end
+	for _, p in Players:GetPlayers() do
+		if p ~= localPlayer and p.Character and p.Character:IsAncestorOf(part) then
+			return p
+		end
+	end
+	return nil
+end
+
+local function screenPosForCharacter(char: Model): Vector2?
+	local root = char:FindFirstChild("HumanoidRootPart") :: BasePart?
+	if not root then
+		return nil
+	end
+	local pos, onScreen = camera:WorldToScreenPoint(root.Position + Vector3.new(0, 2.5, 0))
+	if onScreen then
+		return Vector2.new(pos.X, pos.Y)
+	end
+	return nil
+end
+
+local function isPointInsideRadial(screenPos: Vector2): boolean
+	if not radialFrame.Visible then
+		return false
+	end
+	local absPos = radialFrame.AbsolutePosition
+	local absSize = radialFrame.AbsoluteSize
+	local center = absPos + absSize / 2
+	return (screenPos - center).Magnitude <= (wheelSize / 2 + 8)
+end
+
+local function showMenuAt(target: Player, screenPos: Vector2)
+	_targetPlayer = target
+	buildRadial(target)
+	applyTargetLock(target)
+
+	local vp = camera.ViewportSize
+	local half = wheelSize / 2
+	local x = math.clamp(screenPos.X - half, 0, vp.X - wheelSize)
+	local y = math.clamp(screenPos.Y - half, 0, vp.Y - wheelSize)
+	radialFrame.Position = UDim2.fromOffset(x, y)
+	radialFrame.Visible = true
+	animateOpen()
+end
+
+UserInputService.InputBegan:Connect(function(input: InputObject, gpe: boolean)
+	if gpe then
+		return
+	end
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+		local clickPos = Vector2.new(input.Position.X, input.Position.Y)
+
+		if radialFrame.Visible then
+			if not isPointInsideRadial(clickPos) then
+				closeMenu()
+			end
+			return
+		end
+
+		local unitRay = camera:ScreenPointToRay(input.Position.X, input.Position.Y)
+		local result = Workspace:Raycast(unitRay.Origin, unitRay.Direction * 500)
+		if not result then
+			return
+		end
+		local hitPlayer = getPlayerFromPart(result.Instance)
+		if not hitPlayer or not hitPlayer.Character then
+			return
+		end
+
+		local screenPos = screenPosForCharacter(hitPlayer.Character :: Model)
+		if screenPos then
+			showMenuAt(hitPlayer, screenPos)
+		end
+	end
+end)
+
+UserInputService.InputBegan:Connect(function(input: InputObject, gpe: boolean)
+	if gpe then
+		return
+	end
+	if input.KeyCode == Enum.KeyCode.Escape then
+		closeMenu()
+		closeConfirm()
+	end
+end)
+
+----------------------------------------------------------------
+-- Carry controls
 ----------------------------------------------------------------
 local uncarryBtn = Instance.new("TextButton")
 uncarryBtn.Size = UDim2.new(0, 140, 0, 36)
@@ -540,9 +574,11 @@ end)
 -- Duel / Trade received popups
 ----------------------------------------------------------------
 duelRcv.OnClientEvent:Connect(function(data: any)
-	if typeof(data) ~= "table" then return end
+	if typeof(data) ~= "table" then
+		return
+	end
 	local fromName = tostring(data.fromName or "ผู้เล่น")
-	local fromUid  = data.fromUserId
+	local fromUid = data.fromUserId
 	showConfirm(
 		string.format("⚔ %s ท้าดวลคุณ!\nยอมรับหรือไม่?", fromName),
 		function()
@@ -554,13 +590,13 @@ duelRcv.OnClientEvent:Connect(function(data: any)
 end)
 
 tradeRcv.OnClientEvent:Connect(function(data: any)
-	if typeof(data) ~= "table" then return end
+	if typeof(data) ~= "table" then
+		return
+	end
 	local fromName = tostring(data.fromName or "ผู้เล่น")
 	showConfirm(
 		string.format("💼 %s ขอแลกเปลี่ยนกับคุณ!\n(Trade เปิดใน P4)", fromName),
-		function()
-			-- P4 stub: notify decline (no server call needed for stub)
-		end
+		function() end
 	)
 end)
 
@@ -571,6 +607,4 @@ local whisperBE = Instance.new("BindableEvent")
 whisperBE.Name = "ChatClientWhisperTo"
 whisperBE.Parent = ReplicatedStorage
 
--- ChatClient can listen: ReplicatedStorage.ChatClientWhisperTo.Event:Connect(function(name) ... end)
-
-print("[Interaction] InteractionClient online (P3-C)")
+print("[Interaction] InteractionClient online (P3-C+ radial wheel)")
