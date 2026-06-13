@@ -27,11 +27,12 @@ PLACE_SECRETS = ROOT / "src/ServerScriptService/Secrets/PlaceSecrets.luau"
 TEMPLATE_PLACE_ID = 95206881  # Roblox baseplate template (common default)
 
 PLACES = [
-    ("Hub", "Utopia Plaza Hub"),
-    ("Solhaven", "Solhaven"),
-    ("Nocturne", "Nocturne Alley"),
-    ("EternityCity", "Utopia of Eternity"),
-    ("DeathValley", "Death Valley"),
+	("Hub", "Utopia Plaza Hub"),
+	("Solhaven", "Solhaven"),
+	("Nocturne", "Nocturne Alley"),
+	("EternityCity", "Utopia of Eternity"),
+	("DeathValley", "Death Valley"),
+	("NeonUtopia", "Neon Utopia"),
 ]
 
 

@@ -17,4 +17,5 @@ return {
 	Nocturne = 0,
 	EternityCity = 0,
 	DeathValley = 0,
+	NeonUtopia = 0,
 }

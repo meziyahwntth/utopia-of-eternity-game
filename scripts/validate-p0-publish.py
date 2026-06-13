@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SECRETS = ROOT / "src/ServerScriptService/Secrets"
-PLACE_KEYS = ["Hub", "Solhaven", "Nocturne", "EternityCity", "DeathValley"]
+PLACE_KEYS = ["Hub", "Solhaven", "Nocturne", "EternityCity", "DeathValley", "NeonUtopia"]
 SHOP_RENT_PRODUCT_KEYS = ["shop_rent_7d", "shop_rent_30d"]
 
 P0_PRODUCT_KEYS = [
