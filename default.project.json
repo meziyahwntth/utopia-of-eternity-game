@@ -186,6 +186,12 @@
         "AirTransportService": {
           "$path": "src/ServerScriptService/World/AirTransportService.luau"
         },
+        "AirTransportHandlers": {
+          "$path": "src/ServerScriptService/World/AirTransportHandlers.server.luau"
+        },
+        "DeparturePadTrigger": {
+          "$path": "src/ServerScriptService/World/DeparturePadTrigger.server.luau"
+        },
         "EternityCityLighting": {
           "$path": "src/ServerScriptService/World/EternityCityLighting.luau"
         },
@@ -434,6 +440,12 @@
         },
         "CardHandlers": {
           "$path": "src/ServerScriptService/Progression/CardHandlers.server.luau"
+        },
+        "SpawnRouter": {
+          "$path": "src/ServerScriptService/Progression/SpawnRouter.luau"
+        },
+        "SpawnRouterBootstrap": {
+          "$path": "src/ServerScriptService/Progression/SpawnRouterBootstrap.server.luau"
         }
       },
       "Dungeon": {

@@ -29,7 +29,7 @@ GameConfig.Places = {
 		dayMode = "eternal_night",
 		planet = "Hellbound",
 	},
-	-- V2: เมืองมนุษย์ neon — จุดเกิดแรก (TODO: ใส่ Place ID ใน PlaceSecrets เมื่อสร้าง Place แล้ว)
+	-- V2: เมืองมนุษย์ neon — จุดเกิดแรก (Place ID จาก PlaceSecrets.NeonUtopia)
 	NeonUtopia = {
 		id = 0,
 		name = "Neon Utopia",

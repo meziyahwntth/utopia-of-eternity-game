@@ -120,6 +120,15 @@ ItemTierConfig.Items = {
 		weaponType = "None",
 		tradeable = false,
 	},
+	AirTicket = {
+		id = "AirTicket",
+		name = "ตั๋วโดยสาร",
+		requiredLevel = 1,
+		grandeurRank = 0,
+		weight = 0.01,
+		weaponType = "None",
+		tradeable = true,
+	},
 } :: { [string]: ItemDef }
 
 function ItemTierConfig.get(itemId: string): ItemDef?

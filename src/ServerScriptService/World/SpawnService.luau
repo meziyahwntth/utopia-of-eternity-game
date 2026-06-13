@@ -87,6 +87,29 @@ function SpawnService.start(opts: { deferUntilReady: boolean }?)
 		Players.CharacterAutoLoads = true
 		SpawnService.loadDeferredCharacters()
 	end
+
+	local function onPlayerAddedForNeon(player: Player)
+		task.spawn(function()
+			local ok, WorldPlaceGuard = pcall(function()
+				return require(script.Parent:WaitForChild("WorldPlaceGuard"))
+			end)
+			if not ok or WorldPlaceGuard:GetCurrentPlaceKey() ~= "NeonUtopia" then
+				return
+			end
+			task.wait(5)
+			local okAT, AirTransportService = pcall(function()
+				return require(script.Parent:WaitForChild("AirTransportService"))
+			end)
+			if okAT then
+				AirTransportService.grantStarterTickets(player, 5)
+			end
+		end)
+	end
+
+	Players.PlayerAdded:Connect(onPlayerAddedForNeon)
+	for _, player in Players:GetPlayers() do
+		onPlayerAddedForNeon(player)
+	end
 end
 
 return SpawnService
