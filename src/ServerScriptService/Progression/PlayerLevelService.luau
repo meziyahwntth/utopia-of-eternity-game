@@ -1,6 +1,8 @@
 --!strict
 --[[
-	PlayerLevelService (P7 stub) — level attribute + tier broadcast via VisiblePowerService
+	PlayerLevelService (Full) — DataStore XP + Level + Tier broadcast
+	XP required to level: expNeeded(lv) = lv * 100 + lv^2 * 5
+	Max level: 149 (Hero tier cap in PlayerTierConfig)
 ]]
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -8,38 +10,96 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local PlayerTierConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PlayerTierConfig"))
 local VisiblePowerService = require(script.Parent:WaitForChild("VisiblePowerService"))
+local LevelStore = require(script.Parent:WaitForChild("LevelStore"))
 
 local PlayerLevelService = {}
 
-local LEVEL_ATTR = "PlayerLevel"
-local levels: { [number]: number } = {}
+local cache: { [number]: LevelStore.LevelData } = {}
+local remotesFolder: Folder? = nil
 
-local function readLevel(player: Player): number
-	local attr = player:GetAttribute(LEVEL_ATTR)
-	if typeof(attr) == "number" and attr >= 1 then
-		return math.floor(attr)
-	end
-	return 1
+local MAX_LEVEL = 149
+
+local function expNeeded(lv: number): number
+	return lv * 100 + lv * lv * 5
 end
 
-local function applyLevel(player: Player, newLevel: number)
-	levels[player.UserId] = newLevel
-	player:SetAttribute(LEVEL_ATTR, newLevel)
-	local tier = PlayerTierConfig.getTierForLevel(newLevel)
+local function applyData(player: Player, data: LevelStore.LevelData)
+	cache[player.UserId] = data
+	player:SetAttribute("PlayerLevel", data.level)
+	player:SetAttribute("PlayerXP", data.xp)
+	player:SetAttribute("PlayerXPMax", expNeeded(data.level))
+	local tier = PlayerTierConfig.getTierForLevel(data.level)
 	player:SetAttribute("PlayerTier", tier.tier)
-	VisiblePowerService.onLevelChanged(player, newLevel)
+	VisiblePowerService.onLevelChanged(player, data.level)
 end
 
 function PlayerLevelService.getLevel(player: Player): number
-	return levels[player.UserId] or readLevel(player)
+	local data = cache[player.UserId]
+	return if data then data.level else 1
 end
 
-function PlayerLevelService.setLevel(player: Player, newLevel: number)
-	applyLevel(player, math.max(1, math.floor(newLevel)))
+function PlayerLevelService.getXP(player: Player): number
+	local data = cache[player.UserId]
+	return if data then data.xp else 0
+end
+
+function PlayerLevelService.addExp(player: Player, amount: number)
+	if amount <= 0 then
+		return
+	end
+	local data = cache[player.UserId]
+	if not data then
+		return
+	end
+
+	data.xp += amount
+	local leveledUp = false
+
+	while data.level < MAX_LEVEL do
+		local needed = expNeeded(data.level)
+		if data.xp >= needed then
+			data.xp -= needed
+			data.level += 1
+			leveledUp = true
+		else
+			break
+		end
+	end
+
+	if data.level >= MAX_LEVEL then
+		data.xp = 0
+	end
+
+	applyData(player, data)
+
+	if leveledUp and remotesFolder then
+		local ev = remotesFolder:FindFirstChild("LevelUp") :: RemoteEvent?
+		if ev then
+			ev:FireClient(player, data.level)
+		end
+	end
+
+	task.spawn(function()
+		LevelStore.save(player.UserId, data)
+	end)
 end
 
 function PlayerLevelService.addLevel(player: Player, delta: number)
-	PlayerLevelService.setLevel(player, PlayerLevelService.getLevel(player) + delta)
+	local data = cache[player.UserId]
+	if not data then
+		return
+	end
+	local newLevel = math.clamp(data.level + math.floor(delta), 1, MAX_LEVEL)
+	data.level = newLevel
+	data.xp = 0
+	applyData(player, data)
+	task.spawn(function()
+		LevelStore.save(player.UserId, data)
+	end)
+end
+
+function PlayerLevelService.setLevel(player: Player, newLevel: number)
+	PlayerLevelService.addLevel(player, newLevel - PlayerLevelService.getLevel(player))
 end
 
 function PlayerLevelService.getExpGainMultiplier(player: Player): number
@@ -60,26 +120,33 @@ function PlayerLevelService.getExpGainMultiplier(player: Player): number
 	return mult
 end
 
-function PlayerLevelService.init(remotesFolder: Folder)
-	VisiblePowerService.init(remotesFolder)
+function PlayerLevelService.init(folder: Folder)
+	remotesFolder = folder
+	VisiblePowerService.init(folder)
 end
 
 function PlayerLevelService.onPlayerReady(player: Player)
-	local level = readLevel(player)
-	levels[player.UserId] = level
-	applyLevel(player, level)
+	local data = LevelStore.get(player.UserId)
+	applyData(player, data)
 end
 
 Players.PlayerAdded:Connect(function(player)
 	PlayerLevelService.onPlayerReady(player)
 	player.CharacterAdded:Connect(function()
 		task.wait(0.5)
-		VisiblePowerService.onLevelChanged(player, PlayerLevelService.getLevel(player))
+		local data = cache[player.UserId]
+		if data then
+			VisiblePowerService.onLevelChanged(player, data.level)
+		end
 	end)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
-	levels[player.UserId] = nil
+	local data = cache[player.UserId]
+	if data then
+		LevelStore.save(player.UserId, data)
+	end
+	cache[player.UserId] = nil
 end)
 
 return PlayerLevelService

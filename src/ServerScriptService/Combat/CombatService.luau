@@ -130,25 +130,17 @@ local function computeDamage(player: Player, skillId: string): number
 end
 
 local function grantKillExp(player: Player)
-	local mult = 1.0
 	local okPls, pls = pcall(function()
 		return require(ServerScriptService:WaitForChild("Progression"):WaitForChild("PlayerLevelService"))
 	end)
-	if okPls then
-		mult = (pls :: any).getExpGainMultiplier(player)
-	end
-	if mult <= 0 then
+	if not okPls or not pls then
 		return
 	end
 
-	local accum = player:GetAttribute("CombatExpAccum")
-	local streak = if typeof(accum) == "number" then accum else 0
-	streak += mult
-	while streak >= 10 and okPls do
-		(pls :: any).addLevel(player, 1)
-		streak -= 10
-	end
-	player:SetAttribute("CombatExpAccum", streak)
+	local BASE_KILL_EXP = 25
+	local mult = (pls :: any).getExpGainMultiplier(player)
+	local xpGain = math.floor(BASE_KILL_EXP * mult + 0.5)
+	;(pls :: any).addExp(player, xpGain)
 end
 
 function CombatService.findNpc(npcId: number): Model?

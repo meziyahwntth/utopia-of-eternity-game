@@ -130,3 +130,6 @@ ensure("RemoteFunction", "UnequipPet")
 ensure("RemoteFunction", "GetPetCollection")
 ensure("RemoteEvent", "PetEquipped")
 ensure("RemoteEvent", "PetUnequipped")
+
+-- Progression: Level-up notification
+ensure("RemoteEvent", "LevelUp")

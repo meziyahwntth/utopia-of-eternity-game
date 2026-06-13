@@ -387,6 +387,9 @@
         "PlayerLevelService": {
           "$path": "src/ServerScriptService/Progression/PlayerLevelService.luau"
         },
+        "LevelStore": {
+          "$path": "src/ServerScriptService/Progression/LevelStore.luau"
+        },
         "VisiblePowerService": {
           "$path": "src/ServerScriptService/Progression/VisiblePowerService.luau"
         },
