@@ -181,7 +181,11 @@ local function teleportToLeader(target: Player, leaderId: number, partyId: strin
 		TeleportService:TeleportAsync(placeId, { target }, options)
 	end)
 	if not ok then
-		lastTeleportJoin[target.UserId] = last -- คืน cooldown ถ้า fail
+		if last then
+			lastTeleportJoin[target.UserId] = last -- คืน cooldown ถ้า fail
+		else
+			lastTeleportJoin[target.UserId] = nil
+		end
 		return false, "teleport ล้มเหลว: " .. tostring(err)
 	end
 	return true, "กำลังย้ายไปหาปาร์ตี้..."
@@ -263,7 +267,7 @@ function PartyService.onArrival(player: Player)
 	if typeof(td) ~= "table" then
 		return
 	end
-	local sp = td.socialParty
+	local sp = (td :: any).socialParty
 	if typeof(sp) ~= "table" or typeof(sp.leaderId) ~= "number" then
 		return
 	end

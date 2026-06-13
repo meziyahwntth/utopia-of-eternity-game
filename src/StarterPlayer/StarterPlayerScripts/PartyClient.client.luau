@@ -144,7 +144,7 @@ local function showInvitePopup(invite: any)
 
 	accept.Activated:Connect(function()
 		popup:Destroy()
-		local ok, m = partyAccept:InvokeServer()
+		local _ok, m = partyAccept:InvokeServer()
 		systemMsg("[ปาร์ตี้] " .. tostring(m))
 	end)
 	decline.Activated:Connect(function()
@@ -179,7 +179,7 @@ inviteCmd.Triggered:Connect(function(_o, text)
 		systemMsg("[ระบบ] ใช้: /invite <ชื่อ>")
 		return
 	end
-	local ok, m = partyInviteSend:InvokeServer(name)
+	local _ok, m = partyInviteSend:InvokeServer(name)
 	systemMsg("[ปาร์ตี้] " .. tostring(m))
 end)
 
