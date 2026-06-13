@@ -30,6 +30,12 @@
         "PartyService": {
           "$path": "src/ServerScriptService/Social/PartyService.luau"
         },
+        "GuildStore": {
+          "$path": "src/ServerScriptService/Social/GuildStore.luau"
+        },
+        "GuildService": {
+          "$path": "src/ServerScriptService/Social/GuildService.luau"
+        },
         "SocialHandlers": {
           "$path": "src/ServerScriptService/Social/SocialHandlers.server.luau"
         }
