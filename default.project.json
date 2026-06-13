@@ -49,6 +49,21 @@
           "$path": "src/ServerScriptService/Social/SocialHandlers.server.luau"
         }
       },
+      "Combat": {
+        "$className": "Folder",
+        "CombatRemoteSetup": {
+          "$path": "src/ServerScriptService/Combat/CombatRemoteSetup.server.luau"
+        },
+        "CombatService": {
+          "$path": "src/ServerScriptService/Combat/CombatService.luau"
+        },
+        "AutoBattleService": {
+          "$path": "src/ServerScriptService/Combat/AutoBattleService.luau"
+        },
+        "CombatHandlers": {
+          "$path": "src/ServerScriptService/Combat/CombatHandlers.server.luau"
+        }
+      },
       "HubGreyboxBuilder": {
         "$path": "src/ServerScriptService/HubGreyboxBuilder.luau"
       },
