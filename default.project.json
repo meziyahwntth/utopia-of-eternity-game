@@ -338,6 +338,12 @@
         },
         "PetHandlers": {
           "$path": "src/ServerScriptService/Commerce/PetHandlers.server.luau"
+        },
+        "VehicleMountService": {
+          "$path": "src/ServerScriptService/Commerce/VehicleMountService.server.luau"
+        },
+        "VehicleMountHandlers": {
+          "$path": "src/ServerScriptService/Commerce/VehicleMountHandlers.server.luau"
         }
       },
       "Face": {

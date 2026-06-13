@@ -39,4 +39,10 @@ ensureRemote("RemoteFunction", "TradeCancel")
 ensureRemote("RemoteFunction", "TradeGetInventory")
 ensureRemote("RemoteEvent", "TradeSessionUpdate")
 
+-- Garage: Vehicle + Legendary Mount equip
+ensureRemote("RemoteFunction", "GetVehicleMountState")
+ensureRemote("RemoteEvent", "EquipVehicle")
+ensureRemote("RemoteEvent", "EquipMount")
+ensureRemote("RemoteEvent", "UnequipVehicleMount")
+
 print("[Commerce] Remotes ready")
