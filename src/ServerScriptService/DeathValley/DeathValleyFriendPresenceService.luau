@@ -56,7 +56,7 @@ local remotes = ReplicatedStorage:WaitForChild("DeathValleyRemotes")
 local friendPresenceNotify = remotes:WaitForChild("FriendPresenceNotify") :: RemoteEvent
 
 local function getPlaceKey(): PlaceTeleport.PlaceKey
-	return WorldPlaceGuard:GetCurrentPlaceKey()
+	return WorldPlaceGuard:GetCurrentPlaceKey() :: any
 end
 
 local function buildRecord(player: Player): PresenceRecord
