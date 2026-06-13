@@ -97,7 +97,12 @@ local function saveAsync(userId: number)
 	end
 end
 
-function QuestService.recordProgress(player: Player, objective: QuestConfig.QuestObjective, count: number?)
+function QuestService.recordProgress(
+	player: Player,
+	objective: QuestConfig.QuestObjective,
+	count: number?,
+	zoneId: string?
+)
 	local amount = count or 1
 	ensureDailyQuests(player.UserId)
 	local data = cache[player.UserId]
@@ -112,6 +117,9 @@ function QuestService.recordProgress(player: Player, objective: QuestConfig.Ques
 		end
 		local tmpl = findTemplate(q.questId)
 		if not tmpl or tmpl.objective ~= objective then
+			continue
+		end
+		if objective == "visit_zone" and tmpl.targetZoneId and tmpl.targetZoneId ~= zoneId then
 			continue
 		end
 

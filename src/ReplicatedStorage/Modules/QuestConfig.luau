@@ -19,6 +19,7 @@ export type QuestTemplate = {
 	descTH: string,
 	objective: QuestObjective,
 	targetCount: number,
+	targetZoneId: string?,
 	reward: QuestReward,
 }
 
@@ -63,6 +64,7 @@ QuestConfig.Templates = {
 		descTH = "ไปที่ Marina District",
 		objective = "visit_zone",
 		targetCount = 1,
+		targetZoneId = "marina",
 		reward = { rewardType = "xp", amount = 200 },
 	},
 	{

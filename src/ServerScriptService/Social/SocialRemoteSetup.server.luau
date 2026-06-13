@@ -139,6 +139,7 @@ ensure("RemoteFunction", "GetDailyQuests")
 ensure("RemoteFunction", "ClaimQuestReward")
 ensure("RemoteEvent", "QuestUpdate")
 ensure("RemoteEvent", "QuestCompleted")
+ensure("RemoteEvent", "ZoneVisited")
 ensure("RemoteEvent", "ItemDropped")
 
 -- Crafting (Grandeur Upgrade)
