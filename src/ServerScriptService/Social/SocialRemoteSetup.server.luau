@@ -35,4 +35,15 @@ ensure("RemoteFunction", "PartyChatSend") -- (message) -> ok,msg
 ensure("RemoteEvent", "PartyInviteReceived") -- server->client
 ensure("RemoteEvent", "PartyStateChanged") -- server->client
 ensure("RemoteEvent", "PartyChatReceived") -- server->client
--- (Clan remotes — เพิ่มภายหลัง)
+-- Guild / Clan
+ensure("RemoteFunction", "GuildCreate") -- (name) -> ok,msg
+ensure("RemoteEvent", "GuildDisband") -- ()
+ensure("RemoteFunction", "GuildInviteSend") -- (targetName) -> ok,msg
+ensure("RemoteFunction", "GuildAccept") -- () -> ok,msg
+ensure("RemoteEvent", "GuildDecline") -- ()
+ensure("RemoteEvent", "GuildLeave") -- ()
+ensure("RemoteEvent", "GuildKick") -- (targetUserId)
+ensure("RemoteFunction", "GuildSetRank") -- (targetUserId, rank) -> ok,msg
+ensure("RemoteFunction", "GuildGet") -- () -> publicState?
+ensure("RemoteEvent", "GuildInviteReceived") -- server->client
+ensure("RemoteEvent", "GuildStateChanged") -- server->client
