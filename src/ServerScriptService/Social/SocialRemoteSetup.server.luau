@@ -112,3 +112,7 @@ ensure("RemoteFunction", "GetBountyOn")
 ensure("RemoteEvent", "SkyTreasureAnnounce")
 ensure("RemoteEvent", "SkyTreasureClaimed")
 ensure("RemoteFunction", "ClaimChest")
+
+-- P7 Visible Power (tier aura/glow)
+ensure("RemoteEvent", "TierChanged")
+ensure("RemoteEvent", "PlayerTierBroadcast")

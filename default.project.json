@@ -362,6 +362,15 @@
         },
         "WeightService": {
           "$path": "src/ServerScriptService/Progression/WeightService.luau"
+        },
+        "PlayerLevelService": {
+          "$path": "src/ServerScriptService/Progression/PlayerLevelService.luau"
+        },
+        "VisiblePowerService": {
+          "$path": "src/ServerScriptService/Progression/VisiblePowerService.luau"
+        },
+        "VisiblePowerHandlers": {
+          "$path": "src/ServerScriptService/Progression/VisiblePowerHandlers.server.luau"
         }
       },
       "Dungeon": {
