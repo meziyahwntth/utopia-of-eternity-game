@@ -68,6 +68,12 @@
         },
         "CombatHandlers": {
           "$path": "src/ServerScriptService/Combat/CombatHandlers.server.luau"
+        },
+        "MvpBossService": {
+          "$path": "src/ServerScriptService/Combat/MvpBossService.luau"
+        },
+        "MvpBossHandlers": {
+          "$path": "src/ServerScriptService/Combat/MvpBossHandlers.server.luau"
         }
       },
       "ClanWar": {

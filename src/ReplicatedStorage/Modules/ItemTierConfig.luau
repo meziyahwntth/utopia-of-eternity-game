@@ -102,6 +102,24 @@ ItemTierConfig.Items = {
 		weaponType = "None",
 		tradeable = true,
 	},
+	GrailFragment = {
+		id = "GrailFragment",
+		name = "เศษจอกศักดิ์สิทธิ์",
+		requiredLevel = 40,
+		grandeurRank = 3,
+		weight = 0.5,
+		weaponType = "None",
+		tradeable = false,
+	},
+	EternityGrail = {
+		id = "EternityGrail",
+		name = "จอกนิรันดร์",
+		requiredLevel = 80,
+		grandeurRank = 5,
+		weight = 1,
+		weaponType = "None",
+		tradeable = false,
+	},
 } :: { [string]: ItemDef }
 
 function ItemTierConfig.get(itemId: string): ItemDef?
