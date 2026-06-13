@@ -98,3 +98,12 @@ ensure("RemoteEvent", "TerritoryUpdate")
 ensure("RemoteFunction", "ClaimDividend")
 ensure("RemoteFunction", "SetTaxRate")
 ensure("RemoteFunction", "GetTerritoryStatus")
+
+-- P5+ Mercenary & Bounty
+ensure("RemoteFunction", "PostEscort")
+ensure("RemoteFunction", "AcceptEscort")
+ensure("RemoteFunction", "CompleteEscort")
+ensure("RemoteFunction", "GetEscortJobs")
+ensure("RemoteFunction", "PostBounty")
+ensure("RemoteFunction", "GetBounties")
+ensure("RemoteFunction", "GetBountyOn")

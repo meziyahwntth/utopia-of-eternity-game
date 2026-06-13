@@ -85,6 +85,18 @@
           "$path": "src/ServerScriptService/ClanWar/ClanWarHandlers.server.luau"
         }
       },
+      "Mercenary": {
+        "$className": "Folder",
+        "MercenaryService": {
+          "$path": "src/ServerScriptService/Mercenary/MercenaryService.luau"
+        },
+        "BountyService": {
+          "$path": "src/ServerScriptService/Mercenary/BountyService.luau"
+        },
+        "MercenaryHandlers": {
+          "$path": "src/ServerScriptService/Mercenary/MercenaryHandlers.server.luau"
+        }
+      },
       "HubGreyboxBuilder": {
         "$path": "src/ServerScriptService/HubGreyboxBuilder.luau"
       },
