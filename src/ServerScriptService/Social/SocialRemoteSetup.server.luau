@@ -107,3 +107,8 @@ ensure("RemoteFunction", "GetEscortJobs")
 ensure("RemoteFunction", "PostBounty")
 ensure("RemoteFunction", "GetBounties")
 ensure("RemoteFunction", "GetBountyOn")
+
+-- P6 Sky Treasure Live-Ops
+ensure("RemoteEvent", "SkyTreasureAnnounce")
+ensure("RemoteEvent", "SkyTreasureClaimed")
+ensure("RemoteFunction", "ClaimChest")

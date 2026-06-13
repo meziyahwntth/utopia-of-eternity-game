@@ -159,6 +159,7 @@ function CombatService.processAttack(player: Player, npcId: any, skillId: any): 
 	end
 	local damage = math.floor(rawDamage + 0.5)
 	hum:TakeDamage(damage)
+	hum:SetAttribute("LastAttackerUserId", player.UserId)
 
 	return {
 		ok = true,

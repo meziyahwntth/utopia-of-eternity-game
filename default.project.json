@@ -97,6 +97,15 @@
           "$path": "src/ServerScriptService/Mercenary/MercenaryHandlers.server.luau"
         }
       },
+      "LiveOps": {
+        "$className": "Folder",
+        "SkyTreasureService": {
+          "$path": "src/ServerScriptService/LiveOps/SkyTreasureService.luau"
+        },
+        "SkyTreasureHandlers": {
+          "$path": "src/ServerScriptService/LiveOps/SkyTreasureHandlers.server.luau"
+        }
+      },
       "HubGreyboxBuilder": {
         "$path": "src/ServerScriptService/HubGreyboxBuilder.luau"
       },
@@ -290,6 +299,9 @@
         },
         "TradingHandlers": {
           "$path": "src/ServerScriptService/Commerce/TradingHandlers.server.luau"
+        },
+        "CurrencyService": {
+          "$path": "src/ServerScriptService/Commerce/CurrencyService.luau"
         }
       },
       "Face": {
