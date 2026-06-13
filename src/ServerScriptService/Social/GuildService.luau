@@ -116,6 +116,14 @@ function GuildService.getPlayerGuild(player: Player): GuildData?
 	return loadGuild(gid)
 end
 
+function GuildService.getById(id: string): GuildData?
+	return loadGuild(id)
+end
+
+function GuildService.getByPlayer(player: Player): GuildData?
+	return GuildService.getPlayerGuild(player)
+end
+
 local function rankOf(g: GuildData, userId: number): string?
 	return g.members[tostring(userId)]
 end

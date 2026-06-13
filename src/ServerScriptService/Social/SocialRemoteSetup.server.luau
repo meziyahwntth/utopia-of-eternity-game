@@ -89,3 +89,12 @@ ensure("RemoteFunction", "BlockPlayer")         -- (targetUserId) -> ok,msg
 ensure("RemoteFunction", "UnblockPlayer")       -- (targetUserId) -> ok,msg
 ensure("RemoteFunction", "InteractionPartyInvite") -- (targetName) -> ok,msg
 ensure("RemoteFunction", "InteractionClanInvite")  -- (targetName) -> ok,msg
+
+-- P5 Clan War
+ensure("RemoteFunction", "WarRegister")
+ensure("RemoteEvent", "WarStarted")
+ensure("RemoteEvent", "WarResult")
+ensure("RemoteEvent", "TerritoryUpdate")
+ensure("RemoteFunction", "ClaimDividend")
+ensure("RemoteFunction", "SetTaxRate")
+ensure("RemoteFunction", "GetTerritoryStatus")

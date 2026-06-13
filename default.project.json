@@ -64,6 +64,27 @@
           "$path": "src/ServerScriptService/Combat/CombatHandlers.server.luau"
         }
       },
+      "ClanWar": {
+        "$className": "Folder",
+        "TerritoryStore": {
+          "$path": "src/ServerScriptService/ClanWar/TerritoryStore.luau"
+        },
+        "ClanVaultStore": {
+          "$path": "src/ServerScriptService/ClanWar/ClanVaultStore.luau"
+        },
+        "TaxDistributionService": {
+          "$path": "src/ServerScriptService/ClanWar/TaxDistributionService.luau"
+        },
+        "DefensiveFatigueService": {
+          "$path": "src/ServerScriptService/ClanWar/DefensiveFatigueService.luau"
+        },
+        "ClanWarService": {
+          "$path": "src/ServerScriptService/ClanWar/ClanWarService.luau"
+        },
+        "ClanWarHandlers": {
+          "$path": "src/ServerScriptService/ClanWar/ClanWarHandlers.server.luau"
+        }
+      },
       "HubGreyboxBuilder": {
         "$path": "src/ServerScriptService/HubGreyboxBuilder.luau"
       },
