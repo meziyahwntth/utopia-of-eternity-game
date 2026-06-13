@@ -413,6 +413,21 @@
         },
         "CraftingHandlers": {
           "$path": "src/ServerScriptService/Progression/CraftingHandlers.server.luau"
+        },
+        "CardStore": {
+          "$path": "src/ServerScriptService/Progression/CardStore.luau"
+        },
+        "FusionService": {
+          "$path": "src/ServerScriptService/Progression/FusionService.luau"
+        },
+        "CardService": {
+          "$path": "src/ServerScriptService/Progression/CardService.luau"
+        },
+        "FusionHandlers": {
+          "$path": "src/ServerScriptService/Progression/FusionHandlers.server.luau"
+        },
+        "CardHandlers": {
+          "$path": "src/ServerScriptService/Progression/CardHandlers.server.luau"
         }
       },
       "Dungeon": {

@@ -73,6 +73,9 @@ NpcDropConfig.Profiles = {
 			{ dropType = "pet", itemId = "slime_blue", petId = "slime_blue", minQty = 1, maxQty = 1, chance = 0.10 },
 			{ dropType = "pet", itemId = "fox_fire", petId = "fox_fire", minQty = 1, maxQty = 1, chance = 0.04 },
 			{ dropType = "pet", itemId = "dragon_mini", petId = "dragon_mini", minQty = 1, maxQty = 1, chance = 0.01 },
+			{ dropType = "item", itemId = "CardCommon", petId = nil, minQty = 1, maxQty = 1, chance = 0.15 },
+			{ dropType = "item", itemId = "CardRare", petId = nil, minQty = 1, maxQty = 1, chance = 0.05 },
+			{ dropType = "item", itemId = "CardLegendary", petId = nil, minQty = 1, maxQty = 1, chance = 0.01 },
 		},
 	},
 } :: { [number]: NpcDropProfile }
