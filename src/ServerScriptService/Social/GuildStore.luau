@@ -17,16 +17,18 @@ export type GuildData = {
 	level: number,
 	reputation: number,
 	allianceId: string?,
+	allianceSpeakers: { [string]: boolean }?, -- userId -> canSpeakInAlliance (นอกจาก Leader)
 	createdAt: number,
 }
 
+-- DataStore v2 (schema เปลี่ยน: เพิ่ม allianceSpeakers)
 local guildStore: GlobalDataStore? = nil
 local memberStore: GlobalDataStore? = nil
 pcall(function()
-	guildStore = DataStoreService:GetDataStore("UtopiaGuilds_v1")
+	guildStore = DataStoreService:GetDataStore("UtopiaGuilds_v2")
 end)
 pcall(function()
-	memberStore = DataStoreService:GetDataStore("UtopiaGuildMembers_v1")
+	memberStore = DataStoreService:GetDataStore("UtopiaGuildMembers_v2")
 end)
 if guildStore == nil or memberStore == nil then
 	warn("[Social] GuildStore DataStore unavailable (publish place to persist clans)")

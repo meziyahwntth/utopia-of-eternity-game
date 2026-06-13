@@ -1,5 +1,5 @@
 # MASTER BLUEPRINT — Utopia of Eternity
-**ฉบับรวมศูนย์ (Single Source of Truth)** · อัปเดต 12 มิ.ย. 2026
+**ฉบับรวมศูนย์ (Single Source of Truth)** · อัปเดต 13 มิ.ย. 2026
 **รวม:** ความต้องการของ Praphan + ระบบเด่นจาก MMO ตำนาน (Lineage II / Ragnarok) + เกม Roblox ท็อป
 **เอกสารลูก (รายละเอียด):** `BLUEPRINT-V2-WORLD-PROGRESSION.md` · `GDD-SOCIAL-VOICE.md` · `GDD-SHOP-RENTAL-COMMERCE.md` · `RESEARCH-CLASSIC-MMO-SYSTEMS.md` · `RESEARCH-ROBLOX-TOP-GAMES.md`
 
@@ -14,6 +14,7 @@
 3. **เศรษฐกิจผู้เล่น (Player Economy):** ร้านเช่า · **เทรด P2P** · item tier+grandeur · **card/rune** · เหรียญนำโชค · **แฟร์ ไม่ pay-to-win**
 4. **สังคม (Social):** ปาร์ตี้ · แคลน(progression+war) · เพื่อน/แจ้งเตือน · กระซิบ · **voice push-to-talk** · ตั้งค่าเสียง
 5. **อายุยืน (Live & Fair):** **Clan War ชิงเขต** · **MVP boss** · live-ops calendar · เทศกาลตามฤดู · กันบอท · 3 มุมกล้อง
+6. **📱 Mobile-First UX:** Radial Interaction Wheel · Auto-Battle toggle · thumb-zone HUD · scale-based UI · collapsible menus · target lock · follow system
 
 ## 3. 🔗 วงจรที่ทุกระบบผูกกัน (Core Interconnection)
 ```
@@ -67,7 +68,7 @@
 | Weight system (น้ำหนักเกิน -50%) | 🟡 | P |
 | Item gating ตาม level + เหรียญนำโชค | 🟡 | P |
 | กฎซื้อ Lv1-25 กุญแจ / Lv26+ กุญแจ+robux หรือ robux×5 | 🟡 | P |
-| **Trading P2P (กล่องเทรดปลอดภัย)** | 🟡 | R |
+| **Trading P2P (กล่องเทรดปลอดภัย) — Window-based, 2-step confirm, กันโกง** | 🟡 P4 | R+M |
 | **Collection + Fusion (ฟิวส์ซ้ำ→เรืองแสง)** | 🟡 | R |
 | **Card/Rune socket** (จากบอส, ปรับสเตต/อลังการ) | 🟡 | M |
 | **Fair monetization (no pay-to-win) เป็นนโยบาย** | 🟡 | M+R |
@@ -81,6 +82,10 @@
 | **Guild/Clan + progression (level/reputation/perks/alliance/hall)** | 🟡 | P+M |
 | Voice push-to-talk (Audio API) + ปุ่มโทร | 🟡 | P |
 | Audio Settings (ปิดเพลง/SFX/แจ้งเตือน) | 🟡 | P |
+| **🆕 Radial Interaction Wheel (มือถือ)** — จิ้มตัวละคร→วงล้อไอคอน (Trade/Whisper/Party/Clan/Follow) | 🟡 P3-C+ | M(RO) |
+| **🆕 Follow System** — `PathfindingService` วิ่งตามเป้าหมายอัตโนมัติ | 🔵 stub P3-C | M(RO) |
+| **🆕 In-game Report System** — ปุ่ม Report ตรงจากเมนูผู้เล่น | 🔵 stub P3-C | P |
+| **🆕 Custom Chat GUI** — 5 channel tabs + voice toggle (Lineage II style) | 🔵 P3-C | M(LW) |
 
 ### เสา 5 — Live & Fair
 | ระบบ | สถานะ | ที่มา |
@@ -91,6 +96,9 @@
 | เทศกาลตามฤดู (LoyKrathong) + Fashion Show + Festival | ✅ มี | P+R |
 | Daily Login Streak + codes | ✅ มี streak | R |
 | กันบอท/AFK farm เข้มงวด | ✅ P0 + 🟡 ขยาย | P |
+| **🆕 Player Action Log (Anti-Bot DB)** — บันทึก chat/trade/item ลง DataStore เพื่อ audit | 🟡 P6 | P |
+| **🆕 Auto-Battle / Auto-Skill Toggle** — client loop + server validate (Lineage W style) | 🟡 P3-C+ | M(LW) |
+| **🆕 Target Lock System** — จิ้ม/คลิก → Highlight + BillboardGui + Lock toggle | 🟡 P3-C+ | M(LW) |
 | **Olympiad-style Arena (ผูก Hero tier)** | 🟡 | M |
 | Pet/Companion (ต่อยอด Mount) · emote · คู่/สหาย | 🟡 | M+R |
 | Visible power (aura/glow ตาม tier) | 🟡 | R |
@@ -186,4 +194,56 @@
 > P5 Endgame เพิ่ม: **Eternal Colosseum (แมพ PvP)** + Clan War + MVP Boss + Arena ranked
 > ลำดับ: P3-A สังคมหลัก → P3-B แคลน(+alliance) → P3-C voice → P4 เศรษฐกิจ(trade/fusion/card) → **P5 PvP Arena + Clan War + MVP boss** → P6 กันบอท → P7 กล้อง/visible power → P8 live-ops
 
-*จบ Master Blueprint — พร้อมลุย P3-A*
+
+---
+
+## 10. 📱 Mobile-First Design Mandates (เพิ่ม 13 มิ.ย. 2026)
+> ที่มา: วิเคราะห์จาก Lineage W + Ragnarok Mobile + Roblox Mobile standard
+
+### Feature Requirements Matrix
+| ระบบ | แรงบันดาลใจ | Requirement บังคับ |
+|------|-----------|-----------------|
+| **Targeting System** | Lineage W | Auto-Lock: จิ้ม NPC/ผู้เล่น → Highlight + BillboardGui · ปุ่ม Lock/Unlock toggle |
+| **Radial Interaction Wheel** | Ragnarok Mobile | จิ้มตัวละคร → วงล้อไอคอน (Trade · Whisper · Party · Clan · Follow) รอบตัวละครนั้น · เหมาะนิ้วโป้ง |
+| **Follow System** | Ragnarok Mobile | `Humanoid:MoveTo()` / `PathfindingService` วิ่งตาม target · ใช้ในปาร์ตี้ + social train |
+| **Auto-Battle Toggle** | Lineage W | ปุ่ม toggle มุมซ้ายล่าง · client loop หาศัตรูใกล้สุด → lock → auto attack/skill off-cooldown · server validate |
+| **Custom Chat GUI** | Lineage W | 5 channel tabs + mic toggle · ✅ P3-C done |
+| **Trade Window** | MMORPG standard | GUI 2 ฝ่าย · ขั้นตอน: เสนอ → ล็อค → ยืนยัน 2 ฝ่าย → execute · server-authoritative |
+| **HUD Layout** | Mobile Standard | Bottom-right: Attack/Skill/Jump (ใหญ่สำหรับนิ้วโป้ง) · Bottom/Top-left: Bag/Chat/Auto-battle · ทุก element ใช้ Scale ไม่ใช่ Offset · UIAspectRatioConstraint |
+| **Collapsible UI** | Mobile Standard | Chat/menu ซ่อนอัตโนมัติระหว่างต่อสู้ · กด toggle แสดงอีกครั้ง · ไม่บดบัง viewport |
+| **Player Log / Anti-Bot** | Admin system | บันทึก action log (chat/trade/item move) ลง DataStore · ตรวจ pattern บอท/ฟาร์มไก่ · ban ได้ทันที |
+| **In-game Report** | Admin system | ปุ่ม Report ใน context menu ผู้เล่น → เก็บ log + แจ้ง admin channel |
+
+### กฎ Developer (บังคับ)
+1. **Touch Zone:** ปุ่มทุกอันใน Radial Menu และ HUD ต้องใหญ่พอสำหรับนิ้วโป้ง (≥44×44 pixel ที่ 360p)
+2. **Scale-only UI:** ห้ามใช้ Offset บน component หลัก — ใช้ Scale + UIAspectRatioConstraint เท่านั้น
+3. **Auto-hide logic:** Chat/Radial Menu ต้องมี timer auto-hide (≤5 วินาที หลังไม่ interract)
+4. **Server-authoritative Auto-Battle:** client ส่ง intent → server ยืนยันก่อนทุก action (กันบอท exploit)
+5. **Radial Menu แทน List:** เลิกใช้ list-based interaction menu → ใช้ Radial Wheel (P3-C InteractionClient มี stub แล้ว — ต้องอัปเกรดเป็น radial)
+
+### HUD Zone Map (มือถือแนวตั้ง)
+```
+┌─────────────────────────────────┐
+│ [มินิแผนที่]  [ชื่อ/HP/MP]  [🔔] │  ← TOP (ข้อมูล เข้าถึงนิ้วชี้)
+│                                 │
+│          [GAME WORLD]           │  ← กลางว่าง (ทัศนวิสัย)
+│                                 │
+│ [🎒][💬][⚔️Auto]              │  ← BOTTOM-LEFT (menu/toggle)
+│                   [Skill3][Sk4] │  ← BOTTOM-RIGHT TOP
+│                   [Skill1][⚔️] │  ← BOTTOM-RIGHT (โจมตีใหญ่)
+└─────────────────────────────────┘
+```
+
+### Roadmap Mobile Systems
+| Phase | ระบบ | Priority |
+|-------|------|---------|
+| P3-C+ | Radial Interaction Wheel อัปเกรดจาก context menu | HIGH |
+| P3-C+ | Target Lock System + Highlight + BillboardGui | HIGH |
+| P3-C+ | Auto-Battle Toggle (client loop + server validate) | HIGH |
+| P4 | Trade Window 2-step + Player Log | HIGH |
+| P4+ | HUD refactor ทั้งหมด → Scale-based + thumb zones | MEDIUM |
+| P6 | Player Action Log DataStore + Anti-Bot pattern detection | HIGH |
+
+---
+
+*จบ Master Blueprint — อัปเดต 13 มิ.ย. 2026 (Mobile-First)*

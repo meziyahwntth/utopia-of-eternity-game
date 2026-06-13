@@ -322,4 +322,17 @@ function PartyService.init()
 	end)
 end
 
+
+-- P3-C: exported helper สำหรับ ChatService
+function PartyService.getPartyMembers(player: Player): { Player }
+	local party = getParty(player.UserId)
+	if not party then return {} end
+	local result: { Player } = {}
+	for _, uid in party.members do
+		local p = Players:GetPlayerByUserId(uid)
+		if p then table.insert(result, p) end
+	end
+	return result
+end
+
 return PartyService

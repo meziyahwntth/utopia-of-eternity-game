@@ -12,28 +12,21 @@
 ]]
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TextChatService = game:GetService("TextChatService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 local remotes = ReplicatedStorage:WaitForChild("SocialRemotes")
-local guildCreate        = remotes:WaitForChild("GuildCreate")        :: RemoteFunction
-local guildInviteSend    = remotes:WaitForChild("GuildInviteSend")    :: RemoteFunction
 local guildAccept        = remotes:WaitForChild("GuildAccept")        :: RemoteFunction
 local guildDecline       = remotes:WaitForChild("GuildDecline")       :: RemoteEvent
-local guildLeave         = remotes:WaitForChild("GuildLeave")         :: RemoteEvent
 local guildGet           = remotes:WaitForChild("GuildGet")           :: RemoteFunction
 local guildInviteReceived = remotes:WaitForChild("GuildInviteReceived") :: RemoteEvent
 local guildStateChanged  = remotes:WaitForChild("GuildStateChanged")  :: RemoteEvent
--- chunk2
-local guildChatSend      = remotes:WaitForChild("GuildChatSend")         :: RemoteFunction
+-- chunk2 (slash commands moved to ChatClient)
 local guildChatReceived  = remotes:WaitForChild("GuildChatReceived")     :: RemoteEvent
 local guildMemberJoined  = remotes:WaitForChild("GuildMemberJoined")     :: RemoteEvent
-local allianceCreate     = remotes:WaitForChild("AllianceCreate")        :: RemoteFunction
 local allianceAccept     = remotes:WaitForChild("AllianceAccept")        :: RemoteFunction
 local allianceDecline    = remotes:WaitForChild("AllianceDecline")       :: RemoteEvent
-local allianceLeave      = remotes:WaitForChild("AllianceLeave")         :: RemoteEvent
 local allianceInviteReceived = remotes:WaitForChild("AllianceInviteReceived") :: RemoteEvent
 
 -- state ฝั่ง client
@@ -43,13 +36,7 @@ local _currentGuild: { [string]: any }? = nil
 -- systemMsg helper (เหมือน PartyClient)
 ----------------------------------------------------------------
 local function systemMsg(text: string)
-	pcall(function()
-		local channels = TextChatService:FindFirstChild("TextChannels")
-		local general = channels and channels:FindFirstChild("RBXGeneral")
-		if general and general:IsA("TextChannel") then
-			general:DisplaySystemMessage(text)
-		end
-	end)
+	warn("[SocialClient] " .. text)  -- P3-C: ChatClient แสดงผลแล้วผ่าน ChatReceive
 end
 
 ----------------------------------------------------------------
@@ -271,65 +258,12 @@ local function showInvitePopup(data: any)
 end
 
 ----------------------------------------------------------------
--- Slash Commands
+-- Slash Commands ย้ายไป ChatClient (P3-C)
+-- /clancreate /claninvite /clanleave /clan /g /allianceinvite /allianceleave
 ----------------------------------------------------------------
-local function makeCmd(cmdName: string, primary: string, secondary: string?): TextChatCommand
-	local cmd = Instance.new("TextChatCommand")
-	cmd.Name = cmdName
-	cmd.PrimaryAlias = primary
-	if secondary then
-		cmd.SecondaryAlias = secondary
-	end
-	cmd.Parent = TextChatService
-	return cmd
-end
 
--- /clancreate <ชื่อ>
-local createCmd = makeCmd("ClanCreateCommand", "/clancreate", nil)
-createCmd.Triggered:Connect(function(_o, text)
-	local name = string.match(string.gsub(text, "^/%S+%s*", ""), "^(.+)$")
-	if not name or string.gsub(name, "%s", "") == "" then
-		systemMsg("[แคลน] ใช้: /clancreate <ชื่อแคลน>")
-		return
-	end
-	name = string.gsub(name, "^%s+", "")
-	name = string.gsub(name, "%s+$", "")
-	local _ok, msg = guildCreate:InvokeServer(name)
-	systemMsg("[แคลน] " .. tostring(msg))
-end)
-
--- /claninvite <ชื่อ>
-local inviteCmd = makeCmd("ClanInviteCommand", "/claninvite", nil)
-inviteCmd.Triggered:Connect(function(_o, text)
-	local name = string.match(string.gsub(text, "^/%S+%s*", ""), "^(%S+)")
-	if not name then
-		systemMsg("[แคลน] ใช้: /claninvite <ชื่อผู้เล่น>")
-		return
-	end
-	local _ok, msg = guildInviteSend:InvokeServer(name)
-	systemMsg("[แคลน] " .. tostring(msg))
-end)
-
--- /clanleave
-local leaveCmd = makeCmd("ClanLeaveCommand", "/clanleave", nil)
-leaveCmd.Triggered:Connect(function()
-	guildLeave:FireServer()
-	systemMsg("[แคลน] ออกจากแคลนแล้ว")
-end)
-
--- /clan → toggle panel
-local panelCmd = makeCmd("ClanPanelCommand", "/clan", nil)
-panelCmd.Triggered:Connect(function()
-	if not panel.Visible then
-		-- โหลดข้อมูลใหม่จาก server ก่อนเปิด
-		local state = guildGet:InvokeServer()
-		_currentGuild = state
-		rebuildPanel(state)
-		panel.Visible = true
-	else
-		panel.Visible = false
-	end
-end)
+-- /clan → toggle panel ยังเปิดจาก ChatClient ผ่านเหตุการณ์ BindableEvent หรือ UserInputService
+-- panel toggle function (เรียกจาก ChatClient ไม่ได้โดยตรง — ใช้ keyboard shortcut หรือ HUD button)
 
 ----------------------------------------------------------------
 -- Remote Listeners
@@ -355,38 +289,8 @@ guildStateChanged.OnClientEvent:Connect(function(state: any)
 end)
 
 ----------------------------------------------------------------
--- chunk2: Slash Commands — Clan Chat + Alliance
+-- chunk2: Slash Commands ย้ายไป ChatClient (P3-C)
 ----------------------------------------------------------------
-
--- /g <ข้อความ>
-local gCmd = makeCmd("ClanChatCommand", "/g", nil)
-gCmd.Triggered:Connect(function(_o, text)
-	local msg = string.gsub(text, "^/%S+%s*", "")
-	if msg == "" then return end
-	local ok, m = guildChatSend:InvokeServer(msg)
-	if not ok then
-		systemMsg("[ระบบ] " .. tostring(m))
-	end
-end)
-
--- /allianceinvite <ชื่อแคลน>
-local aInviteCmd = makeCmd("AllianceInviteCommand", "/allianceinvite", nil)
-aInviteCmd.Triggered:Connect(function(_o, text)
-	local name = string.match(string.gsub(text, "^/%S+%s*", ""), "^(.-)%s*$")
-	if not name or name == "" then
-		systemMsg("[พันธมิตร] ใช้: /allianceinvite <ชื่อแคลน>")
-		return
-	end
-	local _ok, msg = allianceCreate:InvokeServer(name)
-	systemMsg("[พันธมิตร] " .. tostring(msg))
-end)
-
--- /allianceleave
-local aLeaveCmd = makeCmd("AllianceLeaveCommand", "/allianceleave", nil)
-aLeaveCmd.Triggered:Connect(function()
-	allianceLeave:FireServer()
-	systemMsg("[พันธมิตร] ออกจากพันธมิตรแล้ว")
-end)
 
 ----------------------------------------------------------------
 -- Alliance Invite Popup

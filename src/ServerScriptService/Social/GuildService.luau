@@ -148,6 +148,7 @@ function GuildService.create(player: Player, name: any): (boolean, string)
 		level = 1,
 		reputation = 0,
 		allianceId = nil,
+		allianceSpeakers = {},
 		createdAt = os.time(),
 	}
 	GuildStore.setPlayerGuildId(player.UserId, g.id)
@@ -521,6 +522,84 @@ function GuildService.allianceLeave(leader: Player): (boolean, string)
 	return true, "ออกจากพันธมิตรแล้ว"
 end
 
+
+----------------------------------------------------------------
+-- P3-C: Alliance Chat permission + broadcast
+----------------------------------------------------------------
+function GuildService.isAllianceSpeaker(g: GuildData, userId: number): boolean
+	local rank = rankOf(g, userId)
+	if rank == "Leader" then return true end
+	local speakers = g.allianceSpeakers
+	if speakers == nil then return false end
+	return speakers[tostring(userId)] == true
+end
+
+function GuildService.setAlliancePermission(leader: Player, targetUserId: any, canSpeak: any): (boolean, string)
+	if typeof(targetUserId) ~= "number" or typeof(canSpeak) ~= "boolean" then
+		return false, "ข้อมูลไม่ถูกต้อง"
+	end
+	local g = GuildService.getPlayerGuild(leader)
+	if not g or g.leaderId ~= leader.UserId then
+		return false, "เฉพาะหัวหน้าแคลนตั้งสิทธิ์ได้"
+	end
+	if not g.members[tostring(targetUserId)] then
+		return false, "ไม่ใช่สมาชิกแคลน"
+	end
+	if g.allianceSpeakers == nil then
+		g.allianceSpeakers = {}
+	end
+	local speakers = g.allianceSpeakers :: { [string]: boolean }
+	speakers[tostring(targetUserId)] = canSpeak
+	persist(g)
+	return true, if canSpeak then "เปิดสิทธิ์แชทพันธมิตรแล้ว" else "ปิดสิทธิ์แชทพันธมิตรแล้ว"
+end
+
+local function broadcastAllianceChat(srcGuildId: string, allianceId: string, fromName: string, message: string)
+	local ev = remotesFolder():FindFirstChild("AllianceChatReceived")
+	if not ev or not ev:IsA("RemoteEvent") then return end
+	local payload = { allianceId = allianceId, guildId = srcGuildId, fromName = fromName, message = message }
+	for _, g in cache do
+		if g.allianceId == allianceId then
+			for uidStr in g.members do
+				local uid = tonumber(uidStr)
+				if uid then
+					local target = Players:GetPlayerByUserId(uid)
+					if target then
+						(ev :: RemoteEvent):FireClient(target, payload)
+					end
+				end
+			end
+		end
+	end
+end
+
+function GuildService.allianceChat(player: Player, message: any): (boolean, string)
+	if typeof(message) ~= "string" or string.gsub(message, "%s", "") == "" then
+		return false, "ข้อความว่าง"
+	end
+	if #message > 200 then return false, "ข้อความยาวเกินไป (สูงสุด 200)" end
+	local g = GuildService.getPlayerGuild(player)
+	if not g then return false, "คุณไม่ได้อยู่ในแคลน" end
+	if not g.allianceId or g.allianceId == "" then return false, "แคลนไม่ได้อยู่ในพันธมิตร" end
+	if not GuildService.isAllianceSpeaker(g, player.UserId) then
+		return false, "คุณไม่มีสิทธิ์แชทพันธมิตร (ขอสิทธิ์จากหัวหน้าแคลน)"
+	end
+	broadcastAllianceChat(g.id, g.allianceId, player.DisplayName, message)
+	task.spawn(function()
+		pcall(function()
+			MessagingService:PublishAsync(TOPIC, {
+				jobId = game.JobId,
+				action = "alliancechat",
+				guildId = g.id,
+				allianceId = g.allianceId,
+				fromName = player.DisplayName,
+				message = message,
+			})
+		end)
+	end)
+	return true, ""
+end
+
 function GuildService.init()
 	if subscribed then
 		return
@@ -570,6 +649,14 @@ function GuildService.init()
 							end
 						end
 					end
+				-- alliance chat cross-server
+				elseif data.action == "alliancechat" and typeof(data.allianceId) == "string" then
+					broadcastAllianceChat(
+						tostring(data.guildId),
+						tostring(data.allianceId),
+						tostring(data.fromName),
+						tostring(data.message)
+					)
 				end
 			end)
 		end)

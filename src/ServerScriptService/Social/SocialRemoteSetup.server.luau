@@ -58,3 +58,34 @@ ensure("RemoteEvent",   "AllianceDecline")       -- ()
 ensure("RemoteEvent",   "AllianceLeave")         -- ()
 ensure("RemoteEvent",   "AllianceInviteReceived") -- server->client: {fromClanName,fromLeaderName}
 ensure("RemoteEvent",   "AllianceStateChanged")  -- server->client: {allianceId,guildIds[]}
+
+-- P3-C: Alliance Chat + Custom Chat System + Voice
+ensure("RemoteFunction", "AllianceChatSend")      -- (message) -> ok,msg
+ensure("RemoteEvent",   "AllianceChatReceived")   -- server->client: {allianceId,guildId,fromName,message}
+ensure("RemoteEvent",   "AlliancePermSet")        -- server->client: confirm permission change
+ensure("RemoteFunction", "AlliancePermSetReq")    -- (targetUserId, canSpeak) -> ok,msg  [leader only]
+-- Custom Chat (P3-C) — server-authoritative route
+ensure("RemoteFunction", "ChatSend")              -- (channel, message, targetName?) -> ok,msg
+ensure("RemoteEvent",   "ChatReceive")            -- server->client: {channel,fromName,message,timestamp}
+-- Admin (P3-C)
+ensure("RemoteFunction", "AdminCmd")              -- (cmd, ...args) -> ok,msg  [admin only]
+-- Voice (P3-C)
+ensure("RemoteEvent",   "VoiceToggleMute")        -- client->server: toggle own mute
+ensure("RemoteEvent",   "VoiceStateChanged")      -- server->client: {muted:bool}
+ensure("RemoteFunction", "VoiceCallRequest")      -- (targetUserId) -> ok,msg
+
+-- P3-C: Player Interaction Context Menu
+ensure("RemoteFunction", "DuelSend")            -- client->server: (targetUserId) -> ok,msg
+ensure("RemoteFunction", "DuelAccept")          -- client->server: (fromUserId) -> ok,msg
+ensure("RemoteEvent",   "DuelReceived")         -- server->client: {fromUserId,fromName}
+ensure("RemoteEvent",   "DuelStart")            -- server->client: {opponentUserId,opponentName}
+ensure("RemoteFunction", "TradeSend")           -- client->server: (targetUserId) -> ok,msg
+ensure("RemoteEvent",   "TradeReceived")        -- server->client: {fromUserId,fromName}
+ensure("RemoteFunction", "CarryRequest")        -- client->server: (targetUserId) -> ok,msg
+ensure("RemoteEvent",   "UncarryRequest")       -- client->server: uncarry self
+ensure("RemoteEvent",   "CarryStarted")         -- server->client: {targetUserId or carrierUserId}
+ensure("RemoteEvent",   "CarryEnded")           -- server->client: {}
+ensure("RemoteFunction", "BlockPlayer")         -- (targetUserId) -> ok,msg
+ensure("RemoteFunction", "UnblockPlayer")       -- (targetUserId) -> ok,msg
+ensure("RemoteFunction", "InteractionPartyInvite") -- (targetName) -> ok,msg
+ensure("RemoteFunction", "InteractionClanInvite")  -- (targetName) -> ok,msg

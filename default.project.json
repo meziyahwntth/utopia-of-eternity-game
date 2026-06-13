@@ -36,6 +36,15 @@
         "GuildService": {
           "$path": "src/ServerScriptService/Social/GuildService.luau"
         },
+        "ChatService": {
+          "$path": "src/ServerScriptService/Social/ChatService.server.luau"
+        },
+        "InteractionService": {
+          "$path": "src/ServerScriptService/Social/InteractionService.luau"
+        },
+        "InteractionHandlers": {
+          "$path": "src/ServerScriptService/Social/InteractionHandlers.server.luau"
+        },
         "SocialHandlers": {
           "$path": "src/ServerScriptService/Social/SocialHandlers.server.luau"
         }

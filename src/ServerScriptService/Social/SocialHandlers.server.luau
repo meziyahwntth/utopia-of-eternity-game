@@ -157,6 +157,20 @@ allianceLeave.OnServerEvent:Connect(function(player: Player)
 end)
 
 ----------------------------------------------------------------
+-- P3-C: Alliance Chat + Alliance Permission
+----------------------------------------------------------------
+local allianceChatSend  = remotes:WaitForChild("AllianceChatSend")    :: RemoteFunction
+local alliancePermSetReq = remotes:WaitForChild("AlliancePermSetReq") :: RemoteFunction
+
+allianceChatSend.OnServerInvoke = function(player: Player, message: any)
+	return GuildService.allianceChat(player, message)
+end
+
+alliancePermSetReq.OnServerInvoke = function(player: Player, targetUserId: any, canSpeak: any)
+	return GuildService.setAlliancePermission(player, targetUserId, canSpeak)
+end
+
+----------------------------------------------------------------
 -- Init all services
 ----------------------------------------------------------------
 WhisperService.init()

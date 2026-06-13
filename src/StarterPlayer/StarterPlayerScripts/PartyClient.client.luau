@@ -5,29 +5,19 @@
 ]]
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TextChatService = game:GetService("TextChatService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 local remotes = ReplicatedStorage:WaitForChild("SocialRemotes")
-local partyInviteSend = remotes:WaitForChild("PartyInviteSend") :: RemoteFunction
 local partyAccept = remotes:WaitForChild("PartyAccept") :: RemoteFunction
 local partyDecline = remotes:WaitForChild("PartyDecline") :: RemoteEvent
-local partyLeave = remotes:WaitForChild("PartyLeave") :: RemoteEvent
-local partyChatSend = remotes:WaitForChild("PartyChatSend") :: RemoteFunction
 local partyInviteReceived = remotes:WaitForChild("PartyInviteReceived") :: RemoteEvent
 local partyStateChanged = remotes:WaitForChild("PartyStateChanged") :: RemoteEvent
 local partyChatReceived = remotes:WaitForChild("PartyChatReceived") :: RemoteEvent
 
 local function systemMsg(text: string)
-	pcall(function()
-		local channels = TextChatService:FindFirstChild("TextChannels")
-		local general = channels and channels:FindFirstChild("RBXGeneral")
-		if general and general:IsA("TextChannel") then
-			general:DisplaySystemMessage(text)
-		end
-	end)
+	warn("[SocialClient] " .. text)  -- P3-C: ChatClient แสดงผลแล้วผ่าน ChatReceive
 end
 
 ----------------------------------------------------------------
@@ -159,48 +149,7 @@ local function showInvitePopup(invite: any)
 end
 
 ----------------------------------------------------------------
--- Slash commands
-----------------------------------------------------------------
-local function makeCommand(name: string, primary: string, secondary: string?)
-	local cmd = Instance.new("TextChatCommand")
-	cmd.Name = name
-	cmd.PrimaryAlias = primary
-	if secondary then
-		cmd.SecondaryAlias = secondary
-	end
-	cmd.Parent = TextChatService
-	return cmd
-end
-
-local inviteCmd = makeCommand("PartyInviteCommand", "/invite", "/inv")
-inviteCmd.Triggered:Connect(function(_o, text)
-	local name = string.match(string.gsub(text, "^/%S+%s*", ""), "^(%S+)")
-	if not name then
-		systemMsg("[ระบบ] ใช้: /invite <ชื่อ>")
-		return
-	end
-	local _ok, m = partyInviteSend:InvokeServer(name)
-	systemMsg("[ปาร์ตี้] " .. tostring(m))
-end)
-
-local pCmd = makeCommand("PartyChatCommand", "/p", nil)
-pCmd.Triggered:Connect(function(_o, text)
-	local msg = string.gsub(text, "^/%S+%s*", "")
-	if msg == "" then
-		return
-	end
-	local ok, m = partyChatSend:InvokeServer(msg)
-	if not ok then
-		systemMsg("[ระบบ] " .. tostring(m))
-	end
-end)
-
-local leaveCmd = makeCommand("PartyLeaveCommand", "/leave", nil)
-leaveCmd.Triggered:Connect(function()
-	partyLeave:FireServer()
-	systemMsg("[ปาร์ตี้] ออกจากปาร์ตี้แล้ว")
-end)
-
+-- Slash commands ย้ายไป ChatClient (P3-C) — ไม่ใช้ TextChatCommand อีก
 ----------------------------------------------------------------
 partyInviteReceived.OnClientEvent:Connect(showInvitePopup)
 partyStateChanged.OnClientEvent:Connect(rebuildList)
