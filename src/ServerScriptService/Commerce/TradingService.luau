@@ -9,6 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemTierConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("ItemTierConfig"))
 local PlayerItemStore = require(script.Parent.Parent:WaitForChild("Progression"):WaitForChild("PlayerItemStore"))
 local WeightService = require(script.Parent.Parent:WaitForChild("Progression"):WaitForChild("WeightService"))
+local CurrencyService = require(script.Parent:WaitForChild("CurrencyService"))
 
 local remotesFolder = ReplicatedStorage:WaitForChild("CommerceRemotes")
 
@@ -19,6 +20,7 @@ export type TradeOffer = { [string]: number }
 export type TradeSideState = {
 	userId: number,
 	offer: TradeOffer,
+	creditOffer: number,
 	locked: boolean,
 	confirmed: boolean,
 }
@@ -70,12 +72,14 @@ local function publish(session: TradeSession)
 			a = {
 				userId = session.a.userId,
 				offer = cloneOffer(session.a.offer),
+				creditOffer = session.a.creditOffer,
 				locked = session.a.locked,
 				confirmed = session.a.confirmed,
 			},
 			b = {
 				userId = session.b.userId,
 				offer = cloneOffer(session.b.offer),
+				creditOffer = session.b.creditOffer,
 				locked = session.b.locked,
 				confirmed = session.b.confirmed,
 			},
@@ -107,6 +111,19 @@ local function validateOffer(userId: number, offer: TradeOffer): (boolean, strin
 		if PlayerItemStore.getQty(userId, itemId) < qty then
 			return false, "insufficient_items"
 		end
+	end
+	return true, nil
+end
+
+local function validateCreditOffer(userId: number, amount: number): (boolean, string?)
+	if amount < 0 or math.floor(amount) ~= amount then
+		return false, "invalid_credits"
+	end
+	if amount == 0 then
+		return true, nil
+	end
+	if CurrencyService.getBalance(userId) < amount then
+		return false, "insufficient_credits"
 	end
 	return true, nil
 end
@@ -151,12 +168,14 @@ function TradingService.startSession(initiator: Player, partnerUserId: number): 
 		a = {
 			userId = initiator.UserId,
 			offer = {},
+			creditOffer = 0,
 			locked = false,
 			confirmed = false,
 		},
 		b = {
 			userId = partnerUserId,
 			offer = {},
+			creditOffer = 0,
 			locked = false,
 			confirmed = false,
 		},
@@ -192,6 +211,29 @@ function TradingService.updateOffer(player: Player, offer: TradeOffer): (boolean
 	return true, "ok"
 end
 
+function TradingService.updateCreditOffer(player: Player, amount: number): (boolean, string)
+	local session = TradingService.getSessionForUser(player.UserId)
+	if not session or session.state ~= "open" then
+		return false, "no_session"
+	end
+	local side = sideFor(session, player.UserId)
+	if not side or side.locked then
+		return false, "locked"
+	end
+	local ok, err = validateCreditOffer(player.UserId, amount)
+	if not ok then
+		return false, err or "invalid_credits"
+	end
+	side.creditOffer = amount
+	side.confirmed = false
+	local other = otherSide(session, player.UserId)
+	if other then
+		other.confirmed = false
+	end
+	publish(session)
+	return true, "ok"
+end
+
 function TradingService.lockOffer(player: Player): (boolean, string)
 	local session = TradingService.getSessionForUser(player.UserId)
 	if not session or session.state ~= "open" then
@@ -204,6 +246,10 @@ function TradingService.lockOffer(player: Player): (boolean, string)
 	local ok, err = validateOffer(player.UserId, side.offer)
 	if not ok then
 		return false, err or "invalid_offer"
+	end
+	local creditOk, creditErr = validateCreditOffer(player.UserId, side.creditOffer)
+	if not creditOk then
+		return false, creditErr or "invalid_credits"
 	end
 	side.locked = true
 	side.confirmed = false
@@ -256,6 +302,17 @@ function TradingService.execute(sessionId: string): (boolean, string)
 		return false, errB or "invalid_b"
 	end
 
+	local creditOkA, creditErrA = validateCreditOffer(session.a.userId, session.a.creditOffer)
+	if not creditOkA then
+		cancelSession(sessionId, creditErrA or "invalid_credits_a")
+		return false, creditErrA or "invalid_credits_a"
+	end
+	local creditOkB, creditErrB = validateCreditOffer(session.b.userId, session.b.creditOffer)
+	if not creditOkB then
+		cancelSession(sessionId, creditErrB or "invalid_credits_b")
+		return false, creditErrB or "invalid_credits_b"
+	end
+
 	for itemId, qty in session.a.offer do
 		if not PlayerItemStore.transfer(session.a.userId, session.b.userId, itemId, qty) then
 			cancelSession(sessionId, "transfer_failed_a")
@@ -267,6 +324,23 @@ function TradingService.execute(sessionId: string): (boolean, string)
 			cancelSession(sessionId, "transfer_failed_b")
 			return false, "transfer_failed"
 		end
+	end
+
+	if session.a.creditOffer > 0 then
+		local deducted, msg = CurrencyService.deductCredits(session.a.userId, session.a.creditOffer)
+		if not deducted then
+			cancelSession(sessionId, "credit_transfer_failed_a")
+			return false, "ยอด credits ไม่พอ: " .. msg
+		end
+		CurrencyService.addCredits(session.b.userId, session.a.creditOffer)
+	end
+	if session.b.creditOffer > 0 then
+		local deducted, msg = CurrencyService.deductCredits(session.b.userId, session.b.creditOffer)
+		if not deducted then
+			cancelSession(sessionId, "credit_transfer_failed_b")
+			return false, "ยอด credits ไม่พอ: " .. msg
+		end
+		CurrencyService.addCredits(session.a.userId, session.b.creditOffer)
 	end
 
 	session.state = "executed"

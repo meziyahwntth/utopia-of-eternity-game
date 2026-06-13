@@ -30,6 +30,13 @@ RF("TradeUpdateOffer").OnServerInvoke = function(player: Player, offer: any)
 	return TradingService.updateOffer(player, typed)
 end
 
+RF("TradeUpdateCreditOffer").OnServerInvoke = function(player: Player, amount: any)
+	if typeof(amount) ~= "number" then
+		return false, "invalid"
+	end
+	return TradingService.updateCreditOffer(player, amount)
+end
+
 RF("TradeLock").OnServerInvoke = function(player: Player)
 	return TradingService.lockOffer(player)
 end

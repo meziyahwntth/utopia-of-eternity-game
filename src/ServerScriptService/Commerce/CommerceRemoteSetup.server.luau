@@ -32,6 +32,7 @@ ensureRemote("RemoteEvent", "OpenShopPromoterDialog")
 -- P4 P2P Trading
 ensureRemote("RemoteFunction", "TradeAccept")
 ensureRemote("RemoteFunction", "TradeUpdateOffer")
+ensureRemote("RemoteFunction", "TradeUpdateCreditOffer")
 ensureRemote("RemoteFunction", "TradeLock")
 ensureRemote("RemoteFunction", "TradeConfirm")
 ensureRemote("RemoteFunction", "TradeCancel")

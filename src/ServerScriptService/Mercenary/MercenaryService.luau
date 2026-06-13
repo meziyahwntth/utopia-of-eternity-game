@@ -6,6 +6,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local MercenaryConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("MercenaryConfig"))
+local CurrencyService = require(script.Parent.Parent:WaitForChild("Commerce"):WaitForChild("CurrencyService"))
 
 export type EscortJobStatus = "open" | "active" | "done" | "cancelled"
 
@@ -136,6 +137,10 @@ function MercenaryService.completeEscort(client: Player, jobId: string): (boolea
 
 	job.status = "done"
 	jobs[jobId] = nil
+
+	if merc then
+		CurrencyService.addCredits(merc.UserId, job.pay)
+	end
 
 	return true, string.format("งานเสร็จ — โอน %d credits ให้ Mercenary", job.pay)
 end

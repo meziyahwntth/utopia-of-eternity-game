@@ -6,6 +6,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local MercenaryConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("MercenaryConfig"))
+local CurrencyService = require(script.Parent.Parent:WaitForChild("Commerce"):WaitForChild("CurrencyService"))
 
 export type Bounty = {
 	bountyId: string,
@@ -115,6 +116,7 @@ function BountyService.onTargetKilled(killerId: number, targetId: number)
 	end
 
 	if totalReward > 0 then
+		CurrencyService.addCredits(killerId, totalReward)
 		print(string.format("[Bounty] %s claimed %d credits on target %d", killer.Name, totalReward, targetId))
 	end
 end

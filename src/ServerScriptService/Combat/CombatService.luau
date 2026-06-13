@@ -99,6 +99,35 @@ local function checkRate(userId: number, attackSpeed: number): boolean
 	return true
 end
 
+local function markLastAttacker(targetModel: Model, attackerUserId: number)
+	local targetHumanoid = targetModel:FindFirstChildOfClass("Humanoid")
+	if targetHumanoid then
+		targetHumanoid:SetAttribute("LastAttackerUserId", attackerUserId)
+	end
+end
+
+local function applyDamage(targetModel: Model, attackerUserId: number, damage: number): Humanoid?
+	local hum = targetModel:FindFirstChildOfClass("Humanoid")
+	if not hum or hum.Health <= 0 then
+		return nil
+	end
+	hum:TakeDamage(damage)
+	markLastAttacker(targetModel, attackerUserId)
+	return hum
+end
+
+local function computeDamage(player: Player, skillId: string): number
+	local weaponTier: CombatConfig.WeaponTier = weaponTierFor(player)
+	local baseDamages: { [CombatConfig.WeaponTier]: number } = CombatConfig.BaseDamage
+	local base = baseDamages[weaponTier]
+	local rawDamage = base * skillMultiplier(skillId)
+	local combatMod = player:GetAttribute("OverweightCombatMultiplier")
+	if typeof(combatMod) == "number" and combatMod > 0 then
+		rawDamage *= combatMod
+	end
+	return math.floor(rawDamage + 0.5)
+end
+
 function CombatService.findNpc(npcId: number): Model?
 	return findNpc(npcId)
 end
@@ -128,7 +157,6 @@ function CombatService.processAttack(player: Player, npcId: any, skillId: any): 
 
 	local maxRanges: { [CombatConfig.WeaponType]: number } = CombatConfig.MaxRange
 	local attackSpeeds: { [CombatConfig.WeaponTier]: number } = CombatConfig.AttackSpeed
-	local baseDamages: { [CombatConfig.WeaponTier]: number } = CombatConfig.BaseDamage
 
 	local weaponType: CombatConfig.WeaponType = weaponTypeFor(player)
 	local weaponTier: CombatConfig.WeaponTier = weaponTierFor(player)
@@ -151,19 +179,67 @@ function CombatService.processAttack(player: Player, npcId: any, skillId: any): 
 		return { ok = false, reason = "blocked_los", npcId = npcId }
 	end
 
-	local base = baseDamages[weaponTier]
-	local rawDamage = base * skillMultiplier(skillId)
-	local combatMod = player:GetAttribute("OverweightCombatMultiplier")
-	if typeof(combatMod) == "number" and combatMod > 0 then
-		rawDamage *= combatMod
-	end
-	local damage = math.floor(rawDamage + 0.5)
-	hum:TakeDamage(damage)
-	hum:SetAttribute("LastAttackerUserId", player.UserId)
+	local damage = computeDamage(player, skillId)
+	applyDamage(npc, player.UserId, damage)
 
 	return {
 		ok = true,
 		npcId = npcId,
+		damage = damage,
+		hp = hum.Health,
+		maxHp = hum.MaxHealth,
+	}
+end
+
+function CombatService.processPlayerAttack(player: Player, targetUserId: any, skillId: any): AttackResult
+	if typeof(targetUserId) ~= "number" or typeof(skillId) ~= "string" then
+		return { ok = false, reason = "invalid_payload" }
+	end
+	if targetUserId == player.UserId then
+		return { ok = false, reason = "self_target" }
+	end
+
+	-- TODO: PvP zone check (Eternal Colosseum only)
+
+	local targetPlayer = Players:GetPlayerByUserId(targetUserId)
+	if not targetPlayer or not targetPlayer.Character then
+		return { ok = false, reason = "target_missing" }
+	end
+	local targetModel = targetPlayer.Character
+	local hum = targetModel:FindFirstChildOfClass("Humanoid")
+	if not hum or hum.Health <= 0 then
+		return { ok = false, reason = "target_dead" }
+	end
+
+	local playerRoot = getPlayerRoot(player)
+	local targetRoot = getPlayerRoot(targetModel)
+	if not playerRoot or not targetRoot then
+		return { ok = false, reason = "missing_root" }
+	end
+
+	local maxRanges: { [CombatConfig.WeaponType]: number } = CombatConfig.MaxRange
+	local attackSpeeds: { [CombatConfig.WeaponTier]: number } = CombatConfig.AttackSpeed
+	local weaponType: CombatConfig.WeaponType = weaponTypeFor(player)
+	local weaponTier: CombatConfig.WeaponTier = weaponTierFor(player)
+	local maxRange = maxRanges[weaponType]
+	local attackSpeed = attackSpeeds[weaponTier]
+
+	local dist = (playerRoot.Position - targetRoot.Position).Magnitude
+	if dist > maxRange then
+		return { ok = false, reason = "out_of_range" }
+	end
+	if not checkRate(player.UserId, attackSpeed) then
+		return { ok = false, reason = "rate_limit" }
+	end
+	if not hasLineOfSight(player, targetModel, playerRoot.Position, targetRoot.Position) then
+		return { ok = false, reason = "blocked_los" }
+	end
+
+	local damage = computeDamage(player, skillId)
+	applyDamage(targetModel, player.UserId, damage)
+
+	return {
+		ok = true,
 		damage = damage,
 		hp = hum.Health,
 		maxHp = hum.MaxHealth,
