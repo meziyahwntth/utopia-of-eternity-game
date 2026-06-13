@@ -10,12 +10,18 @@ local NpcDropConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForC
 local NpcDropService = {}
 
 export type DropResult = {
+	dropType: "item" | "pet",
 	itemId: string,
 	qty: number,
+	petId: string?,
 }
 
 local function getItemStore()
 	return require(ServerScriptService:WaitForChild("Progression"):WaitForChild("PlayerItemStore"))
+end
+
+local function getPetService()
+	return require(ServerScriptService:WaitForChild("Commerce"):WaitForChild("PetService"))
 end
 
 local function getProfile(npcId: number): NpcDropConfig.NpcDropProfile
@@ -32,8 +38,23 @@ function NpcDropService.rollDrops(npcId: number): { DropResult }
 
 	for _, entry in profile.dropTable do
 		if math.random() <= entry.chance then
-			local qty = math.random(entry.minQty, entry.maxQty)
-			table.insert(results, { itemId = entry.itemId, qty = qty })
+			local entryType = entry.dropType or "item"
+			if entryType == "pet" then
+				table.insert(results, {
+					dropType = "pet",
+					itemId = entry.petId or entry.itemId,
+					qty = 1,
+					petId = entry.petId,
+				})
+			else
+				local qty = math.random(entry.minQty, entry.maxQty)
+				table.insert(results, {
+					dropType = "item",
+					itemId = entry.itemId,
+					qty = qty,
+					petId = nil,
+				})
+			end
 		end
 	end
 
@@ -47,8 +68,17 @@ function NpcDropService.grantDrops(player: Player, npcId: number): { DropResult 
 	end
 
 	local itemStore = getItemStore()
+	local petService = getPetService()
+
 	for _, drop in drops do
-		itemStore.addItem(player.UserId, drop.itemId, drop.qty)
+		if drop.dropType == "pet" and drop.petId then
+			local ok, msg = petService.grantPet(player, drop.petId)
+			if not ok and msg ~= "มี pet นี้แล้ว" then
+				warn("[NpcDropService] grantPet failed:", msg)
+			end
+		else
+			itemStore.addItem(player.UserId, drop.itemId, drop.qty)
+		end
 	end
 
 	local remotes = ReplicatedStorage:FindFirstChild("SocialRemotes") :: Folder?

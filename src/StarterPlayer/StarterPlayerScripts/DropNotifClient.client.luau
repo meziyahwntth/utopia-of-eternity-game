@@ -7,8 +7,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 type DropResult = {
+	dropType: string?,
 	itemId: string,
 	qty: number,
+	petId: string?,
 }
 
 local localPlayer = Players.LocalPlayer
@@ -117,9 +119,16 @@ task.spawn(function()
 			return
 		end
 		for _, drop in drops :: { DropResult } do
-			local icon = itemIcons[drop.itemId] or "📦"
-			local color = itemColors[drop.itemId] or Color3.fromRGB(200, 200, 200)
-			spawnNotif(string.format("%s +%d %s", icon, drop.qty, drop.itemId), color)
+			if drop.dropType == "pet" then
+				spawnNotif(
+					"🐾 ได้รับสัตว์เลี้ยง: " .. (drop.petId or drop.itemId) .. "!",
+					Color3.fromRGB(255, 180, 255)
+				)
+			else
+				local icon = itemIcons[drop.itemId] or "📦"
+				local color = itemColors[drop.itemId] or Color3.fromRGB(200, 200, 200)
+				spawnNotif(string.format("%s +%d %s", icon, drop.qty, drop.itemId), color)
+			end
 		end
 	end)
 end)

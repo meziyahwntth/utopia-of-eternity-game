@@ -3,7 +3,9 @@
 	NpcDropConfig — drop table per CombatNpcId + base XP per profile
 ]]
 export type DropEntry = {
+	dropType: ("item" | "pet")?,
 	itemId: string,
+	petId: string?,
 	minQty: number,
 	maxQty: number,
 	chance: number,
@@ -36,6 +38,7 @@ NpcDropConfig.Profiles = {
 			{ itemId = "StoneFragment", minQty = 2, maxQty = 5, chance = 0.65 },
 			{ itemId = "IronOre", minQty = 1, maxQty = 2, chance = 0.30 },
 			{ itemId = "MagicCrystal", minQty = 1, maxQty = 1, chance = 0.05 },
+			{ dropType = "pet", itemId = "slime_blue", petId = "slime_blue", minQty = 1, maxQty = 1, chance = 0.02 },
 		},
 	},
 	[3] = {
@@ -46,6 +49,7 @@ NpcDropConfig.Profiles = {
 			{ itemId = "StoneFragment", minQty = 3, maxQty = 8, chance = 0.60 },
 			{ itemId = "IronOre", minQty = 2, maxQty = 4, chance = 0.40 },
 			{ itemId = "MagicCrystal", minQty = 1, maxQty = 2, chance = 0.10 },
+			{ dropType = "pet", itemId = "fox_fire", petId = "fox_fire", minQty = 1, maxQty = 1, chance = 0.008 },
 		},
 	},
 	[4] = {
@@ -66,6 +70,9 @@ NpcDropConfig.Profiles = {
 			{ itemId = "MagicCrystal", minQty = 3, maxQty = 8, chance = 0.70 },
 			{ itemId = "IronOre", minQty = 5, maxQty = 10, chance = 0.80 },
 			{ itemId = "StoneFragment", minQty = 10, maxQty = 20, chance = 0.90 },
+			{ dropType = "pet", itemId = "slime_blue", petId = "slime_blue", minQty = 1, maxQty = 1, chance = 0.10 },
+			{ dropType = "pet", itemId = "fox_fire", petId = "fox_fire", minQty = 1, maxQty = 1, chance = 0.04 },
+			{ dropType = "pet", itemId = "dragon_mini", petId = "dragon_mini", minQty = 1, maxQty = 1, chance = 0.01 },
 		},
 	},
 } :: { [number]: NpcDropProfile }
