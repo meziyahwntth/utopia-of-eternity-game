@@ -3,6 +3,7 @@
 	CurrencyService (P6) — player credits balance (DataStore + memory fallback)
 ]]
 local DataStoreService = game:GetService("DataStoreService")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local ds: GlobalDataStore? = nil
 pcall(function()
@@ -12,6 +13,16 @@ end)
 local memory: { [number]: number } = {}
 
 local CurrencyService = {}
+
+local function eventMultiplier(buffType: string): number
+	local ok, svc = pcall(function()
+		return require(ServerScriptService:WaitForChild("LiveOps"):WaitForChild("EventCalendarService"))
+	end)
+	if ok then
+		return (svc :: any).getMultiplier(buffType)
+	end
+	return 1.0
+end
 
 function CurrencyService.getBalance(userId: number): number
 	if memory[userId] ~= nil then
@@ -31,6 +42,10 @@ function CurrencyService.getBalance(userId: number): number
 end
 
 function CurrencyService.addCredits(userId: number, amount: number): boolean
+	if amount <= 0 then
+		return false
+	end
+	amount = math.floor(amount * eventMultiplier("DoubleCurrency"))
 	if amount <= 0 then
 		return false
 	end

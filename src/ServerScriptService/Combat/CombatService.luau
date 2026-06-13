@@ -5,6 +5,7 @@
 ]]
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Workspace = game:GetService("Workspace")
 
 local CombatConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("CombatConfig"))
@@ -128,6 +129,33 @@ local function computeDamage(player: Player, skillId: string): number
 	return math.floor(rawDamage + 0.5)
 end
 
+local function grantKillExp(player: Player)
+	local ok, ecs = pcall(function()
+		return require(ServerScriptService:WaitForChild("LiveOps"):WaitForChild("EventCalendarService"))
+	end)
+	if not ok then
+		return
+	end
+	local mult = (ecs :: any).getMultiplier("DoubleExp")
+	if mult <= 1 then
+		return
+	end
+	local okPls, pls = pcall(function()
+		return require(ServerScriptService:WaitForChild("Progression"):WaitForChild("PlayerLevelService"))
+	end)
+	if not okPls then
+		return
+	end
+	local accum = player:GetAttribute("CombatExpAccum")
+	local streak = if typeof(accum) == "number" then accum else 0
+	streak += mult
+	while streak >= 10 do
+		(pls :: any).addLevel(player, 1)
+		streak -= 10
+	end
+	player:SetAttribute("CombatExpAccum", streak)
+end
+
 function CombatService.findNpc(npcId: number): Model?
 	return findNpc(npcId)
 end
@@ -180,14 +208,17 @@ function CombatService.processAttack(player: Player, npcId: any, skillId: any): 
 	end
 
 	local damage = computeDamage(player, skillId)
-	applyDamage(npc, player.UserId, damage)
+	local humAfter = applyDamage(npc, player.UserId, damage)
+	if humAfter and humAfter.Health <= 0 then
+		grantKillExp(player)
+	end
 
 	return {
 		ok = true,
 		npcId = npcId,
 		damage = damage,
-		hp = hum.Health,
-		maxHp = hum.MaxHealth,
+		hp = if humAfter then humAfter.Health else 0,
+		maxHp = if humAfter then humAfter.MaxHealth else hum.MaxHealth,
 	}
 end
 

@@ -116,3 +116,10 @@ ensure("RemoteFunction", "ClaimChest")
 -- P7 Visible Power (tier aura/glow)
 ensure("RemoteEvent", "TierChanged")
 ensure("RemoteEvent", "PlayerTierBroadcast")
+
+-- P8 Emote + Event Calendar
+ensure("RemoteFunction", "PlayEmote")
+ensure("RemoteFunction", "StopEmote")
+ensure("RemoteEvent", "EmotePlayed")
+ensure("RemoteEvent", "EmoteStopped")
+ensure("RemoteEvent", "ActiveEventsUpdate")

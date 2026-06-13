@@ -3,6 +3,7 @@
 	PlayerItemStore (P4) — in-memory item quantities per player (stub until DataStore inventory)
 ]]
 local Players = game:GetService("Players")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local PlayerItemStore = {}
 
@@ -51,6 +52,12 @@ end
 function PlayerItemStore.addItem(userId: number, itemId: string, qty: number): boolean
 	if qty <= 0 then
 		return false
+	end
+	local ok, svc = pcall(function()
+		return require(ServerScriptService:WaitForChild("LiveOps"):WaitForChild("EventCalendarService"))
+	end)
+	if ok then
+		qty = math.max(1, math.floor(qty * (svc :: any).getMultiplier("DoubleDrop")))
 	end
 	local inv = ensure(userId)
 	inv[itemId] = (inv[itemId] or 0) + qty

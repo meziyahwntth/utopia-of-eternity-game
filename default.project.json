@@ -47,6 +47,9 @@
         },
         "SocialHandlers": {
           "$path": "src/ServerScriptService/Social/SocialHandlers.server.luau"
+        },
+        "EmoteService": {
+          "$path": "src/ServerScriptService/Social/EmoteService.luau"
         }
       },
       "Combat": {
@@ -104,6 +107,15 @@
         },
         "SkyTreasureHandlers": {
           "$path": "src/ServerScriptService/LiveOps/SkyTreasureHandlers.server.luau"
+        },
+        "EventCalendarService": {
+          "$path": "src/ServerScriptService/LiveOps/EventCalendarService.luau"
+        },
+        "SeasonService": {
+          "$path": "src/ServerScriptService/LiveOps/SeasonService.luau"
+        },
+        "LiveOpsBootstrap": {
+          "$path": "src/ServerScriptService/LiveOps/LiveOpsBootstrap.server.luau"
         }
       },
       "HubGreyboxBuilder": {
