@@ -123,3 +123,10 @@ ensure("RemoteFunction", "StopEmote")
 ensure("RemoteEvent", "EmotePlayed")
 ensure("RemoteEvent", "EmoteStopped")
 ensure("RemoteEvent", "ActiveEventsUpdate")
+
+-- Backlog B: Pet/Companion
+ensure("RemoteFunction", "EquipPet")
+ensure("RemoteFunction", "UnequipPet")
+ensure("RemoteFunction", "GetPetCollection")
+ensure("RemoteEvent", "PetEquipped")
+ensure("RemoteEvent", "PetUnequipped")

@@ -314,6 +314,15 @@
         },
         "CurrencyService": {
           "$path": "src/ServerScriptService/Commerce/CurrencyService.luau"
+        },
+        "PetStore": {
+          "$path": "src/ServerScriptService/Commerce/PetStore.luau"
+        },
+        "PetService": {
+          "$path": "src/ServerScriptService/Commerce/PetService.luau"
+        },
+        "PetHandlers": {
+          "$path": "src/ServerScriptService/Commerce/PetHandlers.server.luau"
         }
       },
       "Face": {

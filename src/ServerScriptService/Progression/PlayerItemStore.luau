@@ -59,6 +59,13 @@ function PlayerItemStore.addItem(userId: number, itemId: string, qty: number): b
 	if ok then
 		qty = math.max(1, math.floor(qty * (svc :: any).getMultiplier("DoubleDrop")))
 	end
+	local player = Players:GetPlayerByUserId(userId)
+	if player then
+		local luckBonus = player:GetAttribute("PetLuckBonus")
+		if typeof(luckBonus) == "number" and luckBonus > 0 then
+			qty = math.max(1, math.floor(qty * (1 + luckBonus)))
+		end
+	end
 	local inv = ensure(userId)
 	inv[itemId] = (inv[itemId] or 0) + qty
 	return true

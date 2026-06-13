@@ -4,6 +4,7 @@
 ]]
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local PlayerTierConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PlayerTierConfig"))
 local VisiblePowerService = require(script.Parent:WaitForChild("VisiblePowerService"))
@@ -39,6 +40,24 @@ end
 
 function PlayerLevelService.addLevel(player: Player, delta: number)
 	PlayerLevelService.setLevel(player, PlayerLevelService.getLevel(player) + delta)
+end
+
+function PlayerLevelService.getExpGainMultiplier(player: Player): number
+	local mult = 1.0
+
+	local petBonus = player:GetAttribute("PetExpBonus")
+	if typeof(petBonus) == "number" and petBonus > 0 then
+		mult += petBonus
+	end
+
+	local ok, ecs = pcall(function()
+		return require(ServerScriptService:WaitForChild("LiveOps"):WaitForChild("EventCalendarService"))
+	end)
+	if ok then
+		mult *= (ecs :: any).getMultiplier("DoubleExp")
+	end
+
+	return mult
 end
 
 function PlayerLevelService.init(remotesFolder: Folder)
