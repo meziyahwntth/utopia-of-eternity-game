@@ -258,3 +258,264 @@ StarterPlayer/StarterPlayerScripts/
 ---
 
 *จบร่าง — รอ feedback/approval ก่อนเริ่ม Phase ใด ๆ*
+
+---
+
+## J. สถาปัตยกรรม Combat Server-Authoritative (§2.5) 🗡️
+> อ้างอิง MASTER-BLUEPRINT §11.1 — รายละเอียดสำหรับ Cursor implement
+
+### J1. โครงสร้าง Module Script ฝั่ง Server
+
+```
+ServerScriptService/
+  Combat/
+    CombatService.luau          ← Module หลัก: Sanity Check 3 ชั้น + HP management
+    AutoBattleService.luau      ← เก็บ auto-battle state per player (on/off + targetId)
+    CombatHandlers.server.luau  ← wire RemoteEvents → CombatService
+  Security/
+    RateLimitGuard.luau         ← MemoryStore token bucket per player per action
+ReplicatedStorage/Modules/
+    CombatConfig.luau           ← weapon ranges, attack speeds, damage tables
+StarterPlayer/StarterPlayerScripts/
+    AutoBattleClient.client.luau ← target lock UI + animation + FireServer
+```
+
+### J2. Flow การทำงาน (ลำดับชัดเจน)
+
+```lua
+-- 1. Client เปิด Auto-Battle
+AutoBattleToggle.MouseButton1Click → AutoBattleService:SetAutoMode(player, true)
+
+-- 2. Client loop (RunService.Heartbeat ทุก AttackTick)
+local nearest = findNearestEnemy(maxRange)  -- client-side only
+if nearest then
+  remoteAttack:FireServer(nearest.NPC_Id, currentSkillId)
+end
+
+-- 3. Server: CombatService.processAttack(player, npcId, skillId)
+local function processAttack(player, npcId, skillId)
+  -- CHECK 1: Distance
+  local dist = (player.Character.HumanoidRootPart.Position
+               - npc.HumanoidRootPart.Position).Magnitude
+  if dist > CombatConfig.MaxRange[weaponTier] then return false end
+
+  -- CHECK 2: Rate Limit (token bucket via MemoryStore)
+  if not RateLimitGuard:consume(player.UserId, "attack") then return false end
+
+  -- CHECK 3: Line of Sight
+  local ray = workspace:Raycast(
+    player.Character.HumanoidRootPart.Position,
+    (npc.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position),
+    raycastParams  -- exclude player + npc models
+  )
+  if ray and ray.Instance and not ray.Instance:IsDescendantOf(npc) then
+    return false  -- กำแพงกั้น
+  end
+
+  -- ผ่านทั้ง 3 → apply damage
+  local dmg = CombatConfig.BaseDamage[weaponTier] * skillMultiplier[skillId]
+  npc:TakeDamage(dmg)  -- server-authoritative
+  return true
+end
+```
+
+### J3. CombatConfig Schema
+```lua
+-- ReplicatedStorage/Modules/CombatConfig.luau
+return {
+  MaxRange = {
+    Sword = 10,   -- studs
+    Bow   = 50,
+    Staff = 30,
+  },
+  AttackSpeed = {  -- วินาที/ครั้ง (rate limit)
+    T1 = 1.0, T2 = 0.9, T3 = 0.8, T4 = 0.7, T5 = 0.6,
+  },
+  BaseDamage = {
+    T1 = 10, T2 = 20, T3 = 35, T4 = 55, T5 = 80,
+  },
+  SkillMultiplier = {
+    ["BasicAttack"] = 1.0,
+    ["PowerSlash"]  = 1.8,
+    ["AoeSpin"]     = 1.2,
+  },
+}
+```
+
+### J4. Remotes ที่ต้องเพิ่มใน SocialRemoteSetup (หรือ CombatRemoteSetup ใหม่)
+```lua
+ensure("RemoteEvent", "CombatAttackRequest")   -- Client→Server (Fire)
+ensure("RemoteEvent", "CombatResultClient")    -- Server→Client (damage VFX, HP update)
+ensure("RemoteFunction", "AutoBattleToggle")   -- Client↔Server (on/off)
+```
+
+---
+
+## K. ระบบภาษี Clan War — Tax Distribution DB (§2.6) 💰
+> อ้างอิง MASTER-BLUEPRINT §11.2 — รายละเอียดสำหรับ Cursor implement
+
+### K1. DataStore Schema
+
+```lua
+-- TerritoryStore: key = "territory_v1_{zoneId}"
+export type TerritoryData = {
+  ownerClanId: string,
+  taxRate: number,            -- 1..5 (percent) — clan leader ตั้ง
+  maintenanceCostBase: number,-- คำนวณ ณ เวลา war win
+  fortHp: number,             -- 100 → ลด -5%/สัปดาห์ (min 40)
+  weeksClaimed: number,
+  lastWarCycleId: string,
+  clanVaultBalance: number,   -- สะสม 50% ของภาษี
+  memberDividends: {          -- {[userId: string]: number} รอ claim
+    [string]: number
+  },
+  serverBuffActive: boolean,  -- 20% → drop rate +5% ทั่วเขต
+  lastDistributedAt: number,  -- os.time()
+}
+
+-- ClanVaultStore: key = "clanvault_v1_{clanId}"
+export type ClanVaultData = {
+  balance: number,            -- ยอดรวม
+  npcGuardSlots: number,      -- จำนวน NPC ยามที่ซื้อไว้
+  barrierLevel: number,       -- กำแพงสงคราม tier 1–5
+  lastWithdrawnBy: string,    -- userId leader ที่ถอนล่าสุด
+  lastUpdatedAt: number,
+}
+```
+
+### K2. TaxDistributionService — Flow
+
+```
+[ShopRentalService / TradeService]
+  → emit TaxCollected(zoneId, amount)
+  → TaxDistributionService:onTaxCollected(zoneId, amount)
+      ├─ 50% → TerritoryData.clanVaultBalance += amount*0.5
+      │         ClanVaultStore:save()
+      ├─ 30% → แบ่งให้สมาชิก Veteran+ (ตาม GuildService.getRankedMembers)
+      │         TerritoryData.memberDividends[userId] += share
+      └─ 20% → apply ServerBuff("DropRateBonus", zone, 0.05, duration=7days)
+                TerritoryData.serverBuffActive = true
+```
+
+### K3. Maintenance Cost Formula (Exponential)
+```lua
+local multipliers = { [1]=1.0, [2]=1.5, [3]=2.5, [4]=4.0, [5]=6.5 }
+local BASE_MAINTENANCE = 100  -- เครดิตต่อสัปดาห์
+local maintenanceCost = BASE_MAINTENANCE * multipliers[taxRate]
+```
+
+### K4. DefensiveFatigueService — Weekly Cron
+```lua
+-- รันทุก 7 วัน (ผ่าน task scheduler หรือ MemoryStore sorted set timer)
+for zoneId, territory in TerritoryStore:getAll() do
+  if territory.ownerClanId ~= "" then
+    territory.fortHp = math.max(40, territory.fortHp - 5)
+    territory.weeksClaimed += 1
+    TerritoryStore:save(zoneId, territory)
+  end
+end
+```
+
+### K5. Modules ที่ต้องสร้าง (Phase P5)
+```
+ServerScriptService/ClanWar/
+  ClanWarService.luau            ← war scheduling, zone capture, winner logic
+  TaxDistributionService.luau    ← 50/30/20 split, ServerBuff apply
+  TerritoryStore.luau            ← DataStore wrapper (pcall ครบ)
+  ClanVaultStore.luau            ← Clan Vault DataStore wrapper
+  DefensiveFatigueService.luau   ← weekly HP decay cron
+ReplicatedStorage/Modules/
+  ClanWarConfig.luau             ← tax rates, maintenance multipliers, war schedule, fatigue rate
+  TaxConfig.luau                 ← split ratios (50/30/20), buff duration, buff magnitude
+```
+
+---
+
+## L. Retention & Interdependency (§2.7) 🔗
+> อ้างอิง MASTER-BLUEPRINT §11.3
+
+### L1. Low-Tier Material Sink — ItemCraftingConfig Schema
+```lua
+-- ReplicatedStorage/Modules/ItemCraftingConfig.luau
+return {
+  Grandeur = {
+    ["★★★ Sword"] = {
+      baseItem = "★★ Sword",
+      materials = {
+        { id = "StoneFragment", qty = 500 },   -- drop จาก Lv1-15 mobs
+        { id = "IronOre",       qty = 200 },   -- drop จาก Lv16-30 mobs
+        { id = "MagicCrystal",  qty = 50  },   -- drop จาก Dungeon boss
+      },
+      creditCost = 1000,
+    },
+    -- ... เพิ่ม recipe อื่น
+  },
+  CardFusion = {
+    -- Card socket upgrade ต้องการ low-tier card × N
+  },
+}
+```
+
+### L2. Mercenary System — Module Structure
+```
+ServerScriptService/Mercenary/
+  MercenaryService.luau      ← post/accept/complete escort job
+  BountyService.luau         ← post/accept/claim bounty
+  MercenaryHandlers.server.luau ← wire remotes
+StarterPlayerScripts/
+  BountyBoardClient.client.luau ← NPC board UI, job list, accept button
+ReplicatedStorage/Modules/
+  MercenaryConfig.luau       ← escort timeout, min/max pay, bounty limits
+```
+
+### L3. Sky Treasure Event — Module Structure
+```
+ServerScriptService/LiveOps/
+  SkyTreasureService.luau    ← cron every 2hr, spawn, 3min countdown, reward
+StarterPlayerScripts/
+  SkyTreasureClient.client.luau ← server announcement banner, minimap marker, timer
+ReplicatedStorage/Modules/
+  SkyTreasureConfig.luau     ← spawnPoints[], rewardPool[], intervalSeconds=7200
+```
+
+### L4. Sky Treasure Flow
+```
+SkyTreasureService (server):
+  every 7200 seconds:
+    zones = SkyTreasureConfig.spawnPoints  -- จุดที่เป็นไปได้
+    chosen = Random.new():NextInteger(1, #zones) * 3  -- สุ่ม 3 จุด
+    for each zone:
+      MessagingService:PublishAsync("UtopiaLiveOps", {
+        event = "SkyTreasure", zone = zone, endsAt = os.time()+180
+      })
+      spawn treasure chest model at zone.Position
+      wait 180 seconds
+      → ผู้เล่นที่อยู่ในรัศมี 20 studs นานสุด → reward (tie-break: ผู้เล่นแรก)
+      despawn chest
+```
+
+---
+
+## M. อัปเดตโครงสร้างไฟล์รวม (หลัง §2.5–2.7)
+
+```
+ServerScriptService/
+  Combat/       CombatService · AutoBattleService · CombatHandlers
+  ClanWar/      ClanWarService · TaxDistributionService · TerritoryStore
+                ClanVaultStore · DefensiveFatigueService
+  Mercenary/    MercenaryService · BountyService · MercenaryHandlers
+  LiveOps/      SkyTreasureService
+  (เดิม)
+  World/        CloudDeckBuilder · VoidGuard · NeonUtopiaWorldBuilder ...
+  Progression/  PlayerLevelService · QuestService · VolunteerService ...
+  Security/     AntiBotGuard · FarmGuard · HumanityCheck · RateLimitGuard(ใหม่)
+ReplicatedStorage/Modules/
+  CombatConfig · ClanWarConfig · TaxConfig · MercenaryConfig
+  SkyTreasureConfig · ItemCraftingConfig · (เดิม: GameConfig, Prism*)
+StarterPlayerScripts/
+  AutoBattleClient · BountyBoardClient · SkyTreasureClient · (เดิม)
+```
+
+---
+
+*BLUEPRINT-V2-WORLD-PROGRESSION อัปเดต 13 มิ.ย. 2026 (§J–M: Research 2.5–2.7 architecture)*

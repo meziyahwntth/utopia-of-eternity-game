@@ -247,3 +247,151 @@
 ---
 
 *จบ Master Blueprint — อัปเดต 13 มิ.ย. 2026 (Mobile-First)*
+
+---
+
+## 11. 🆕 สถาปัตยกรรมเชิงลึก — Combat, Tax & Retention (เพิ่ม 13 มิ.ย. 2026)
+> จากข้อเสนอแนะงานวิจัย 2.5–2.7: เพื่อยกระดับให้เหนือกว่าตลาด Roblox ปัจจุบัน
+
+---
+
+### 11.1 Auto-Battle Server-Authoritative Combat System (§2.5)
+> ปัญหา: Exploit/Executor สแปมโจมตี / ตีทะลุกำแพง / ตีข้ามแมพ
+
+#### หลักการ Client–Server แบ่งบทบาทชัดเจน:
+```
+[Client - มือถือ]                    [Server - CombatService.luau]
+  Auto-Battle toggle เปิด              รับ RemoteEvent:FireServer()
+  → ค้นหา target ใกล้สุด (TargetLock)   → Sanity Check 3 ชั้น:
+  → เล่น Animation (ตีดาบ/เวท)           1. Distance Check (≤10 studs สำหรับดาบ)
+  → FireServer(Target_ID, Skill_ID)  →   2. Rate Limit / Cooldown (Tick() gap ≥ AttackSpeed)
+                                         3. Line of Sight Raycast (กำแพงกั้น?)
+                                     → ผ่านทั้ง 3 → ลด HP มอนสเตอร์ + ดรอปของ
+                                     → ไม่ผ่าน → ปัดตก (silent / log)
+```
+
+#### Module ที่ต้องสร้างใหม่ (Phase P3-C+):
+| Module | บทบาท | Path |
+|--------|------|------|
+| `CombatService.luau` | Server-auth combat: Distance/Cooldown/Raycast check, HP management | `ServerScriptService/Combat/` |
+| `AutoBattleService.luau` | เก็บสถานะ auto-battle ต่อผู้เล่น, ส่ง tick ให้ CombatService | `ServerScriptService/Combat/` |
+| `CombatConfig.luau` | MaxRange per weapon tier, AttackSpeed per tier, Cooldown constants | `ReplicatedStorage/Modules/` |
+| `AutoBattleClient.client.luau` | Target lock UI + animation + `FireServer(Target_ID, Skill_ID)` | `StarterPlayerScripts/` |
+
+#### กฎ Anti-exploit ที่บังคับ:
+- Server **ไม่เชื่อ** ค่า damage จาก client เด็ดขาด — คำนวณ damage เองจาก CombatConfig
+- Rate limit per player: สูงสุด `1 attack / AttackSpeed วินาที` (ผ่าน MemoryStore token bucket)
+- Raycast target ยืนยันจาก server position ไม่ใช่ client position
+
+---
+
+### 11.2 Clan War Tax Distribution System (§2.6)
+> ปัญหา: "Rich get richer" — แคลนใหญ่ผูกขาดรวยอยู่กลุ่มเดียว
+
+#### กลไกภาษี 3 ชั้น:
+```
+ผู้เล่น/ร้านค้าในเขต
+  → จ่ายค่าเช่า/ค่า Trade fee (1%–5%)
+  → TaxDistributionService.luau คำนวณ + แบ่ง:
+
+  ┌─────────────────────────────────┐
+  │  รายได้ภาษีทั้งหมด (100%)        │
+  ├─────────────────────────────────┤
+  │  50% → คลังแคลน (Clan Vault)    │  ← NPC ยาม, กำแพงสงคราม
+  │  30% → สมาชิกระดับ Veteran+     │  ← ปันผลรายสัปดาห์อัตโนมัติ
+  │  20% → Server Buff (Drop +5%)   │  ← ทุกคนในเขตได้ (กัน anti-tax sentiment)
+  └─────────────────────────────────┘
+```
+
+#### Progressive Tax + Maintenance Cost (กัน Exploitation):
+| อัตราภาษีที่ตั้ง | ค่าบำรุงรักษารายสัปดาห์ |
+|---------------|---------------------|
+| 1% | ฐาน × 1.0 |
+| 2% | ฐาน × 1.5 |
+| 3% | ฐาน × 2.5 |
+| 4% | ฐาน × 4.0 |
+| 5% | ฐาน × 6.5 |
+
+*บังคับหัวหน้าแคลนหาจุดสมดุล — ตั้งภาษีสูงเกินไปเสียค่าบำรุงมากกว่าที่รับ*
+
+#### Defensive Fatigue (กลไกผู้พิทักษ์อ่อนล้า):
+- ครองเขตติดต่อกัน **1 สัปดาห์** → Fort HP -5%
+- ครบ **4 สัปดาห์** (Fort HP ≈80%) → โอกาสแคลนใหม่โจมตีสูงขึ้นชัดเจน
+- Fort HP รีเซ็ตหลัง Clan War season รอบใหม่ (ไม่ลงไปต่ำกว่า 40% โดยไม่โดนโจมตี)
+
+#### DataStore Schema สำหรับ Tax Distribution:
+```lua
+-- TerritoryStore key: "territory_v1_{zoneId}"
+type TerritoryData = {
+  ownerClanId: string,
+  taxRate: number,           -- 1..5 (percent)
+  maintenanceCost: number,   -- คำนวณจาก taxRate (exponential)
+  fortHp: number,            -- 0..100 (percent)
+  weeksClaimed: number,      -- สำหรับ Defensive Fatigue
+  lastWarCycleId: string,    -- กัน duplicate update
+  clanVaultBalance: number,  -- accumulated 50%
+  lastDistributedAt: number, -- Unix timestamp
+}
+```
+
+#### Module ที่ต้องสร้างใหม่ (Phase P5):
+| Module | บทบาท |
+|--------|------|
+| `ClanWarService.luau` | War scheduling, siege logic, winner determination |
+| `TaxDistributionService.luau` | คำนวณ + แบ่ง 50/30/20, ปันผลสมาชิก, Server Buff apply |
+| `TerritoryStore.luau` | DataStore wrapper สำหรับ TerritoryData |
+| `DefensiveFatigueService.luau` | Weekly cron: ลด fortHp ของแคลนที่ครองอยู่ |
+| `ClanWarConfig.luau` | taxRateRange, maintenanceMultipliers, fatigueRate, warSchedule |
+
+---
+
+### 11.3 Retention & Interdependency System (§2.7)
+> เป้าหมาย: ผู้เล่น Lv149 ไม่เบื่อ + ผู้เล่นใหม่มีคุณค่าในระบบเศรษฐกิจ
+
+#### A. Low-Tier Material Sink (สร้างความต้องการ item ระดับล่าง):
+- Grandeur/Fusion/Card upgrade ระดับสูง **ต้องใช้วัตถุดิบ "ระดับ 1"** จำนวนมาก
+- ทำให้ผู้เล่น Lv149 **ต้องซื้อจากผู้เล่นใหม่** ผ่าน Trading P2P
+- ตัวอย่าง: อาวุธ Grandeur ★★★ ต้องการ "เศษหิน" (drop จาก mobs ช่วง Lv1-15) × 500 ชิ้น
+- Config: `ItemCraftingConfig.luau` → recipe ระบุ required materials per grandeur tier
+
+#### B. Mercenary System (อาชีพรับจ้างสายอิสระ):
+```
+Bounty Board (NPC ในเมือง)
+  → พ่อค้า (ร้านเช่า) โพสต์งาน "คุ้มกันขนของ Neon→Utopia" + ค่าจ้าง
+  → Mercenary รับงาน → ติดตาม + ป้องกัน → งานสำเร็จ → ได้ค่าจ้าง
+  → ผู้เล่นโพสต์ "Bounty" บนศัตรู → Mercenary คนแรกที่จัดการได้ค่าหัว
+```
+| Module | บทบาท |
+|--------|------|
+| `MercenaryService.luau` | ระบบรับ/ปิดงาน, track escort, pay out |
+| `BountyService.luau` | โพสต์/รับ/ล้าง bounty per player |
+| `BountyBoardUI.client.luau` | NPC UI แสดงงานที่มีอยู่ |
+
+#### C. RNG Live-Ops Event — Sky Treasure Box (ทุก 2 ชั่วโมง):
+```
+ทุก 2 ชั่วโมง (server cron):
+  → สุ่มจุดตก (3-5 จุดต่อเซิร์ฟเวอร์) ใน Eternity City / Neon Utopia
+  → ประกาศ server-wide: "🎁 กล่องสมบัติลอยฟ้าตกที่ [ชื่อจุด]!"
+  → ผู้เล่นวิ่งแข่ง → ผู้ถึงก่อน + defend 3 นาที → รับ rare item
+  → หลัง 3 นาที → ระเบิด/หายไป (กัน camp)
+```
+| Module | บทบาท |
+|--------|------|
+| `SkyTreasureService.luau` | cron trigger, random spawn, countdown, reward |
+| `SkyTreasureClient.client.luau` | announcement banner + minimap marker + timer UI |
+
+---
+
+### 11.4 อัปเดต Roadmap หลัง 2.5–2.7
+
+| เฟส | งานเพิ่ม |
+|-----|---------|
+| **P3-C+** | `CombatService` + `AutoBattleService` + `AutoBattleClient` (combat server-auth) |
+| **P4** | `ItemCraftingConfig` Low-Tier Sink + Trading P2P (ผูกกัน) |
+| **P5** | `ClanWarService` + `TaxDistributionService` + `TerritoryStore` + `DefensiveFatigueService` |
+| **P5+** | `MercenaryService` + `BountyService` (ต่อยอด P5) |
+| **P6** | `SkyTreasureService` (Live-ops RNG event) + `PlayerActionLog` (Anti-Bot DB) |
+
+---
+
+*MASTER-BLUEPRINT อัปเดต 13 มิ.ย. 2026 (§11 Research 2.5–2.7 integrated)*

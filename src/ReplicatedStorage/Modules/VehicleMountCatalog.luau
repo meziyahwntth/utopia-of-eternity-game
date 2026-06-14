@@ -21,9 +21,42 @@ export type CatalogEntry = {
 	summonZone: SummonZone,
 	eternityShopOnly: boolean?,
 	keyRewardEligible: boolean?,
+	iconAssetId: string?,
 }
 
 local VehicleMountCatalog = {}
+
+local ICONS: { [string]: string } = {
+	["amphibious_flying_motorcycle"] = "rbxassetid://131937012876652",
+	["flying_car_boat_hybrid"] = "rbxassetid://86794600437117",
+	["big_bike"] = "rbxassetid://127337459723099",
+	["sports_car"] = "rbxassetid://93208287150310",
+	["sedan"] = "rbxassetid://119728073566090",
+	["pickup_truck"] = "rbxassetid://109323264607459",
+	["van"] = "rbxassetid://78283126115161",
+	["public_transport_bus"] = "rbxassetid://123349143644096",
+	["jeep"] = "rbxassetid://74486478556685",
+	["public_transport_airplane"] = "rbxassetid://127420478291204",
+	["private_jet"] = "rbxassetid://105086144486137",
+	["speedboat"] = "rbxassetid://139949962258926",
+	["public_transport_boat"] = "rbxassetid://123420885777156",
+	["prism_hover_shuttle"] = "rbxassetid://123349143644096",
+	["pegasus"] = "rbxassetid://123314756359923",
+	["hippogriff"] = "rbxassetid://91394478666144",
+	["white_stag"] = "rbxassetid://73879090995676",
+	["griffin"] = "rbxassetid://117205257612614",
+	["dragon"] = "rbxassetid://121476509159294",
+	["dragon_female"] = "rbxassetid://93941416576869",
+	["unicorn"] = "rbxassetid://86136120729971",
+	["flamingo"] = "rbxassetid://104344791260914",
+	["legendary_swan"] = "rbxassetid://97666811262566",
+	["dog"] = "rbxassetid://78755674352797",
+	["cat"] = "rbxassetid://129621262197960",
+	["rabbit"] = "rbxassetid://78477229008513",
+	["tiger"] = "rbxassetid://118256628837583",
+	["lion"] = "rbxassetid://76928135120535",
+	["swan"] = "rbxassetid://116190761548823",
+}
 
 local function entry(
 	id: string,
@@ -45,6 +78,7 @@ local function entry(
 		seatCount = seatCount,
 		refImage = refImage,
 		summonZone = summonZone,
+		iconAssetId = ICONS[id],
 		eternityShopOnly = if opts then opts.eternityShopOnly else nil,
 		keyRewardEligible = if opts then opts.keyRewardEligible else nil,
 	}

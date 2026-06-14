@@ -3,18 +3,243 @@
   "source": "ChatGPT-generated concept art (original IP — Utopia of Eternity)",
   "conceptArtDir": "assets/weapons/generated",
   "weapons": [
-    { "id": "blood_knife", "file": "blood-knife.png", "displayName": "Blood Knife", "kind": "Dagger", "slot": "light" },
-    { "id": "m16", "file": "m16.png", "displayName": "M16", "kind": "AssaultRifle", "slot": "light" },
-    { "id": "ak47", "file": "ak47.png", "displayName": "AK-47", "kind": "AssaultRifle", "slot": "light" },
-    { "id": "m4a1", "file": "m4a1.png", "displayName": "M4A1", "kind": "AssaultRifle", "slot": "light" },
-    { "id": "goddess_fan", "file": "goddess-fan.png", "displayName": "Goddess Fan", "kind": "Fan", "slot": "light" },
-    { "id": "demon_slaying_spear", "file": "demon-slaying-spear.png", "displayName": "Demon-Slaying Spear", "kind": "Spear", "slot": "light" },
-    { "id": "immortal_sword", "file": "immortal-sword.png", "displayName": "Immortal Sword", "kind": "Longsword", "slot": "light" },
-    { "id": "machine_gun", "file": "machine-gun.png", "displayName": "Machine Gun", "kind": "LMG", "slot": "heavy" },
-    { "id": "bazooka", "file": "bazooka.png", "displayName": "Bazooka", "kind": "Launcher", "slot": "heavy" },
-    { "id": "bazuka", "file": "bazuka-lion.png", "displayName": "Bazuka", "kind": "Launcher", "slot": "heavy" },
-    { "id": "thors_hammer", "file": "thors-hammer.png", "displayName": "Thor's Hammer", "kind": "Hammer", "slot": "heavy" },
-    { "id": "demon_slayer_sword", "file": "demon-slayer-sword.png", "displayName": "Demon Slayer Sword", "kind": "Greatsword", "slot": "heavy" },
-    { "id": "heavenly_sword", "file": "heavenly-sword.png", "displayName": "Heavenly Sword", "kind": "Greatsword", "slot": "heavy" }
+    {
+      "id": "blood_knife",
+      "file": "blood-knife.png",
+      "displayName": "Blood Knife",
+      "kind": "Dagger",
+      "slot": "light"
+    },
+    {
+      "id": "m16",
+      "file": "m16.png",
+      "displayName": "M16",
+      "kind": "AssaultRifle",
+      "slot": "light"
+    },
+    {
+      "id": "ak47",
+      "file": "ak47.png",
+      "displayName": "AK-47",
+      "kind": "AssaultRifle",
+      "slot": "light"
+    },
+    {
+      "id": "m4a1",
+      "file": "m4a1.png",
+      "displayName": "M4A1",
+      "kind": "AssaultRifle",
+      "slot": "light"
+    },
+    {
+      "id": "goddess_fan",
+      "file": "goddess-fan.png",
+      "displayName": "Goddess Fan",
+      "kind": "Fan",
+      "slot": "light"
+    },
+    {
+      "id": "demon_slaying_spear",
+      "file": "demon-slaying-spear.png",
+      "displayName": "Demon-Slaying Spear",
+      "kind": "Spear",
+      "slot": "light"
+    },
+    {
+      "id": "immortal_sword",
+      "file": "immortal-sword.png",
+      "displayName": "Immortal Sword",
+      "kind": "Longsword",
+      "slot": "light"
+    },
+    {
+      "id": "machine_gun",
+      "file": "machine-gun.png",
+      "displayName": "Machine Gun",
+      "kind": "LMG",
+      "slot": "heavy"
+    },
+    {
+      "id": "bazooka",
+      "file": "bazooka.png",
+      "displayName": "Bazooka",
+      "kind": "Launcher",
+      "slot": "heavy"
+    },
+    {
+      "id": "bazuka",
+      "file": "bazuka-lion.png",
+      "displayName": "Bazuka",
+      "kind": "Launcher",
+      "slot": "heavy"
+    },
+    {
+      "id": "thors_hammer",
+      "file": "thors-hammer.png",
+      "displayName": "Thor's Hammer",
+      "kind": "Hammer",
+      "slot": "heavy"
+    },
+    {
+      "id": "demon_slayer_sword",
+      "file": "demon-slayer-sword.png",
+      "displayName": "Demon Slayer Sword",
+      "kind": "Greatsword",
+      "slot": "heavy"
+    },
+    {
+      "id": "heavenly_sword",
+      "file": "heavenly-sword.png",
+      "displayName": "Heavenly Sword",
+      "kind": "Greatsword",
+      "slot": "heavy"
+    },
+    {
+      "id": "eternity_blade_skin",
+      "file": "eternity-blade.png",
+      "displayName": "Eternity Blade",
+      "kind": "Longsword",
+      "slot": "heavy"
+    },
+    {
+      "id": "void_cleaver",
+      "file": "void-cleaver.png",
+      "displayName": "Void Cleaver",
+      "kind": "Greatsword",
+      "slot": "heavy"
+    },
+    {
+      "id": "sakura_katana",
+      "file": "sakura-katana.png",
+      "displayName": "Sakura Katana",
+      "kind": "Longsword",
+      "slot": "light"
+    },
+    {
+      "id": "prism_crystal_staff",
+      "file": "prism-crystal-staff.png",
+      "displayName": "Prism Crystal Staff",
+      "kind": "Staff",
+      "slot": "heavy"
+    },
+    {
+      "id": "eternal_staff_divine",
+      "file": "eternal-staff-divine.png",
+      "displayName": "Eternal Staff Divine",
+      "kind": "Staff",
+      "slot": "heavy"
+    },
+    {
+      "id": "void_cannon",
+      "file": "void-cannon.png",
+      "displayName": "Void Cannon",
+      "kind": "Launcher",
+      "slot": "heavy"
+    },
+    {
+      "id": "prism_railgun",
+      "file": "prism-railgun.png",
+      "displayName": "Prism Railgun",
+      "kind": "LMG",
+      "slot": "heavy"
+    },
+    {
+      "id": "celestial_longbow",
+      "file": "celestial-longbow.png",
+      "displayName": "Celestial Longbow",
+      "kind": "Bow",
+      "slot": "light"
+    },
+    {
+      "id": "earth_shatter_hammer",
+      "file": "earth-shatter-hammer.png",
+      "displayName": "Earth Shatter Hammer",
+      "kind": "Hammer",
+      "slot": "heavy"
+    },
+    {
+      "id": "prism_twin_daggers",
+      "file": "prism-twin-daggers.png",
+      "displayName": "Prism Twin Daggers",
+      "kind": "Dagger",
+      "slot": "light"
+    },
+    {
+      "id": "blood_moon_blade",
+      "file": "blood-moon-blade.png",
+      "displayName": "Blood Moon Blade",
+      "kind": "Longsword",
+      "slot": "heavy"
+    },
+    {
+      "id": "royal_longsword",
+      "file": "royal-longsword.png",
+      "displayName": "Royal Longsword",
+      "kind": "Longsword",
+      "slot": "light"
+    },
+    {
+      "id": "thunder_claymore",
+      "file": "thunder-claymore.png",
+      "displayName": "Thunder Claymore",
+      "kind": "Greatsword",
+      "slot": "heavy"
+    },
+    {
+      "id": "void_shadow_bow",
+      "file": "void-shadow-bow.png",
+      "displayName": "Void Shadow Bow",
+      "kind": "Bow",
+      "slot": "light"
+    },
+    {
+      "id": "prism_sniper_rifle",
+      "file": "prism-sniper.png",
+      "displayName": "Prism Sniper Rifle",
+      "kind": "AssaultRifle",
+      "slot": "light"
+    },
+    {
+      "id": "sakura_shortbow",
+      "file": "sakura-shortbow.png",
+      "displayName": "Sakura Shortbow",
+      "kind": "Bow",
+      "slot": "light"
+    },
+    {
+      "id": "thunder_repeater",
+      "file": "thunder-repeater.png",
+      "displayName": "Thunder Repeater",
+      "kind": "AssaultRifle",
+      "slot": "light"
+    },
+    {
+      "id": "void_wand",
+      "file": "void-wand.png",
+      "displayName": "Void Wand",
+      "kind": "Staff",
+      "slot": "light"
+    },
+    {
+      "id": "dragon_tome_staff",
+      "file": "dragon-tome-staff.png",
+      "displayName": "Dragon Tome Staff",
+      "kind": "Staff",
+      "slot": "heavy"
+    },
+    {
+      "id": "lunar_moon_staff",
+      "file": "lunar-moon-staff.png",
+      "displayName": "Lunar Moon Staff",
+      "kind": "Staff",
+      "slot": "heavy"
+    },
+    {
+      "id": "dragon_mortar",
+      "file": "dragon-mortar.png",
+      "displayName": "Dragon Mortar",
+      "kind": "Launcher",
+      "slot": "heavy"
+    }
   ]
 }
