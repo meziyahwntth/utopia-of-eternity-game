@@ -14,6 +14,7 @@ local playerGui = localPlayer:WaitForChild("PlayerGui")
 local remotes = ReplicatedStorage:WaitForChild("CommerceRemotes")
 local tradeAccept = remotes:WaitForChild("TradeAccept") :: RemoteFunction
 local tradeUpdateOffer = remotes:WaitForChild("TradeUpdateOffer") :: RemoteFunction
+local tradeUpdateCreditOffer = remotes:WaitForChild("TradeUpdateCreditOffer") :: RemoteFunction
 local tradeLock = remotes:WaitForChild("TradeLock") :: RemoteFunction
 local tradeConfirm = remotes:WaitForChild("TradeConfirm") :: RemoteFunction
 local tradeCancel = remotes:WaitForChild("TradeCancel") :: RemoteFunction
@@ -35,6 +36,8 @@ end
 local sessionId: string? = nil
 local myUserId = localPlayer.UserId
 local myOffer: TradeOffer = {}
+local myCreditOffer = 0
+local partnerCreditOffer = 0
 local myLocked = false
 local partnerLocked = false
 local partnerName = "ผู้เล่น"
@@ -104,7 +107,7 @@ do
 end
 
 local myList = Instance.new("TextLabel")
-myList.Size = UDim2.new(1, -8, 1, -8)
+myList.Size = UDim2.new(1, -8, 1, -34)
 myList.Position = UDim2.fromOffset(4, 4)
 myList.BackgroundTransparency = 1
 myList.Text = ""
@@ -116,8 +119,28 @@ myList.TextYAlignment = Enum.TextYAlignment.Top
 myList.TextWrapped = true
 myList.Parent = myPanel
 
+local creditBox = Instance.new("TextBox")
+creditBox.Name = "CreditOffer"
+creditBox.Size = UDim2.new(1, -8, 0, 24)
+creditBox.Position = UDim2.new(0, 4, 1, -28)
+creditBox.BackgroundColor3 = Color3.fromRGB(28, 40, 70)
+creditBox.BorderSizePixel = 0
+creditBox.ClearTextOnFocus = false
+creditBox.Text = "0"
+creditBox.PlaceholderText = "💰 เครดิต"
+creditBox.TextColor3 = Color3.fromRGB(255, 230, 140)
+creditBox.PlaceholderColor3 = Color3.fromRGB(150, 160, 190)
+creditBox.Font = Enum.Font.GothamBold
+creditBox.TextSize = 12
+creditBox.Parent = myPanel
+do
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, 4)
+	c.Parent = creditBox
+end
+
 local partnerList = Instance.new("TextLabel")
-partnerList.Size = UDim2.new(1, -8, 1, -8)
+partnerList.Size = UDim2.new(1, -8, 1, -34)
 partnerList.Position = UDim2.fromOffset(4, 4)
 partnerList.BackgroundTransparency = 1
 partnerList.Text = ""
@@ -128,6 +151,18 @@ partnerList.TextXAlignment = Enum.TextXAlignment.Left
 partnerList.TextYAlignment = Enum.TextYAlignment.Top
 partnerList.TextWrapped = true
 partnerList.Parent = partnerPanel
+
+local partnerCreditLabel = Instance.new("TextLabel")
+partnerCreditLabel.Name = "PartnerCreditOffer"
+partnerCreditLabel.Size = UDim2.new(1, -8, 0, 24)
+partnerCreditLabel.Position = UDim2.new(0, 4, 1, -28)
+partnerCreditLabel.BackgroundTransparency = 1
+partnerCreditLabel.Text = "💰 0"
+partnerCreditLabel.TextColor3 = Color3.fromRGB(255, 230, 140)
+partnerCreditLabel.Font = Enum.Font.GothamBold
+partnerCreditLabel.TextSize = 12
+partnerCreditLabel.TextXAlignment = Enum.TextXAlignment.Left
+partnerCreditLabel.Parent = partnerPanel
 
 local function makeBtn(text: string, x: number, color: Color3): TextButton
 	local btn = Instance.new("TextButton")
@@ -175,6 +210,11 @@ local function refreshUi(partnerOffer: TradeOffer)
 		lockTxt,
 		partnerLockTxt
 	)
+	if not creditBox:IsFocused() then
+		creditBox.Text = tostring(myCreditOffer)
+	end
+	creditBox.TextEditable = not myLocked
+	partnerCreditLabel.Text = "💰 " .. tostring(partnerCreditOffer)
 	lockBtn.Text = if myLocked then "🔒 Locked" else "🔒 Lock"
 	lockBtn.AutoButtonColor = not myLocked
 	confirmBtn.Visible = myLocked and partnerLocked
@@ -184,6 +224,8 @@ local function closeWindow()
 	window.Visible = false
 	sessionId = nil
 	myOffer = {}
+	myCreditOffer = 0
+	partnerCreditOffer = 0
 	myLocked = false
 	partnerLocked = false
 end
@@ -208,6 +250,25 @@ addBtn.MouseButton1Click:Connect(function()
 			myOffer.StoneFragment = nextQty
 		end
 		warn("[Trading] update offer:", msg)
+	end
+end)
+
+creditBox.FocusLost:Connect(function()
+	if myLocked then
+		creditBox.Text = tostring(myCreditOffer)
+		return
+	end
+	local amount = math.floor(tonumber(creditBox.Text) or 0)
+	if amount < 0 then
+		amount = 0
+	end
+	local ok, msg = tradeUpdateCreditOffer:InvokeServer(amount)
+	if ok then
+		myCreditOffer = amount
+		creditBox.Text = tostring(amount)
+	else
+		warn("[Trading] update credit:", msg)
+		creditBox.Text = tostring(myCreditOffer)
 	end
 end)
 
@@ -259,6 +320,8 @@ tradeSessionUpdate.OnClientEvent:Connect(function(payload: any)
 	myOffer = if typeof(mySide.offer) == "table" then mySide.offer :: TradeOffer else {}
 	myLocked = mySide.locked == true
 	partnerLocked = theirSide.locked == true
+	myCreditOffer = if typeof(mySide.creditOffer) == "number" then mySide.creditOffer else 0
+	partnerCreditOffer = if typeof(theirSide.creditOffer) == "number" then theirSide.creditOffer else 0
 
 	if payload.state == "executed" or payload.state == "cancelled" then
 		closeWindow()

@@ -7,6 +7,8 @@ export type BossReward = {
 	credits: number,
 	itemId: string?,
 	mvpItemId: string?,
+	mvpPetId: string?,
+	mvpPetChance: number?,
 }
 
 export type MvpBossDef = {
@@ -68,6 +70,8 @@ MvpBossConfig.Bosses = {
 			credits = 600,
 			itemId = "CardRare",
 			mvpItemId = "EternityGrail",
+			mvpPetId = "void_imp",
+			mvpPetChance = 0.10,
 		},
 	},
 } :: { MvpBossDef }

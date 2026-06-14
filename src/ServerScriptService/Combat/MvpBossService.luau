@@ -32,6 +32,10 @@ local function getItemStore()
 	return require(ServerScriptService:WaitForChild("Progression"):WaitForChild("PlayerItemStore"))
 end
 
+local function getPetService()
+	return require(ServerScriptService:WaitForChild("Commerce"):WaitForChild("PetService"))
+end
+
 local function getBossDefByTime(): MvpBossConfig.MvpBossDef
 	local bosses = MvpBossConfig.Bosses
 	local idx = math.floor(os.time() / MvpBossConfig.SPAWN_INTERVAL_SECONDS) % #bosses + 1
@@ -157,6 +161,22 @@ local function grantRewards(boss: MvpBossConfig.MvpBossDef)
 			local mvpEv = remotes:FindFirstChild("MvpAnnounce") :: RemoteEvent?
 			if mvpEv then
 				mvpEv:FireClient(player, boss.nameTH, reward.mvpItemId)
+			end
+		end
+
+		-- MVP (rank 1) pet drop — e.g. void_imp from the world boss
+		local mvpPetId = reward.mvpPetId
+		if rank == 1 and mvpPetId then
+			if math.random() < (reward.mvpPetChance or 1) then
+				local ok = pcall(function()
+					getPetService().grantPet(player, mvpPetId)
+				end)
+				if ok then
+					local petEv = remotes:FindFirstChild("MvpAnnounce") :: RemoteEvent?
+					if petEv then
+						petEv:FireClient(player, boss.nameTH, mvpPetId)
+					end
+				end
 			end
 		end
 	end
