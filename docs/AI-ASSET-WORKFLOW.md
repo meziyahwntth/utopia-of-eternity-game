@@ -5,7 +5,7 @@
 
 ## 1. UI & 2D Assets Pipeline
 - **ร่าง/Concept:** ChatGPT (DALL·E 3) ทำ Orthographic Reference / concept art เบื้องต้น
-- **ผลิตจริง:** Leonardo.ai + Midjourney v6 **หรือ Cursor** สร้าง game assets (skill icon, Card/Rune, Radial Menu button) — เน้นคมชัด + สไตล์เป็นเอกภาพ
+- **ผลิตจริง:** **Cursor** / Leonardo.ai / Midjourney v6 สร้าง game assets (skill icon, Card/Rune, Radial Menu button) — เน้นคมชัด + สไตล์เป็นเอกภาพ (Cursor = เร็วสุด batch ~52 รูป/5 นาที, ประหยัด usage)
 - **Upscale:** Krea.ai อัป 4K–8K กันภาพแตกบนมือถือ (Mobile-First UX)
 - **Import:** อัปโหลดเข้า **Asset Manager** เป็น Decal/Image → ใช้ใน StarterGui
 

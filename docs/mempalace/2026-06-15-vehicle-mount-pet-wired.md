@@ -22,6 +22,15 @@
 - ทางเลือก: Copy ID to Clipboard ทีละไฟล์ + read_clipboard (เชื่อถือได้แต่ช้า 46 รอบ)
 - ล้าง decal ชั่วคราวออกจาก workspace หลังดึง ID เสร็จ
 
+## Deploy (15 มิ.ย. 2026)
+- **git commit `d16c2ff`** (รวม catalog + art 46 รูป + prompt guides) — push ยังค้าง (ต้องใช้ PAT ของ Praphan: `git push origin main`, มี 6 commits)
+- **EternityCity 94486544638073 published v5→v6** ผ่าน Rojo serve + sync ใน Studio + File→Publish to Roblox
+  - terrain-safe (default.project.json ไม่ map Workspace) — sync เป็น additive ใหญ่เพราะ place เดิม (v5) เก่ามาก ขาดหลายระบบ
+  - verify ใน Studio: pets=18 icon1=rbxassetid://138487953541573, vm=29 icon1=rbxassetid://131937012876652, terrain=true
+  - place อื่น (Hub/Solhaven/Nocturne/DeathValley/NeonUtopia) ยังไม่ได้ deploy รอบนี้
+
 ## งานถัดไป (ค้าง)
+- `git push` (Praphan ใส่ PAT)
 - โมเดล 3D vehicle/mount จาก refImage
 - pet modelId ยัง = rbxassetid://0 (ยังไม่มีโมเดล 3D)
+- (ถ้าต้องการ) deploy โค้ดล่าสุดไป place อื่นด้วยวิธีเดียวกัน

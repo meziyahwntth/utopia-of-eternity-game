@@ -394,4 +394,39 @@ Bounty Board (NPC ในเมือง)
 
 ---
 
-*MASTER-BLUEPRINT อัปเดต 13 มิ.ย. 2026 (§11 Research 2.5–2.7 integrated)*
+## 12. 🆕 Next-Gen Direction & 2-Day Progress (อัปเดต 15 มิ.ย. 2026)
+
+### 12.1 ทิศทางใหม่ (ยืนยันโดย Praphan)
+ยกระดับ Utopia เป็น **Next-Gen mobile MMORPG** คุณภาพเทียบ **Lineage W / Ragnarok Mobile** — "แมพที่ดีที่สุดเท่าที่เคยมี ไม่เร่ง ทุกดีเทลต้องดีที่สุด" เพื่อส่งมอบ: กราฟิกอลังการสมจริง, เนื้อเรื่องน่าตื่นเต้น, live-ops มีของใหม่เรื่อย ๆ, กิจกรรมไม่รู้จบ, สังคมเกมดี + แอดมินจริยธรรม (แบนบอท/ฟาร์มเข้มงวด).
+
+**Art direction = Next-Gen สมจริง (ไม่ใช่บล็อกคลาสสิก):** custom skinned mesh body + **PBR** (Color/Normal/Roughness/Metalness ผ่าน `SurfaceAppearance`) + lighting/atmosphere + animation/camera สมจริง. หมายเหตุสำคัญ: avatar ในเกม = Roblox mesh เสมอ → ภาพ realistic-human (เช่นที่ Cursor เจน) ใช้เป็น **marketing/concept**; เสื้อผ้า/wearable จริงต้องออกแบบบนทรง mesh เป้าหมายเพื่อแมปได้.
+
+### 12.2 AI Asset Pipeline มาตรฐาน → `docs/AI-ASSET-WORKFLOW.md`
+2D/UI: ChatGPT DALL·E3 (ร่าง ortho) → **Cursor / Leonardo.ai / Midjourney v6** (asset จริง) → Krea.ai (upscale 4K-8K) → Asset Manager Decal/Image → StarterGui · Env: Blockade Skybox AI · texture→NormalMap-Online→SurfaceAppearance · 3D: ChatGPT→Meshy/Tripo→Blender(ลด poly)→Roblox 3D Importer→MeshPart. **Cowork ทำเอง:** Cursor batch prompt, อัปโหลด/ดึง ID/wire, import mesh, publish, verify. **ทำเองไม่ได้:** เจนภาพ/mesh (ใช้ Cursor/external).
+
+### 12.3 ✅ เสร็จแล้วช่วง 14-15 มิ.ย. (verified)
+- **Weapon icons 34/34** wired (`iconAssetId`), group 791898614, moderation Green
+- **Vehicle/Mount/Pet asset IDs:** อัปโหลด 46 รูป → wire `PetConfig.icon` (emoji→rbxassetid ×18) + `VehicleMountCatalog.iconAssetId` (×29) — ตาราง `docs/visual-ref/ASSET-IDS-VEHICLE-MOUNT-PET.md`
+- **Publish EternityCity v5→v6→v7** (Rojo live-sync + Publish, terrain-safe)
+- **MVP boss void_imp pet drop** (eternal_warden, MVP rank1 10%) + **TradingClient credit offer UI** (v7, commit 976bbc3)
+- **Auto-Lock Targeting System** (commit 75c955a): `TargetingController` + `TargetingClient` + AutoBattle refactor — tap-lock, ring+name/HP, Lock/Unlock mobile button, server-auth คงเดิม (verified compile + synced)
+- **Fashion art:** teen-trend **90/90** (Cursor wave2 ครบ), national 20, concepts 8 (`docs/visual-ref/fashion/`)
+- เอกสาร: `MOBILE-FIRST-RPG-MATRIX.md` (gap analysis), `AI-ASSET-WORKFLOW.md`
+
+### 12.4 ⚠️ ต้องกลับไปแก้ให้ตรงเป้า Next-Gen
+- **Avatar body:** ย้ายไป custom skinned mesh (chibi-curvy/Next-Gen) + สูงขึ้น — ยังเป็นบล็อก default (งานใหญ่แยก)
+- **ความสอดคล้องภาพ concept:** teen-trend 90 รูปเป็น human-realistic → ตัดสิน: ปรับให้ตรงทรง avatar จริง หรือใช้เป็น marketing + ทำ wearable บน mesh
+- **PBR pass:** อาวุธ/ฉาก/พื้นผิวยังเป็น texture เรียบ → เพิ่ม SurfaceAppearance (Normal/Roughness/Metalness)
+- **Skybox/Lighting:** ทำ Blockade skybox ต่อมิติ + ปรับ atmosphere ให้ Next-Gen
+
+### 12.5 ▶️ Roadmap ถัดไป (Mobile-First gap fill — Matrix 80% มีแล้ว)
+| ลำดับ | งาน | สถานะ |
+|---|---|---|
+| 1 | **Auto-Lock Targeting** | ✅ เสร็จ (v7 synced; รอ playtest/publish) |
+| 2 | **Skill Bar HUD มือถือ** (ปุ่มสกิลขวาล่าง + cooldown + attack/jump) | ⏳ ถัดไป |
+| 3 | **Mobile-UX audit** (ทุก HUD: Scale+UIAspectRatioConstraint, touch zone, collapsible/auto-hide ตอนสู้) | ⏳ |
+| 4 | **Next-Gen Art track** (custom mesh body + PBR + skybox) | ⏳ งานใหญ่ขนาน (Cursor/Meshy/Blender) |
+
+---
+
+*MASTER-BLUEPRINT อัปเดต 15 มิ.ย. 2026 (§12 Next-Gen direction + 2-day progress) · §11 13 มิ.ย. · ดู `MOBILE-FIRST-RPG-MATRIX.md` + `AI-ASSET-WORKFLOW.md`*
