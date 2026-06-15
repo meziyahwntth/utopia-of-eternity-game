@@ -354,6 +354,24 @@
       },
       "Progression": {
         "$className": "Folder",
+        "ClassService": {
+          "$path": "src/ServerScriptService/Progression/ClassService.luau"
+        },
+        "ClassRemoteSetup": {
+          "$path": "src/ServerScriptService/Progression/ClassRemoteSetup.server.luau"
+        },
+        "ClassHandlers": {
+          "$path": "src/ServerScriptService/Progression/ClassHandlers.server.luau"
+        },
+        "RaceService": {
+          "$path": "src/ServerScriptService/Progression/RaceService.luau"
+        },
+        "RaceRemoteSetup": {
+          "$path": "src/ServerScriptService/Progression/RaceRemoteSetup.server.luau"
+        },
+        "RaceHandlers": {
+          "$path": "src/ServerScriptService/Progression/RaceHandlers.server.luau"
+        },
         "PrismKeyService": {
           "$path": "src/ServerScriptService/Progression/PrismKeyService.luau"
         },

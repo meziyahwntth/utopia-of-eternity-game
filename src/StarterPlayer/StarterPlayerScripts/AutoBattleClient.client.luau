@@ -15,6 +15,7 @@ local playerGui = localPlayer:WaitForChild("PlayerGui")
 local Modules = ReplicatedStorage:WaitForChild("Modules")
 local CombatConfig = require(Modules:WaitForChild("CombatConfig"))
 local Targeting = require(Modules:WaitForChild("TargetingController"))
+local CombatState = require(Modules:WaitForChild("CombatStateController"))
 
 local remotes = ReplicatedStorage:WaitForChild("CombatRemotes")
 local attackRequest = remotes:WaitForChild("CombatAttackRequest") :: RemoteEvent
@@ -124,6 +125,9 @@ end
 local function setAuto(enabled: boolean)
 	autoEnabled = enabled
 	refreshToggle()
+	if enabled then
+		CombatState.EnterCombat("auto-battle")
+	end
 end
 
 toggleBtn.Activated:Connect(function()
@@ -178,6 +182,7 @@ RunService.Heartbeat:Connect(function()
 	end
 	nextAttackAt = now + attackSpeed()
 	attackRequest:FireServer(npcId, CombatConfig.DefaultSkillId)
+	CombatState.EnterCombat("auto-attack")
 end)
 
 refreshToggle()

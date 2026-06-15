@@ -3,6 +3,10 @@
 	Death Valley Phase A — Beacon, night cycle, wraith wave tuning.
 ]]
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local PartySizeScaling = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PartySizeScaling"))
+
 export type WraithKind = "Whisper" | "Stalker" | "LegionEcho"
 export type NightPhase = "prep" | "wave" | "intermission"
 
@@ -120,7 +124,7 @@ PrismDeathValleySurvivalConfig.Wraiths = {
 }
 
 PrismDeathValleySurvivalConfig.BaseWraithsPerWave = 2
-PrismDeathValleySurvivalConfig.WraithsPerPartyMember = 1
+PrismDeathValleySurvivalConfig.WraithsPerPartyMember = 1 -- legacy; wave count now uses PartySizeScaling hpMult
 PrismDeathValleySurvivalConfig.WraithsPerThreeNights = 1
 
 PrismDeathValleySurvivalConfig.Revive = {
@@ -343,9 +347,11 @@ end
 
 function PrismDeathValleySurvivalConfig.computeWraithCount(nightNumber: number, partySize: number, modifier: NightModifierDef?): number
 	local mod = modifier or PrismDeathValleySurvivalConfig.getNightModifier(nightNumber)
-	local count = PrismDeathValleySurvivalConfig.BaseWraithsPerWave
-		+ partySize * PrismDeathValleySurvivalConfig.WraithsPerPartyMember
+	local scale = PartySizeScaling.compute(partySize)
+	local core = PrismDeathValleySurvivalConfig.BaseWraithsPerWave
 		+ math.floor(nightNumber / 3) * PrismDeathValleySurvivalConfig.WraithsPerThreeNights
+	-- Solo: fewer wraiths (core × 1.0). Party: more wraiths via hpMult curve. Night modifier extras unchanged.
+	local count = math.floor(core * scale.hpMult)
 		+ mod.extraWhispers
 		+ mod.extraStalkers
 		+ mod.extraLegion

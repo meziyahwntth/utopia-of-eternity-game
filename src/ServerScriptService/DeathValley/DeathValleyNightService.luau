@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local GameConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("GameConfig"))
+local PartySizeScaling = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PartySizeScaling"))
 local PrismDeathValleySurvivalConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PrismDeathValleySurvivalConfig"))
 local WorldPlaceGuard = require(script.Parent.Parent:WaitForChild("World"):WaitForChild("WorldPlaceGuard"))
 
@@ -37,8 +38,7 @@ local wraithFolderParent: Instance? = nil
 local lastWaveBroadcast = 0
 
 local function getPartySize(): number
-	local count = #Players:GetPlayers()
-	return math.clamp(count, 1, GameConfig.DeathValley.PartySize)
+	return PartySizeScaling.countInPlace()
 end
 
 local function syncPlayerMeta()
@@ -126,7 +126,7 @@ local function beginWave()
 	waveActive = true
 	phaseEndsAt = os.clock() + currentWaveSeconds
 	local parent = wraithFolderParent or workspace:FindFirstChild("UtopiaDeathValley") or workspace
-	local spawned = DeathValleyWraithFactory.spawnWave(currentNight, getPartySize(), parent, modifier)
+	local spawned = DeathValleyWraithFactory.spawnWave(currentNight, parent, modifier)
 	wraithAlert:FireAllClients({
 		kind = "WaveStart",
 		message = string.format(

@@ -16,6 +16,7 @@ local playerGui = localPlayer:WaitForChild("PlayerGui")
 local Modules = ReplicatedStorage:WaitForChild("Modules")
 local CombatConfig = require(Modules:WaitForChild("CombatConfig"))
 local Targeting = require(Modules:WaitForChild("TargetingController"))
+local CombatState = require(Modules:WaitForChild("CombatStateController"))
 
 local remotes = ReplicatedStorage:WaitForChild("CombatRemotes")
 local attackRequest = remotes:WaitForChild("CombatAttackRequest") :: RemoteEvent
@@ -134,38 +135,94 @@ local function makeButton(order: number, text: string, color: Color3): (TextButt
 	return btn, ov, cdText
 end
 
--- skill buttons
-local skills: { CombatConfig.SkillDef } = CombatConfig.Skills
-for i, def in skills do
-	local btn, ov, cdText = makeButton(i, def.icon, Color3.fromRGB(46, 58, 92))
-	table.insert(overlays, { id = def.id, cd = def.cooldown, frame = ov, label = cdText })
-	btn.Activated:Connect(function()
-		local cdEnd = cooldownEnd[def.id]
-		if cdEnd and os.clock() < cdEnd then
-			return
+-- แปลง list of skill id → SkillDef (icon/label/cooldown) ผ่าน CombatConfig.SkillMeta/SkillCooldown
+local function skillDefsFromIds(ids: { string }): { CombatConfig.SkillDef }
+	local out: { CombatConfig.SkillDef } = {}
+	local meta: { [string]: { label: string, icon: string } } = (CombatConfig :: any).SkillMeta
+	local cds: { [string]: number } = CombatConfig.SkillCooldown
+	for _, id in ids do
+		local m = meta and meta[id]
+		local cd = cds[id]
+		table.insert(out, {
+			id = id,
+			label = if m then m.label else id,
+			icon = if m then m.icon else "•",
+			cooldown = if typeof(cd) == "number" then cd else 0,
+		})
+	end
+	return out
+end
+
+local function clearButtons()
+	for _, child in bar:GetChildren() do
+		if child:IsA("TextButton") then
+			child:Destroy()
 		end
-		local enemy = currentEnemy()
-		if not enemy then
-			return
-		end
-		local npcId = enemy:GetAttribute(CombatConfig.NpcIdAttribute)
-		if typeof(npcId) ~= "number" then
-			return
-		end
-		attackRequest:FireServer(npcId, def.id)
-		if def.cooldown > 0 then
-			cooldownEnd[def.id] = os.clock() + def.cooldown
+	end
+	table.clear(overlays)
+	table.clear(cooldownEnd)
+end
+
+-- สร้างแถบสกิล (ตามคลาส; default = CombatConfig.Skills) — เรียกซ้ำได้เมื่อเปลี่ยนคลาส
+local function buildBar(skillDefs: { CombatConfig.SkillDef })
+	clearButtons()
+	for i, def in skillDefs do
+		local btn, ov, cdText = makeButton(i, def.icon, Color3.fromRGB(46, 58, 92))
+		table.insert(overlays, { id = def.id, cd = def.cooldown, frame = ov, label = cdText })
+		btn.Activated:Connect(function()
+			local cdEnd = cooldownEnd[def.id]
+			if cdEnd and os.clock() < cdEnd then
+				return
+			end
+			local enemy = currentEnemy()
+			if not enemy then
+				return
+			end
+			local npcId = enemy:GetAttribute(CombatConfig.NpcIdAttribute)
+			if typeof(npcId) ~= "number" then
+				return
+			end
+			attackRequest:FireServer(npcId, def.id)
+			CombatState.EnterCombat("skill")
+			if def.cooldown > 0 then
+				cooldownEnd[def.id] = os.clock() + def.cooldown
+			end
+		end)
+	end
+	-- Jump button (rightmost)
+	local jumpBtn = makeButton(#skillDefs + 1, "⤴", Color3.fromRGB(70, 100, 60))
+	jumpBtn.Activated:Connect(function()
+		local char = localPlayer.Character
+		local hum = char and char:FindFirstChildOfClass("Humanoid")
+		if hum then
+			hum.Jump = true
 		end
 	end)
 end
 
--- Jump button (rightmost, larger emphasis color)
-local jumpBtn = makeButton(#skills + 1, "⤴", Color3.fromRGB(70, 100, 60))
-jumpBtn.Activated:Connect(function()
-	local char = localPlayer.Character
-	local hum = char and char:FindFirstChildOfClass("Humanoid")
-	if hum then
-		hum.Jump = true
+-- เริ่มด้วย default แล้วลองดึงสกิลตามคลาส + ฟังการเปลี่ยนคลาส
+buildBar(CombatConfig.Skills)
+task.spawn(function()
+	local remotes = ReplicatedStorage:WaitForChild("ClassRemotes", 10)
+	if not remotes then
+		return
+	end
+	local getMyClass = remotes:FindFirstChild("GetMyClass")
+	if getMyClass and getMyClass:IsA("RemoteFunction") then
+		local ok, _classId, classSkills = pcall(function()
+			return getMyClass:InvokeServer()
+		end)
+		if ok and typeof(classSkills) == "table" then
+			buildBar(skillDefsFromIds(classSkills))
+		end
+	end
+	local changed = remotes:FindFirstChild("ClassChanged")
+	if changed and changed:IsA("RemoteEvent") then
+		changed.OnClientEvent:Connect(function(_classId: any, classSkills: any)
+			if typeof(classSkills) == "table" then
+				buildBar(skillDefsFromIds(classSkills))
+			end
+		end)
 	end
 end)
 

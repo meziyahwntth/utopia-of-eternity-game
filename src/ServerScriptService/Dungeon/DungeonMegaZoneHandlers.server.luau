@@ -117,7 +117,7 @@ startBoss.OnServerInvoke = function(player: Player, zoneId: string)
 	end
 
 	local zoneDef = runtime.zoneDef
-	local count = #DungeonZoneRuntime.getPlayersInZone(runtime)
+	local count = DungeonZoneRuntime.getPartyCount(runtime)
 	if count < zoneDef.minToEnterBoss then
 		return {
 			ok = false,
@@ -126,7 +126,7 @@ startBoss.OnServerInvoke = function(player: Player, zoneId: string)
 	end
 
 	runtime.bossActive = true
-	runtime.bossHp = runtime.bossMaxHp
+	DungeonZoneRuntime.prepareBossEncounter(runtime)
 	broadcastState(runtime)
 
 	local canWin = count >= zoneDef.minToSucceed
@@ -253,6 +253,7 @@ recordAssist.OnServerInvoke = function(player: Player, assistType: string)
 					local message = contributionReason or "Contribution not met"
 					if contributionMet then
 						granted, message = grantKey(p, runtime.zoneDef.id, runtime.zoneDef.zoneIndex)
+						DungeonZoneRuntime.grantShardReward(p, runtime.scaledShardReward)
 					end
 					p:SetAttribute("DungeonZone" .. runtime.zoneDef.zoneIndex .. "Cleared", true)
 					broadcastPersonalClear(runtime, p, granted, message, contributionMet)

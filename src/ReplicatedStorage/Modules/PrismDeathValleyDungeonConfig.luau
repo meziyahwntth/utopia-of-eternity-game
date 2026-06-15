@@ -4,6 +4,10 @@
 	Design: docs/DEATH-VALLEY-MEGA-DUNGEON.md
 ]]
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local PartySizeScaling = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PartySizeScaling"))
+
 export type DungeonRoleId =
 	"BossStriker"
 	| "AddStriker"
@@ -31,6 +35,7 @@ export type ZoneDef = {
 	rewardMultiplier: number,
 	bossName: string,
 	bossMaxHp: number?,
+	baseShardReward: number?,
 	damagePerAssistHit: number?,
 }
 
@@ -47,10 +52,11 @@ PrismDeathValleyDungeonConfig.Zones = {
 		zoneIndex = 1,
 		nominalTeamSize = 2,
 		minToEnterBoss = 1,
-		minToSucceed = 2,
+		minToSucceed = 1, -- solo-viable baseline (PartySizeScaling count=1)
 		rewardMultiplier = 1.0,
 		bossName = "Wraith Pair",
 		bossMaxHp = 240,
+		baseShardReward = 10,
 		damagePerAssistHit = 15,
 	},
 	{
@@ -63,6 +69,7 @@ PrismDeathValleyDungeonConfig.Zones = {
 		rewardMultiplier = 1.1,
 		bossName = "Hollow Choir",
 		bossMaxHp = 480,
+		baseShardReward = 12,
 		damagePerAssistHit = 18,
 	},
 	{
@@ -75,6 +82,7 @@ PrismDeathValleyDungeonConfig.Zones = {
 		rewardMultiplier = 1.2,
 		bossName = "Spirit Colossus",
 		bossMaxHp = 1200,
+		baseShardReward = 15,
 		damagePerAssistHit = 20,
 	},
 	{
@@ -87,6 +95,7 @@ PrismDeathValleyDungeonConfig.Zones = {
 		rewardMultiplier = 1.3,
 		bossName = "Legion Warden",
 		bossMaxHp = 2400,
+		baseShardReward = 18,
 		damagePerAssistHit = 22,
 	},
 	{
@@ -99,6 +108,7 @@ PrismDeathValleyDungeonConfig.Zones = {
 		rewardMultiplier = 1.4,
 		bossName = "Triad Wraith Sovereign",
 		bossMaxHp = 6000,
+		baseShardReward = 20,
 		damagePerAssistHit = 25,
 	},
 }
@@ -201,6 +211,30 @@ end
 
 function PrismDeathValleyDungeonConfig.getRewardMultiplier(zoneIndex: number): number
 	return 1 + PrismDeathValleyDungeonConfig.RewardBonusPerZone * (zoneIndex - 1)
+end
+
+function PrismDeathValleyDungeonConfig.getBaseBossHp(zoneDef: ZoneDef): number
+	return zoneDef.bossMaxHp or 240
+end
+
+function PrismDeathValleyDungeonConfig.getBaseClearShardReward(zoneDef: ZoneDef): number
+	local base = zoneDef.baseShardReward or 10
+	return math.floor(base * zoneDef.rewardMultiplier)
+end
+
+--[[
+	Scale boss HP / clear reward from instance participant set (zonePlayers).
+	Solo count=1 → hpMult=1, rewardMult=1 (baseline soloable).
+]]
+function PrismDeathValleyDungeonConfig.scaleBossHp(zoneDef: ZoneDef, participants: { [number]: boolean }): number
+	local count = PartySizeScaling.countInSet(participants)
+	return PartySizeScaling.scaleHp(PrismDeathValleyDungeonConfig.getBaseBossHp(zoneDef), count)
+end
+
+function PrismDeathValleyDungeonConfig.scaleClearReward(zoneDef: ZoneDef, participants: { [number]: boolean }): number
+	local count = PartySizeScaling.countInSet(participants)
+	local baseReward = PrismDeathValleyDungeonConfig.getBaseClearShardReward(zoneDef)
+	return PartySizeScaling.scaleReward(baseReward, count)
 end
 
 return PrismDeathValleyDungeonConfig

@@ -1,24 +1,25 @@
-=== Fri Jun 12 00:47:18 +07 2026 ===
+=== Mon Jun 15 09:00:34 +07 2026 ===
 Input image: docs/visual-ref/city-concept/SkyRailPlaza.png (1878 KB)
 Output:      /Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/assets/City/SkyRailPlaza-18k.obj
-Meshy task created: 019eb7cb-ac31-7df7-afca-788fb60b57b1
+Meshy task created: 019ec902-5de8-7f7e-baac-99a5f5b4b4d7
   status=IN_PROGRESS progress=1%
-  status=IN_PROGRESS progress=1%
-  status=IN_PROGRESS progress=15%
+  status=IN_PROGRESS progress=7%
+  status=IN_PROGRESS progress=22%
   status=IN_PROGRESS progress=27%
   status=IN_PROGRESS progress=49%
   status=SUCCEEDED progress=100%
-Downloaded meshy-SkyRailPlaza-raw.obj (32.3 MB) → /tmp/meshy-SkyRailPlaza-raw.obj
+Downloaded meshy-SkyRailPlaza-raw.obj (29.1 MB) → /tmp/meshy-SkyRailPlaza-raw.obj
 Traceback (most recent call last):
-  File "/Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/scripts/meshy-hero-mesh.py", line 366, in <module>
+  File "/Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/scripts/meshy-hero-mesh.py", line 375, in <module>
     raise SystemExit(main())
                      ~~~~^^
-  File "/Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/scripts/meshy-hero-mesh.py", line 351, in main
+  File "/Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/scripts/meshy-hero-mesh.py", line 360, in main
     report = decimate_mesh(raw_path, name, out_path)
   File "/Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/scripts/meshy-hero-mesh.py", line 199, in decimate_mesh
     import numpy as np
 ModuleNotFoundError: No module named 'numpy'
 script exit=1
-raw copied to assets/City/SkyRailPlaza-raw.obj ( 32M)
--rw-r--r--  1 macbook  staff  33843406 Jun 12 00:48 SkyRailPlaza-raw.obj
-=== DONE Fri Jun 12 00:48:10 +07 2026 ===
+raw copied to assets/City/SkyRailPlaza-raw.obj ( 29M)
+-rw-r--r--   1 macbook  staff    617905 Jun 12 01:14 SkyRailPlaza-18k.obj
+-rw-r--r--   1 macbook  staff  30561156 Jun 15 09:01 SkyRailPlaza-raw.obj
+=== DONE Mon Jun 15 09:01:27 +07 2026 ===

@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
+local PartySizeScaling = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PartySizeScaling"))
 local PrismDeathValleySurvivalConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PrismDeathValleySurvivalConfig"))
 local DeathValleyBeaconService = require(script.Parent:WaitForChild("DeathValleyBeaconService"))
 
@@ -46,13 +47,15 @@ end
 function DeathValleyWraithFactory.spawn(
 	kind: PrismDeathValleySurvivalConfig.WraithKind,
 	parent: Instance,
-	modifier: PrismDeathValleySurvivalConfig.NightModifierDef?
+	modifier: PrismDeathValleySurvivalConfig.NightModifierDef?,
+	partyHpMult: number?
 ): Model
 	local def = PrismDeathValleySurvivalConfig.Wraiths[kind]
 	local mod = modifier or {
 		wraithSpeedMultiplier = 1,
 		wraithHealthMultiplier = 1,
 	} :: PrismDeathValleySurvivalConfig.NightModifierDef
+	local hpMult = partyHpMult or 1
 	local model = Instance.new("Model")
 	model.Name = "Wraith_" .. kind
 
@@ -68,7 +71,7 @@ function DeathValleyWraithFactory.spawn(
 	model.PrimaryPart = core
 
 	local hum = Instance.new("Humanoid")
-	hum.MaxHealth = math.floor(def.maxHealth * mod.wraithHealthMultiplier)
+	hum.MaxHealth = math.floor(def.maxHealth * mod.wraithHealthMultiplier * hpMult)
 	hum.Health = hum.MaxHealth
 	hum.WalkSpeed = def.walkSpeed * mod.wraithSpeedMultiplier
 	hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
@@ -106,14 +109,15 @@ end
 
 function DeathValleyWraithFactory.spawnWave(
 	nightNumber: number,
-	partySize: number,
 	parent: Instance,
 	modifier: PrismDeathValleySurvivalConfig.NightModifierDef?
 ): number
 	DeathValleyWraithFactory.ensureFolder(parent)
 	local mod = modifier or PrismDeathValleySurvivalConfig.getNightModifier(nightNumber)
+	local partyCount = PartySizeScaling.countInPlace()
+	local scale = PartySizeScaling.compute(partyCount)
 	local kinds = PrismDeathValleySurvivalConfig.getWraithKindsForNight(nightNumber)
-	local total = PrismDeathValleySurvivalConfig.computeWraithCount(nightNumber, partySize, mod)
+	local total = PrismDeathValleySurvivalConfig.computeWraithCount(nightNumber, partyCount, mod)
 	local spawned = 0
 	for i = 1, total do
 		local kind = kinds[((i - 1) % #kinds) + 1]
@@ -129,7 +133,7 @@ function DeathValleyWraithFactory.spawnWave(
 		elseif mod.extraWhispers > 0 and i <= mod.extraWhispers then
 			kind = "Whisper"
 		end
-		DeathValleyWraithFactory.spawn(kind, activeFolder :: Folder, mod)
+		DeathValleyWraithFactory.spawn(kind, activeFolder :: Folder, mod, scale.hpMult)
 		spawned += 1
 	end
 	DeathValleyWraithFactory.startAi()

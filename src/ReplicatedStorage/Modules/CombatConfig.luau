@@ -31,9 +31,27 @@ CombatConfig.BaseDamage = {
 } :: { [WeaponTier]: number }
 
 CombatConfig.SkillMultiplier = {
+	-- shared / starter
 	BasicAttack = 1.0,
 	PowerSlash = 1.8,
 	AoeSpin = 1.2,
+	-- Warrior line (Sword)
+	ShieldBash = 1.4,
+	IronGuard = 1.0,
+	Rampage = 2.4,
+	HolyStrike = 1.7,
+	-- Mage line (Staff)
+	Fireball = 1.6,
+	FrostNova = 1.3,
+	Meteor = 2.6,
+	Smite = 1.6,
+	CurseBolt = 1.8,
+	-- Hunter line (Bow)
+	PiercingArrow = 1.6,
+	MultiShot = 1.3,
+	RapidFire = 2.2,
+	Backstab = 2.5,
+	TrapShot = 1.5,
 } :: { [string]: number }
 
 -- Per-skill cooldown (seconds). BasicAttack=0 uses weapon AttackSpeed cadence.
@@ -42,16 +60,51 @@ CombatConfig.SkillCooldown = {
 	BasicAttack = 0,
 	PowerSlash = 4,
 	AoeSpin = 7,
+	ShieldBash = 6,
+	IronGuard = 10,
+	Rampage = 12,
+	HolyStrike = 8,
+	Fireball = 5,
+	FrostNova = 8,
+	Meteor = 14,
+	Smite = 7,
+	CurseBolt = 9,
+	PiercingArrow = 5,
+	MultiShot = 8,
+	RapidFire = 12,
+	Backstab = 11,
+	TrapShot = 9,
 } :: { [string]: number }
 
 export type SkillDef = { id: string, label: string, icon: string, cooldown: number }
 
--- Ordered list shown on the mobile Skill Bar (bottom-right).
+-- Ordered list shown on the mobile Skill Bar (bottom-right) — default (ผู้เล่นที่ยังไม่เลือกคลาส)
 CombatConfig.Skills = {
 	{ id = "BasicAttack", label = "Attack", icon = "⚔", cooldown = 0 },
 	{ id = "PowerSlash", label = "Power", icon = "💥", cooldown = 4 },
 	{ id = "AoeSpin", label = "Spin", icon = "🌀", cooldown = 7 },
 } :: { SkillDef }
+
+-- Metadata (icon/label) ต่อ skill id — ใช้ render Skill Bar ตามคลาส (ClassConfig.skills อ้าง id เหล่านี้)
+CombatConfig.SkillMeta = {
+	BasicAttack = { label = "Attack", icon = "⚔" },
+	PowerSlash = { label = "Power", icon = "💥" },
+	AoeSpin = { label = "Spin", icon = "🌀" },
+	ShieldBash = { label = "Bash", icon = "🛡" },
+	IronGuard = { label = "Guard", icon = "🛡️" },
+	Rampage = { label = "Rampage", icon = "🔥" },
+	HolyStrike = { label = "Holy", icon = "✨" },
+	Fireball = { label = "Fire", icon = "🔥" },
+	FrostNova = { label = "Frost", icon = "❄" },
+	Meteor = { label = "Meteor", icon = "☄" },
+	Smite = { label = "Smite", icon = "🌟" },
+	CurseBolt = { label = "Curse", icon = "💀" },
+	PiercingArrow = { label = "Pierce", icon = "🏹" },
+	MultiShot = { label = "Multi", icon = "🎯" },
+	RapidFire = { label = "Rapid", icon = "💨" },
+	Backstab = { label = "Backstab", icon = "🗡" },
+	TrapShot = { label = "Trap", icon = "🪤" },
+} :: { [string]: { label: string, icon: string } }
 
 CombatConfig.DefaultWeaponType = "Sword" :: WeaponType
 CombatConfig.DefaultWeaponTier = "T1" :: WeaponTier

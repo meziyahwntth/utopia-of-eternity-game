@@ -6,6 +6,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local PartySizeScaling = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PartySizeScaling"))
 local PrismDeathValleySurvivalConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PrismDeathValleySurvivalConfig"))
 local DeathValleyPlayerStore = require(script.Parent:WaitForChild("DeathValleyPlayerStore"))
 local DeathValleyExpansionService = require(script.Parent:WaitForChild("DeathValleyExpansionService"))
@@ -19,6 +20,7 @@ local bossActive = false
 local bossHp = 0
 local bossMaxHp = 0
 local currentBossId = ""
+local encounterPartyCount = 1
 local participants: { [number]: boolean } = {}
 
 function DeathValleyWeeklyBossService.getWeekId(): string
@@ -71,8 +73,8 @@ function DeathValleyWeeklyBossService.startBoss(player: Player): (boolean, strin
 	end
 
 	local boss = DeathValleyWeeklyBossService.getBossDef()
-	local partySize = math.clamp(#Players:GetPlayers(), 1, 8)
-	bossMaxHp = math.floor(boss.baseHp + boss.hpPerPlayer * partySize)
+	encounterPartyCount = PartySizeScaling.countInPlace()
+	bossMaxHp = PartySizeScaling.scaleHp(boss.baseHp, encounterPartyCount)
 	bossHp = bossMaxHp
 	bossActive = true
 	currentBossId = boss.id
@@ -93,6 +95,7 @@ function DeathValleyWeeklyBossService.attackBoss(player: Player): (boolean, stri
 
 	if bossHp <= 0 then
 		bossActive = false
+		local shardReward = PartySizeScaling.scaleReward(boss.shardReward, encounterPartyCount)
 		for userId, _ in participants do
 			DeathValleyPlayerStore.markWeeklyBossClear(userId, DeathValleyWeeklyBossService.getWeekId())
 			local p = Players:GetPlayerByUserId(userId)
@@ -101,12 +104,12 @@ function DeathValleyWeeklyBossService.attackBoss(player: Player): (boolean, stri
 				if typeof(shards) ~= "number" then
 					shards = 0
 				end
-				p:SetAttribute("DV_LuminiteShards", shards + boss.shardReward)
+				p:SetAttribute("DV_LuminiteShards", shards + shardReward)
 				p:SetAttribute("DV_WeeklyBossCleared", DeathValleyWeeklyBossService.getWeekId())
 			end
 		end
 		broadcast()
-		return true, string.format("%s defeated! +%d Luminite shards", boss.displayName, boss.shardReward), 0
+		return true, string.format("%s defeated! +%d Luminite shards", boss.displayName, shardReward), 0
 	end
 	return true, string.format("%s — %d HP left", boss.displayName, bossHp), bossHp
 end

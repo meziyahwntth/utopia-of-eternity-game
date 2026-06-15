@@ -6,6 +6,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local PartySizeScaling = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PartySizeScaling"))
 local DungeonContributionChecker = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("DungeonContributionChecker"))
 local DungeonLoadoutCalculator = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("DungeonLoadoutCalculator"))
 local PrismDeathValleyDungeonConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PrismDeathValleyDungeonConfig"))
@@ -26,31 +27,29 @@ export type ZoneRuntime = {
 	bossCleared: boolean,
 	bossHp: number,
 	bossMaxHp: number,
+	baseBossHp: number,
+	encounterPartyCount: number,
+	scaledShardReward: number,
 	lastOutcomeMessage: string?,
 }
 
 local DungeonZoneRuntime = {}
 
-local DEFAULT_BOSS_HP = {
-	duo_depth = 240,
-	squad_hollow = 480,
-	raid_cavern = 1200,
-	legion_pass = 2400,
-	abyss_throne = 6000,
-}
-
 -- Registry กลาง zoneId → runtime (ให้ SecurityRemoteBootstrap lookup ได้)
 local registry: { [string]: ZoneRuntime } = {}
 
 function DungeonZoneRuntime.create(zoneDef: PrismDeathValleyDungeonConfig.ZoneDef): ZoneRuntime
-	local maxHp = zoneDef.bossMaxHp or DEFAULT_BOSS_HP[zoneDef.id] or 240
+	local baseHp = PrismDeathValleyDungeonConfig.getBaseBossHp(zoneDef)
 	local runtime: ZoneRuntime = {
 		zoneDef = zoneDef,
 		zonePlayers = {},
 		bossActive = false,
 		bossCleared = false,
 		bossHp = 0,
-		bossMaxHp = maxHp,
+		bossMaxHp = baseHp,
+		baseBossHp = baseHp,
+		encounterPartyCount = 1,
+		scaledShardReward = PrismDeathValleyDungeonConfig.getBaseClearShardReward(zoneDef),
 		lastOutcomeMessage = nil,
 	}
 	registry[zoneDef.id] = runtime
@@ -59,6 +58,45 @@ end
 
 function DungeonZoneRuntime.getRuntime(zoneId: string): ZoneRuntime?
 	return registry[zoneId]
+end
+
+function DungeonZoneRuntime.getParticipantSet(runtime: ZoneRuntime): { [number]: boolean }
+	local participants: { [number]: boolean } = {}
+	for userId, _ in runtime.zonePlayers do
+		local player = Players:GetPlayerByUserId(userId)
+		if player then
+			participants[userId] = true
+		end
+	end
+	return participants
+end
+
+function DungeonZoneRuntime.getPartyCount(runtime: ZoneRuntime): number
+	return PartySizeScaling.countInSet(DungeonZoneRuntime.getParticipantSet(runtime))
+end
+
+--[[
+	Lock encounter difficulty to participants present when the boss starts.
+]]
+function DungeonZoneRuntime.prepareBossEncounter(runtime: ZoneRuntime): number
+	local participants = DungeonZoneRuntime.getParticipantSet(runtime)
+	local partyCount = PartySizeScaling.countInSet(participants)
+	runtime.encounterPartyCount = partyCount
+	runtime.bossMaxHp = PrismDeathValleyDungeonConfig.scaleBossHp(runtime.zoneDef, participants)
+	runtime.bossHp = runtime.bossMaxHp
+	runtime.scaledShardReward = PrismDeathValleyDungeonConfig.scaleClearReward(runtime.zoneDef, participants)
+	return partyCount
+end
+
+function DungeonZoneRuntime.grantShardReward(player: Player, amount: number)
+	if amount <= 0 then
+		return
+	end
+	local shards = player:GetAttribute("DV_LuminiteShards")
+	if typeof(shards) ~= "number" then
+		shards = 0
+	end
+	player:SetAttribute("DV_LuminiteShards", shards + amount)
 end
 
 function DungeonZoneRuntime.getPlayersInZone(runtime: ZoneRuntime): { Player }
@@ -147,6 +185,7 @@ function DungeonZoneRuntime.grantKeysAfterClear(
 
 		if contributionMet then
 			granted, message = grantKeyFn(p, zoneDef.id, zoneDef.zoneIndex)
+			DungeonZoneRuntime.grantShardReward(p, runtime.scaledShardReward)
 		end
 
 		p:SetAttribute("DungeonZone" .. zoneDef.zoneIndex .. "Cleared", true)

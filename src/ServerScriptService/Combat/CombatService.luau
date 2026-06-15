@@ -14,6 +14,29 @@ local NpcDropService = require(script.Parent:WaitForChild("NpcDropService"))
 
 local CombatService = {}
 
+-- Class/Job integration (lazy require — กัน circular + ทำงานได้แม้ยังไม่มีคลาส)
+local _classService: any = nil
+local function classService(): any
+	if _classService == nil then
+		local ok, mod = pcall(function()
+			return require(ServerScriptService:WaitForChild("Progression"):WaitForChild("ClassService"))
+		end)
+		_classService = if ok then mod else false
+	end
+	return _classService or nil
+end
+
+local _raceService: any = nil
+local function raceService(): any
+	if _raceService == nil then
+		local ok, mod = pcall(function()
+			return require(ServerScriptService:WaitForChild("Progression"):WaitForChild("RaceService"))
+		end)
+		_raceService = if ok then mod else false
+	end
+	return _raceService or nil
+end
+
 export type AttackResult = {
 	ok: boolean,
 	reason: string?,
@@ -147,6 +170,15 @@ local function computeDamage(player: Player, skillId: string): number
 	local baseDamages: { [CombatConfig.WeaponTier]: number } = CombatConfig.BaseDamage
 	local base = weaponDamageFromEquipped(player) or baseDamages[weaponTier]
 	local rawDamage = base * skillMultiplier(skillId)
+	-- Class statMods.atk × Race statMods.atk (default 1 ถ้าไม่มี)
+	local cs = classService()
+	if cs then
+		rawDamage *= cs.getAtkMult(player)
+	end
+	local rsv = raceService()
+	if rsv then
+		rawDamage *= rsv.getAtkMult(player)
+	end
 	local combatMod = player:GetAttribute("OverweightCombatMultiplier")
 	if typeof(combatMod) == "number" and combatMod > 0 then
 		rawDamage *= combatMod
@@ -190,6 +222,12 @@ function CombatService.processAttack(player: Player, npcId: any, skillId: any): 
 		return { ok = false, reason = "invalid_payload" }
 	end
 
+	-- Class/Job: ยิงสกิลที่ไม่อยู่ในชุดสกิลของคลาส = ปฏิเสธ (กัน exploit; ไม่มีคลาส = อนุญาต)
+	local cs = classService()
+	if cs and not cs.allowsSkill(player, skillId) then
+		return { ok = false, reason = "skill_not_in_class", npcId = npcId }
+	end
+
 	local npc = findNpc(npcId)
 	if not npc then
 		warn("[Combat] reject: npc missing", player.UserId, npcId)
@@ -230,6 +268,10 @@ function CombatService.processAttack(player: Player, npcId: any, skillId: any): 
 	-- server-authoritative per-skill cooldown (anti-exploit)
 	local skillCooldowns: { [string]: number } = CombatConfig.SkillCooldown
 	local skillCd = skillCooldowns[skillId]
+	-- Class statMods.cdMult (default 1)
+	if typeof(skillCd) == "number" and cs then
+		skillCd = skillCd * cs.getCdMult(player)
+	end
 	if typeof(skillCd) == "number" and skillCd > 0 then
 		local userSkills = lastSkillAt[player.UserId]
 		if not userSkills then

@@ -1,15 +1,15 @@
-=== Fri Jun 12 01:34:05 +07 2026 ===
+=== Mon Jun 15 09:00:34 +07 2026 ===
 === validate-p0-publish ===
 === P0 Publish Validation ===
 PlaceSecrets: /Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/src/ServerScriptService/Secrets/PlaceSecrets.luau
 CatalogSecrets: /Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/src/ServerScriptService/Secrets/CatalogSecrets.luau
 
 OK — all P0 Place IDs and Developer Products configured.
-Places: {'Hub': 119887759427070, 'Solhaven': 115650957014564, 'Nocturne': 93828090134581, 'EternityCity': 94486544638073, 'DeathValley': 91092008076019}
+Places: {'Hub': 119887759427070, 'Solhaven': 115650957014564, 'Nocturne': 93828090134581, 'EternityCity': 94486544638073, 'DeathValley': 91092008076019, 'NeonUtopia': 119711258870458}
 Products: {'dv_pack_survivor_starter': 3603506927, 'dv_pack_hellbound_elite': 3603507041, 'dv_pack_veteran_trail': 3603507080, 'dv_pack_style_only': 3603507112, 'dv_pack_commerce_luxury': 3603507136, 'dv_pack_commerce_creator_spotlight': 3603507160, 'dv_pack_ugc_generic': 3603507187}
 === publishing file ===
--rw-------@ 1 macbook  staff  2881896 Jun 12 01:32 /Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/utopia-playtest.rbxlx
+-rw-------@ 1 macbook  staff  1893269 Jun 15 09:00 /Users/macbook/Desktop/Utopia of Eternity/utopia-of-eternity-game/utopia-playtest.rbxlx
 HTTP 200
 placeId=94486544638073
-versionNumber=5
+versionNumber=10
 DONE — EternityCity published.
