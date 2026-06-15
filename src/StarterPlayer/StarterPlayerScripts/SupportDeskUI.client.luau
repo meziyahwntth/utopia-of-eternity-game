@@ -37,7 +37,9 @@ openGui.Parent = playerGui
 local openBtn = Instance.new("TextButton")
 openBtn.Name = "SupportOpenButton"
 openBtn.Size = UDim2.fromOffset(88, 32)
-openBtn.Position = UDim2.new(1, -96, 1, -48)
+-- moved up out of the bottom-right combat cluster (Skill Bar + Lock button)
+openBtn.AnchorPoint = Vector2.new(1, 1)
+openBtn.Position = UDim2.new(1, -8, 1, -240)
 openBtn.BackgroundColor3 = Color3.fromRGB(30, 40, 60)
 openBtn.TextColor3 = Color3.fromRGB(0, 229, 255)
 openBtn.Font = Enum.Font.GothamBold
