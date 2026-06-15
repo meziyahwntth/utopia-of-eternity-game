@@ -429,4 +429,44 @@ Bounty Board (NPC ในเมือง)
 
 ---
 
-*MASTER-BLUEPRINT อัปเดต 15 มิ.ย. 2026 (§12 Next-Gen direction + 2-day progress) · §11 13 มิ.ย. · ดู `MOBILE-FIRST-RPG-MATRIX.md` + `AI-ASSET-WORKFLOW.md`*
+## 13. 🆕 World Identity · Races · Lore · Policy (อัปเดต 15 มิ.ย. 2026 — ยืนยันโดย Praphan)
+
+> รวมการตัดสินใจทิศทางทั้งหมดของ session 15 มิ.ย. · เอกสารลูกละเอียด: `world/FIVE-CITIES-REVISIT-2026-06.md` · `world/RACES-AND-HELLBOUND-LORE-2026-06.md` · `world/MMORPG-FPS-CITY-MAPPING-2026-06.md` · `world/SOLO-PLAYER-SUPPORT-2026-06.md` · `death-valley/HORROR-DESIGN-RESEARCH.md` · `POLICY-ECONOMY-PVP-ANTIGRIEF.md` · `CLASS-JOB-SYSTEM-BLUEPRINT.md`
+
+### 13.1 บทบาท 5 เมือง + เผ่า (แต่ละเมืองเด่นคนละเรื่อง ไม่ทับกัน)
+| เมือง | เผ่า | บทบาทหลัก | benchmark ต้องชน |
+|---|---|---|---|
+| **NeonUtopia** | **Human** | Onboarding + **เมืองแข่งรถหลัก** | Velocity Outlast · Brookhaven |
+| **Solhaven** | **Elf** | Sanctuary cozy + crafting/เศรษฐกิจ + **ศูนย์กลาง solo** | Grow a Garden · Adopt Me |
+| **Nocturne** | **Dark Elf** | Nightlife + PvP arena + **ดริฟต์กลางคืนรอง** | Blox Fruits · club |
+| **EternityCity** | **Alien** | Flagship endgame + Clan War/ภาษี + live-ops + จุด Hyper Space | Nexus (กราฟิก) |
+| **DeathValley (Hellbound)** | **Orc (สูญพันธุ์)** | Horror survival co-op + ทุ่งล่า/raid boss | DOORS · The Mimic · 99 Nights · Pressure |
+
+### 13.2 ตำนานแกน (Lore) — "เรื่องเล่า/ตำนาน/ผี/ต่างดาว = ขายได้เสมอ"
+4 เผ่าเล่นได้ (Human/Elf/Dark Elf/Alien) + **Orc = เผ่าสูญพันธุ์** ที่ Hellbound. ออร์คเคยมีอารยธรรมยิ่งใหญ่ แต่ **ผู้นำโลภแย่งชิงอำนาจทั้งดวงดาว → สงคราม → หายนะภูเขาไฟ → สูญพันธุ์** เหลือ **Shadow Wraiths = วิญญาณออร์ค** = parable สะท้อนโลกจริง → ให้ "ความหมาย" กับ horror (story horror แบบ The Mimic). เผ่า = affinity เบา ไม่ lock class, เลือกฟรี, แต่ละเผ่า = custom mesh+PBR.
+
+### 13.3 Lineage II / FPS mapping
+- **Lineage II = แกนทั้งเกม แบ่ง 2 ครึ่ง:** EternityCity = เมืองหลวง/siege/economy (ClanWar zoneId config-driven มีแล้ว) · DeathValley = ทุ่งล่า/raid boss/rare drop. **ชิ้นที่ขาด = ระบบ Class/Job** (Blueprint พร้อมแล้ว).
+- **FPS = เลื่อนไปก่อน (Praphan เลือก A)** จน core เสร็จ — ไม่ทำเมืองที่ 6, ไม่ยัดเข้า combat; ถ้าทำทีหลัง = instanced place แยก entry ที่ NeonUtopia.
+
+### 13.4 ระบบ Class/Job (MMORPG core ชิ้นที่ขาด) → `CLASS-JOB-SYSTEM-BLUEPRINT.md`
+3 base (Warrior/Mage/Hunter = Sword/Bow/Staff) → 9 sub-class · job-change gate Lv10/40/100 (align 7 tier) · per-class skill set ต่อยอด `CombatConfig` · server-authoritative (skill-of-class check + statMods ใน `CombatService`) · trainer NPC ที่ EternityCity · ไม่เลือกคลาส = default skills (ไม่พังเกมเดิม) · **ทุก sub-class ต้อง solo-viable**.
+
+### 13.5 นโยบายถาวร — Economy (no-P2W) + PvP/Anti-Grief → `POLICY-ECONOMY-PVP-ANTIGRIEF.md`
+- **Economy time-vs-convenience:** solo ฟรีครบแค่ช้ากว่า · social เร็วกว่าฟรี (โบนัส earned) · เงินซื้อแค่ **สะดวก+สวย ห้ามขายพลัง** · ยกเลิก "solo ต้อง P2W".
+- **PvP opt-in zone-gated:** นอกโซน **ตีไม่มีผล/ไม่มีเอฟเฟกต์ต่อคนไม่ยินยอม** · ranged คง PvE-only.
+- **Anti-grief:** ยกเลิก "ตีรำคาญ" · ตีกัน = **duel consensual** · block/mute + `GriefingGuard`/`RemoteGuard`.
+
+### 13.6 Solo-friendly → `world/SOLO-PLAYER-SUPPORT-2026-06.md`
+social = โบนัส ไม่บังคับ · difficulty scale ตามจำนวนผู้เล่น · NPC แทนปาร์ตี้ (Pet/Mercenary มีแล้ว) · solo instance (DeathValley horror + dungeon scale 1 คน) · **ต้องเพิ่ม Party-Size Scaling** (Cursor prompt).
+
+### 13.7 ▶️ ลำดับงานถัดไป (ยืนยัน)
+1. **Mobile-UX audit** (Cursor prompt-pack พร้อม → `CURSOR-PROMPTS-MOBILE-UX-AUDIT.md`)
+2. **Class/Job system** (Blueprint+prompt-pack พร้อม)
+3. **Race system** (ทำหลัง Class/Job — interlock; prompt-pack จะเขียนเพิ่ม)
+4. **Party-Size Scaling** + **Next-Gen Art track** (custom mesh+PBR ต่อเผ่า/เมือง, ChatGPT เจนภาพ ต้องชน benchmark ก่อน deploy)
+> กฎคุณภาพ: ไม่ชน/เทียบเท่า benchmark = ไม่ deploy (`feedback-graphics-benchmark`)
+
+---
+
+*MASTER-BLUEPRINT อัปเดต 15 มิ.ย. 2026 (§13 World/Races/Lore/Policy + §12 Next-Gen) · §11 13 มิ.ย. · เอกสารลูก world/* · POLICY-ECONOMY-PVP-ANTIGRIEF · CLASS-JOB-SYSTEM-BLUEPRINT · MOBILE-FIRST-RPG-MATRIX · AI-ASSET-WORKFLOW*

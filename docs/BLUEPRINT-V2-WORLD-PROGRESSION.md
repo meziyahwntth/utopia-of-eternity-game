@@ -4,6 +4,8 @@
 **วันที่:** 12 มิ.ย. 2026
 **อิงสถาปัตยกรรมเดิม:** `ServerScriptService/{World,DeathValley,Commerce,Security,Dungeon,Progression}`, `ReplicatedStorage/Modules` (GameConfig, Prism*), `StarterPlayer/StarterPlayerScripts`, bridge FastAPI
 
+> 🆕 **อัปเดต 15 มิ.ย. 2026:** ทิศทาง World/Races/Lore/Policy ล่าสุดอยู่ที่ `MASTER-BLUEPRINT.md §13` + เอกสารลูก `world/*` · `POLICY-ECONOMY-PVP-ANTIGRIEF.md` · `CLASS-JOB-SYSTEM-BLUEPRINT.md` — เผ่า (Human/Elf/Dark Elf/Alien + Orc สูญพันธุ์ที่ Hellbound), บทบาท 5 เมือง, no-P2W/PvP zoning, Class/Job, solo-friendly. เอกสารนี้ (V2) ยังใช้สำหรับโครง World/Progression/Economy เดิม.
+
 > เอกสารนี้แปลความต้องการที่คุณส่งมาเป็นสถาปัตยกรรมแบบ **modular** — แยกแต่ละระบบเป็น module ชัดเจน เพื่อไม่ให้เกิด Context Loop แบบ AI ตัวก่อน ทุกระบบเป็น **server-authoritative** (client แค่ส่ง intent, server ตัดสิน) เพื่อรองรับข้อกำหนด "กันบอท/กันโกงเข้มงวด"
 
 ---
