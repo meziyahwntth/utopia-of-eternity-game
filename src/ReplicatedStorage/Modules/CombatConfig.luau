@@ -36,6 +36,23 @@ CombatConfig.SkillMultiplier = {
 	AoeSpin = 1.2,
 } :: { [string]: number }
 
+-- Per-skill cooldown (seconds). BasicAttack=0 uses weapon AttackSpeed cadence.
+-- Enforced BOTH client-side (Skill Bar UI gating) and server-side (CombatService).
+CombatConfig.SkillCooldown = {
+	BasicAttack = 0,
+	PowerSlash = 4,
+	AoeSpin = 7,
+} :: { [string]: number }
+
+export type SkillDef = { id: string, label: string, icon: string, cooldown: number }
+
+-- Ordered list shown on the mobile Skill Bar (bottom-right).
+CombatConfig.Skills = {
+	{ id = "BasicAttack", label = "Attack", icon = "⚔", cooldown = 0 },
+	{ id = "PowerSlash", label = "Power", icon = "💥", cooldown = 4 },
+	{ id = "AoeSpin", label = "Spin", icon = "🌀", cooldown = 7 },
+} :: { SkillDef }
+
 CombatConfig.DefaultWeaponType = "Sword" :: WeaponType
 CombatConfig.DefaultWeaponTier = "T1" :: WeaponTier
 CombatConfig.DefaultSkillId = "BasicAttack"

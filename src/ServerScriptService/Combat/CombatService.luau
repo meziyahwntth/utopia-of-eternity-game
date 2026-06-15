@@ -24,6 +24,7 @@ export type AttackResult = {
 }
 
 local lastAttackAt: { [number]: number } = {}
+local lastSkillAt: { [number]: { [string]: number } } = {}
 local rayParams = RaycastParams.new()
 rayParams.FilterType = Enum.RaycastFilterType.Exclude
 
@@ -226,6 +227,23 @@ function CombatService.processAttack(player: Player, npcId: any, skillId: any): 
 		return { ok = false, reason = "rate_limit", npcId = npcId }
 	end
 
+	-- server-authoritative per-skill cooldown (anti-exploit)
+	local skillCooldowns: { [string]: number } = CombatConfig.SkillCooldown
+	local skillCd = skillCooldowns[skillId]
+	if typeof(skillCd) == "number" and skillCd > 0 then
+		local userSkills = lastSkillAt[player.UserId]
+		if not userSkills then
+			userSkills = {}
+			lastSkillAt[player.UserId] = userSkills
+		end
+		local lastSkill = userSkills[skillId]
+		local nowSkill = os.clock()
+		if lastSkill and (nowSkill - lastSkill) < skillCd then
+			return { ok = false, reason = "skill_cooldown", npcId = npcId }
+		end
+		userSkills[skillId] = nowSkill
+	end
+
 	if not hasLineOfSight(player, npc, playerRoot.Position, npcRoot.Position) then
 		warn("[Combat] reject: blocked_los", player.UserId, npcId)
 		return { ok = false, reason = "blocked_los", npcId = npcId }
@@ -303,6 +321,7 @@ end
 
 Players.PlayerRemoving:Connect(function(player: Player)
 	lastAttackAt[player.UserId] = nil
+	lastSkillAt[player.UserId] = nil
 end)
 
 return CombatService
