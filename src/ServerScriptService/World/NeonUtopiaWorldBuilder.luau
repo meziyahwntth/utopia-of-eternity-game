@@ -210,6 +210,11 @@ function NeonUtopiaWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): Wo
 		parent = model,
 	})
 
+	-- Racing: สร้างสนาม Neon Grand Prix (loop รอบเมือง)
+	pcall(function()
+		require(script.Parent.NeonUtopiaRaceTrackBuilder).build(model)
+	end)
+
 	WorldBuildBudget:report("NeonUtopia", budget)
 	print("[Utopia] Neon Utopia (human city) greybox built — departure pad \u{2192} Utopia")
 	return WorldBuilderTypes.success(model)

@@ -596,6 +596,9 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 		assertHeroMeshContract(model)
 		WorldBuildBudget:report("EternityCity-augment", budget)
 		SkyCityLift.apply(model, profile.SkyAltitude)
+		pcall(function()
+			require(script.Parent.UtopiaUndergroundRaceBuilder).build(model)
+		end)
 		return WorldBuilderTypes.success(model)
 	end
 
@@ -714,7 +717,10 @@ function EternityCityWorldBuilder:Build(_ctx: WorldBuilderTypes.BuildContext?): 
 	WorldBuildBudget:report("EternityCity", budget)
 
 	SkyCityLift.apply(model, profile.SkyAltitude)
-	print("[Utopia] Eternity City built — aurora · marina · canal · gates · Sky Lounge 50 · loadout plaza · ลอยฟ้า")
+	pcall(function()
+		require(script.Parent.UtopiaUndergroundRaceBuilder).build(model)
+	end)
+	print("[Utopia] Eternity City built — aurora · marina · canal · gates · Sky Lounge 50 · loadout plaza · underground GP · ลอยฟ้า")
 	return WorldBuilderTypes.success(model)
 end
 

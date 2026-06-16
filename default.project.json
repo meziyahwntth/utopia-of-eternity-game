@@ -133,6 +133,21 @@
       "ShuttleGreyboxBuilder": {
         "$path": "src/ServerScriptService/ShuttleGreyboxBuilder.luau"
       },
+      "Racing": {
+        "$className": "Folder",
+        "RaceTrackService": {
+          "$path": "src/ServerScriptService/Racing/RaceTrackService.luau"
+        },
+        "RaceLeaderboardStore": {
+          "$path": "src/ServerScriptService/Racing/RaceLeaderboardStore.luau"
+        },
+        "RaceRemoteSetup": {
+          "$path": "src/ServerScriptService/Racing/RaceRemoteSetup.server.luau"
+        },
+        "RaceHandlers": {
+          "$path": "src/ServerScriptService/Racing/RaceHandlers.server.luau"
+        }
+      },
       "World": {
         "$className": "Folder",
         "OrganicCSGBuilder": {
@@ -182,6 +197,12 @@
         },
         "NeonUtopiaWorldBuilder": {
           "$path": "src/ServerScriptService/World/NeonUtopiaWorldBuilder.luau"
+        },
+        "NeonUtopiaRaceTrackBuilder": {
+          "$path": "src/ServerScriptService/World/NeonUtopiaRaceTrackBuilder.luau"
+        },
+        "UtopiaUndergroundRaceBuilder": {
+          "$path": "src/ServerScriptService/World/UtopiaUndergroundRaceBuilder.luau"
         },
         "AirTransportService": {
           "$path": "src/ServerScriptService/World/AirTransportService.luau"

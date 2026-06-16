@@ -18,8 +18,9 @@ GameConfig.Places = {
 	Nocturne = { id = 0, name = "Nocturne Alley", dayMode = "permanent_twilight" },
 	EternityCity = {
 		id = 0,
-		name = "Utopia of Eternity",
-		subtitle = "The Eternal City",
+		-- display: เมืองหลวง = "Utopia" (PlaceKey ภายในคง EternityCity); Eternity = ชื่อโลก/endgame
+		name = "Utopia",
+		subtitle = "Sky Capital of Eternity",
 		dayMode = "permanent_day",
 	},
 	DeathValley = {
@@ -349,7 +350,7 @@ GameConfig.Sanctuary = {
 		Hub = "Prism Heart Plaza",
 		Solhaven = "Sunhaven Sanctuary",
 		Nocturne = "Twilight Meet Point",
-		EternityCity = "Eternity Sanctuary",
+		EternityCity = "Utopia Sanctuary",
 		DeathValley = "จุดไฟชีวิต",
 	},
 }
